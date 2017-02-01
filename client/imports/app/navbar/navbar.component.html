@@ -1,0 +1,30 @@
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+  <button type="button" class="navbar-toggler navbar-toggler-right" (click)="toggleCollapse()"
+        aria-expanded="false">
+      <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <a class="navbar-brand" href="#">Socially</a>
+  <div class="navbar-collapse" id="bs-navbar-collapse" [class.collapse]="isCollapsed">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#">Disabled</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0" [hidden]="user">
+        <a class="form-control mr-sm-2"  [routerLink]="['/login']" >Login</a>
+        <a class="btn btn-outline-success my-2 my-sm-0" [routerLink]="['/signup']">Sign up</a>
+    </form>
+    <form class="form-inline my-2 my-lg-0" [hidden]="!user">
+        <span>{{ user | displayName }}</span>
+        <button type="button" class="btn btn-primary" (click)="logout()">Logout</button>
+      </form>
+  </div>
+</nav>
+

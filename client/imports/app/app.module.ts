@@ -13,6 +13,9 @@ import { routes, ROUTES_PROVIDERS } from './app.routes';
 import { PARTIES_DECLARATIONS } from './parties';
 import { SHARED_DECLARATIONS } from './shared';
 
+import { NAVBAR_DECLARATIONS } from './navbar';
+
+
 import { FocusDirective } from '../directives/focus.directive';
 
 
@@ -24,6 +27,7 @@ import { FocusDirective } from '../directives/focus.directive';
     ...PARTIES_DECLARATIONS,
     ...SHARED_DECLARATIONS,
     FocusDirective,
+    ...NAVBAR_DECLARATIONS,
     
   ],
 
