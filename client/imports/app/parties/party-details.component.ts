@@ -1,5 +1,6 @@
 // angular
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Injectable } from '@angular/core';
+
 import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 import { InjectUser } from "angular2-meteor-accounts-ui";
 
@@ -25,6 +26,7 @@ import style from './party-details.component.scss';
   template,
   styles: [ style ],
 })
+@Injectable()
 @InjectUser('user')
 export class PartyDetailsComponent implements OnInit, OnDestroy {
   partyId: string;

@@ -1,0 +1,37 @@
+<div *ngIf="!user">Please, log in to change a product</div>
+
+<!-- name, code, size, color, description -->
+<form [formGroup]="addForm" (ngSubmit)="add()" class="form-inline">
+  <fieldset class="form-group">
+
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label" for="name">Product&nbsp;Name</label>
+      <div class="col-sm-8">
+        <input id="name" class="form-control" type="text" formControlName="name" placeholder="Product Name" [focus]="submitFocused" />
+      </div>
+    </div>
+    
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label" for="name">Code</label>
+      <div class="col-sm-8">
+        <input id="code" class="form-control" type="text" formControlName="code" placeholder="Product Code" />
+      </div>
+    </div>
+    
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label" for="name">Size</label>
+      <div class="col-sm-8">
+        <input id="size" class="form-control" type="text" formControlName="size" placeholder="Product Size" />
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label" for="name">Description</label>
+      <div class="col-sm-8">
+        <input id="descriptino" class="form-control" type="text" formControlName="description" placeholder="Description" />
+      </div>
+    </div>
+
+    <button type="submit" (click)="setSubmitFocus()" class="btn btn-primary">Add</button>
+  </fieldset>
+</form>

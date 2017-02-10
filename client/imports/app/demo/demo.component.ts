@@ -1,4 +1,6 @@
 import { Component, OnInit } from "@angular/core";
+import { Injectable } from "@angular/core";
+
 import { Observable } from "rxjs";
 import { DemoDataService } from "./demo-data.service";
 import { Demo } from "../../../../both/models/demo.model";
@@ -10,6 +12,7 @@ import style from "./demo.component.scss";
   template,
   styles: [ style ]
 })
+@Injectable()
 export class DemoComponent implements OnInit {
   greeting: string;
   data: Observable<Demo[]>;

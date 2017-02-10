@@ -4,18 +4,18 @@ import { InjectUser } from 'angular2-meteor-accounts-ui';
 import { Component, OnInit, ViewChild, Input, Injectable } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms'; 
 
-import { Parties } from '../../../../both/collections/parties.collection';
+import { Products } from '../../../../both/collections/products.collection';
 import { FocusDirective } from '../../directives/focus.directive';
 
-import template from './parties-form.component.html';
+import template from './product-form.component.html';
 
 @Component({
-  selector: 'parties-form', 
+  selector: 'product-form', 
   template
 })
 @Injectable()
 @InjectUser('user')
-export class PartiesFormComponent implements OnInit {
+export class ProductFormComponent implements OnInit {
   addForm: FormGroup;
   user: Meteor.User;
   
@@ -26,23 +26,22 @@ export class PartiesFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    //console.log(this.user);
     this.addForm = this.formBuilder.group({
       name: ['', Validators.required],
-      description: [],
-      location: ['', Validators.required],
-      public: [false]
+      code: ['', Validators.required],
+      size: [],
+      description: ['', Validators.required]
     });
   }
 
-  addParty(): void {
+  add(): void {
     if (!Meteor.userId()) {
-      alert('Please log in to add a party');
+      alert('Please log in to add a product');
       return;
     }
 
     if (this.addForm.valid) {
-      Parties.insert(Object.assign({}, this.addForm.value, { owner: Meteor.userId() }));
+      Products.insert(Object.assign({}, this.addForm.value));
       this.addForm.reset();
     }
   }

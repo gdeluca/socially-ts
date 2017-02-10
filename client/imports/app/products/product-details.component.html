@@ -1,0 +1,50 @@
+<div class="row ma-party-details-container">
+  <div class="col-sm-6 col-sm-offset-3">
+    <legend>Ver y editar el producto:</legend>
+    <!-- name, code, size, color, description -->
+
+    <form class="form-horizontal" *ngIf="product" (submit)="save()">
+       
+      <div class="form-group">
+        <label>Nombre del producto</label>
+        <input [disabled]="!isAdmin" type="text" [(ngModel)]="product.name" name="name" class="form-control">
+      </div>
+ 
+      <div class="form-group">
+        <label>Codigo de producto</label>
+        <input [disabled]="!isAdmin" type="text" [(ngModel)]="product.code" name="code" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>Talla</label>
+        <input [disabled]="!isAdmin" type="text" [(ngModel)]="product.size" name="size" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>Color</label>
+        <input [disabled]="!isAdmin" type="text" [(ngModel)]="product.color" name="color" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>Descripcion</label>
+        <input [disabled]="!isAdmin" type="text" [(ngModel)]="product.description" name="description" class="form-control">
+      </div> 
+
+      <div class="form-group">
+        <label>Categorias:</label>
+        <select [disabled]="!isAdmin" class="form-control" [ngModel]="category">
+          <option *ngFor="let category of availableCategories | async">
+            {{category.name}}
+          </option>
+        </select>
+      </div> 
+
+      <div class="form-group">
+        <button [disabled]="!isAdmin" type="submit" class="btn btn-primary">Save</button>
+        <a [routerLink]="['/products']" class="btn">Back</a>
+      </div>
+    
+    </form>
+
+  </div>
+</div>

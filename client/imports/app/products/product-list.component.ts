@@ -1,6 +1,5 @@
 // angular
-import { Component, OnInit, OnDestroy, Injectable, Inject } from '@angular/core';
-
+import { Component, OnInit, OnDestroy, Injectable } from '@angular/core';
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
 
@@ -14,40 +13,40 @@ import 'rxjs/add/operator/combineLatest';
 import { Counts } from 'meteor/tmeasday:publish-counts';
 
 // model 
-import { Parties } from '../../../../both/collections/parties.collection';
-import { Party } from '../../../../both/models/party.model';
+import { Products } from '../../../../both/collections/products.collection';
+import { Product } from '../../../../both/models/product.model';
 import { SearchOptions } from '../../../../both/search/search-options';
  
-import template from './parties-list.component.html';
-import style from './parties-list.component.scss';
+import template from './product-list.component.html';
+import style from './product-list.component.scss';
 
 @Component({
-  selector: 'parties-list',
+  selector: 'product-list',
   template,
   styles: [ style ],
 })
 @Injectable()
 @InjectUser('user')
-export class PartiesListComponent implements OnInit, OnDestroy {
-  parties: Observable<Party[]>;
+export class ProductListComponent implements OnInit, OnDestroy {
+  products: Observable<Product[]>;
   
   // pagination related
   pageSize: Subject<number> = new Subject<number>();
   curPage: Subject<number> = new Subject<number>();
   nameOrder: Subject<number> = new Subject<number>();
-  partiesSize: number = 0;
+  productsSize: number = 0;
   PAGESIZE: number = 3; 
   
-  partiesSub: Subscription;
+  productsSub: Subscription;
   optionsSub: Subscription;
   autorunSub: Subscription;
 
-  location: Subject<string> = new Subject<string>();
+  name: Subject<string> = new Subject<string>();
   user: Meteor.User;
 
 
   constructor(
-    @Inject(PaginationService)  private paginationService: PaginationService
+    private paginationService: PaginationService
   ) {}
  
    ngOnInit() {
@@ -55,8 +54,8 @@ export class PartiesListComponent implements OnInit, OnDestroy {
       this.pageSize,
       this.curPage,
       this.nameOrder,
-      this.location
-    ).subscribe(([pageSize, curPage, nameOrder, location]) => {
+      this.name
+    ).subscribe(([pageSize, curPage, nameOrder, name]) => {
         const options: SearchOptions = {
         limit: pageSize as number,
         skip: ((curPage as number) - 1) * (pageSize as number),
@@ -65,12 +64,12 @@ export class PartiesListComponent implements OnInit, OnDestroy {
  
       this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
 
-      if (this.partiesSub) {
-        this.partiesSub.unsubscribe();
+      if (this.productsSub) {
+        this.productsSub.unsubscribe();
       }
       
-      this.partiesSub = MeteorObservable.subscribe('parties', options, location).subscribe(() => {
-        this.parties = Parties.find({}, {
+      this.productsSub = MeteorObservable.subscribe('products', options, name).subscribe(() => {
+        this.products = Products.find({}, {
           sort: {
             name: nameOrder
           }
@@ -81,11 +80,11 @@ export class PartiesListComponent implements OnInit, OnDestroy {
     this.pageSize.next(this.PAGESIZE);
     this.curPage.next(1);
     this.nameOrder.next(1);
-    this.location.next('');
+    this.name.next('');
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
-      this.partiesSize = Counts.get('numberOfParties');
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.partiesSize);
+      this.productsSize = Counts.get('numberOfProducts');
+      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.productsSize);
     });
 
     this.paginationService.register({
@@ -97,8 +96,8 @@ export class PartiesListComponent implements OnInit, OnDestroy {
 
   }
   
-  removeParty(party: Party): void {
-    Parties.remove(party._id);
+  remove(product: Product): void {
+    Products.remove(product._id);
   }
 
   onPageChanged(page: number): void {
@@ -107,19 +106,20 @@ export class PartiesListComponent implements OnInit, OnDestroy {
 
   search(value: string): void {
     this.curPage.next(1);
-    this.location.next(value);
+    this.name.next(value);
   }
   
   changeSortOrder(nameOrder: string): void {
     this.nameOrder.next(parseInt(nameOrder));
   }
 
-  isOwner(party: Party): boolean {
-    return this.user && this.user._id === party.owner;
+  isAdmin(): boolean {
+    // check https://themeteorchef.com/tutorials/using-the-roles-package
+    return true // this.user && Roles.userIsInRole( this.user_id, 'admin' ); 
   }
   
   ngOnDestroy() {
-    this.partiesSub.unsubscribe();
+    this.productsSub.unsubscribe();
     this.optionsSub.unsubscribe(); 
     this.autorunSub.unsubscribe();
   } 

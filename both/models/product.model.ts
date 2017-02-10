@@ -5,7 +5,8 @@ import { Category } from './category.model';
 export interface Product extends CollectionObject {
   name: string;
   code: number;
-  size: number;
+  size: string;
   color: string;
+  description: string;
   category: Category;
 }

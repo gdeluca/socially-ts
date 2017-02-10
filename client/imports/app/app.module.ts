@@ -10,10 +10,12 @@ import { Ng2PaginationModule } from 'ng2-pagination';
 
 import { AppComponent } from './app.component';
 import { routes, ROUTES_PROVIDERS } from './app.routes';
+
+// project definitions
 import { PARTIES_DECLARATIONS } from './parties';
 import { SHARED_DECLARATIONS } from './shared';
-
 import { NAVBAR_DECLARATIONS } from './navbar';
+import { PRODUCTS_DECLARATIONS } from './products';
 
 
 import { FocusDirective } from '../directives/focus.directive';
@@ -24,10 +26,11 @@ import { FocusDirective } from '../directives/focus.directive';
   declarations: [
     AppComponent,
     DemoComponent,
+    FocusDirective,
     ...PARTIES_DECLARATIONS,
     ...SHARED_DECLARATIONS,
-    FocusDirective,
     ...NAVBAR_DECLARATIONS,
+    ...PRODUCTS_DECLARATIONS,
     
   ],
 
@@ -39,7 +42,7 @@ import { FocusDirective } from '../directives/focus.directive';
   // Providers
   providers: [
     DemoDataService,
-    ...ROUTES_PROVIDERS
+    ...ROUTES_PROVIDERS,
   ],
   
   // Modules
