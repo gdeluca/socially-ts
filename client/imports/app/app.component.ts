@@ -14,4 +14,5 @@ import { Party } from '../../../both/models/party.model';
   styles: [ style ]
 })
 export class AppComponent {
+  
 }

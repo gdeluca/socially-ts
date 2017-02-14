@@ -1,0 +1,40 @@
+<div class="login-page">
+  <div class="row">
+    <div class="col-lg-4 col-lg-offset-4">
+      <h1>Registrarse</h1>
+      <form [formGroup]="signupForm" #f="ngForm" (ngSubmit)="signup()">
+        <fieldset class="form-group">
+
+          <div class="form-content">
+           
+            <div class="form-group">
+              <input type="text" formControlName="email" class="form-control input-underline input-lg"  placeholder="Email">
+              <div class="form-text error" *ngIf="signupForm.controls.email.touched">
+                <div *ngIf="signupForm.controls.email.hasError('required')">El Email es requerido.</div>
+                <div *ngIf="signupForm.controls.email.hasError('invalidEmail')">El Email es invalido.</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <input type="password" formControlName="password" class="form-control input-underline input-lg" placeholder="Password">
+            </div>
+
+            <div class="form-group">
+              <input type="password" formControlName="confirmPassword" class="form-control input-underline input-lg" placeholder="Confirmar Password">
+            </div>
+
+            <div class='form-text text-danger' *ngIf="signupForm.controls.confirmPassword.touched">
+              <div *ngIf="signupForm.hasError('mismatchedPasswords')">Los Passwords no coinciden.</div>
+            </div>
+
+          </div>
+
+          <button type="submit" class="btn btn-primary" >Registrarse</button>
+          &nbsp;
+          <a type="submit" class="btn rounded-btn" routerLink="/"> Ya esta registrado? </a>
+        </fieldset>
+      </form>      
+      <!--<pre>{{signupForm.value | json}}</pre>-->
+    </div>  
+  </div>
+</div>

@@ -10,19 +10,3 @@ body {
   font-family: 'Muli', sans-serif;
 }
  
-.navbar {
-  background-color: #ffffff;
-  border-bottom: #eee 1px solid;
-  color: $color3;
-  font-family: 'Muli', sans-serif;
-  a {
-    color: $color3;
-    text-decoration: none !important;
-  }
- 
-  .navbar-right-container {
-    position: absolute;
-    top: 17px;
-    right: 17px;
-  }
-}
