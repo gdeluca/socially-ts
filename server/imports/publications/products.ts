@@ -1,15 +1,47 @@
 import { Meteor } from 'meteor/meteor';
+
 import { Counts } from 'meteor/tmeasday:publish-counts';
 
 import { Products } from '../../../both/collections/products.collection';
+import { Categories } from '../../../both/collections/categories.collection';
+
 import { SearchOptions } from '../../../both/search/search-options';
 
-Meteor.publish('products', () => Products.find());
-
-Meteor.publish('product', function(productId: string) {
-  return Products.find(buildQuery.call(this, productId));
+Meteor.publish('productById', function(productId: string) {
+ return {
+    find: function() {
+        return Products.find({ _id: productId })
+    }, 
+    children: [{
+        find: function(product) {
+            return Categories.find({_id: product.categoryId});
+        }
+    }]
+  }
 });
- 
-function buildQuery(productId?: string): Object { 
- return { _id: productId };
-}
+
+Meteor["publishComposite"]('productByName', function(productName) {
+return {
+    find: function() {
+        return Products.find({ name: productName })
+    }, 
+    children: [{
+        find: function(product) {
+            return Categories.find({_id: product.categoryId});
+        }
+    }]
+  }
+});
+
+Meteor["publishComposite"]('products', function() {
+return {
+    find: function() {
+        return Products.find()
+    }, 
+    children: [{
+        find: function(product) {
+            return Categories.find({_id: product.categoryId});
+        }
+    }]
+  }
+});

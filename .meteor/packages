@@ -28,3 +28,6 @@ email@1.1.18
 jquery@1.11.10
 coursierprive:tether
 twbs:bootstrap@=4.0.0-alpha2
+reywood:publish-composite
+momentjs:moment
+dburles:collection-helpers

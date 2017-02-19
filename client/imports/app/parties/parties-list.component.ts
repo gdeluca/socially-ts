@@ -26,7 +26,6 @@ import style from './parties-list.component.scss';
   template,
   styles: [ style ],
 })
-@Injectable()
 @InjectUser('user')
 export class PartiesListComponent implements OnInit, OnDestroy {
   parties: Observable<Party[]>;
@@ -47,35 +46,38 @@ export class PartiesListComponent implements OnInit, OnDestroy {
 
 
   constructor(
-    @Inject(PaginationService)  private paginationService: PaginationService
+    private paginationService: PaginationService
   ) {}
  
    ngOnInit() {
+
     this.optionsSub = Observable.combineLatest(
       this.pageSize,
       this.curPage,
       this.nameOrder,
       this.location
     ).subscribe(([pageSize, curPage, nameOrder, location]) => {
-        const options: SearchOptions = {
+      const options: SearchOptions = {
         limit: pageSize as number,
         skip: ((curPage as number) - 1) * (pageSize as number),
         sort: { name: nameOrder as number }
       };
- 
+      
       this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
 
       if (this.partiesSub) {
         this.partiesSub.unsubscribe();
       }
       
-      this.partiesSub = MeteorObservable.subscribe('parties', options, location).subscribe(() => {
+      this.partiesSub = MeteorObservable.subscribe('parties', options, location)
+      .subscribe(() => {
         this.parties = Parties.find({}, {
           sort: {
             name: nameOrder
           }
         }).zone();
       });
+      
     });
 
     this.pageSize.next(this.PAGESIZE);

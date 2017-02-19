@@ -32,8 +32,8 @@
 
       <div class="form-group">
         <label>Categorias:</label>
-        <select [disabled]="!isAdmin" class="form-control" [ngModel]="category">
-          <option *ngFor="let category of availableCategories | async">
+        <select [disabled]="!isAdmin" class="form-control" [ngModel]="product.category">
+          <option *ngFor="let category of product.categories | async">
             {{category.name}}
           </option>
         </select>

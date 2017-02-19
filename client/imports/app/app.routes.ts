@@ -11,7 +11,7 @@ import { SignupComponent } from './auth/signup.component';
 
  
 export const routes: Route[] = [
-  { path: '', redirectTo: '/sales', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
+  { path: '', redirectTo: '/products', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
   { path: 'parties', component: PartiesListComponent , canActivate: ['canActivateForLoggedIn'] },
   { path: 'party/:partyId', component: PartyDetailsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'products', component: ProductListComponent, canActivate: ['canActivateForLoggedIn'] },

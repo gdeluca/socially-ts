@@ -62,7 +62,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
           this.productSub.unsubscribe();
         }
 
-        this.productSub = MeteorObservable.subscribe('product', this.productId).subscribe(() => {
+        this.productSub = MeteorObservable.subscribe('productById', this.productId).subscribe(() => {
           MeteorObservable.autorun().subscribe(() => {
             this.product = Products.findOne(this.productId);
           });
@@ -88,13 +88,13 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     }
 
     Products.update(this.product._id, {
-      $set: {
+      $set: { 
          name: this.product.name,
          code: this.product.code,
          size: this.product.size,
          color: this.product.color,
          description: this.product.description,
-         category: this.product.category,
+         categoryId: this.product.categoryId
       }
     });
  

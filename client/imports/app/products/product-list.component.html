@@ -34,13 +34,21 @@
       <li *ngFor="let product of products | async" class="list-group-item ma-party-item">
         <div class="row">
           <div class="col-sm-8">
+            
             <h2 class="ma-party-name">
               <a [routerLink]="['/product', product._id]">{{product.name}}</a>
             </h2>
-            @ {{product.category.name}}
+            
+            <div *ngFor="let category of categories | async" >
+              <template [ngIf]="category._id == product.categoryId">
+                Categoria: {{category.name}}
+              </template>
+            </div>
+            
             <p class="ma-party-description">
               {{product.description}}
             </p>
+
           </div>
           <div class="col-sm-4">
             <button class="btn btn-danger pull-right" [hidden]="!isAdmin()" (click)="remove(product)"> 

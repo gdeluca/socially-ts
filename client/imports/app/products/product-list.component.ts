@@ -16,6 +16,10 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 // model 
 import { Products } from '../../../../both/collections/products.collection';
 import { Product } from '../../../../both/models/product.model';
+import { Category } from '../../../../both/models/category.model';
+import { Categories } from '../../../../both/collections/categories.collection';
+
+
 import { SearchOptions } from '../../../../both/search/search-options';
  
 import template from './product-list.component.html';
@@ -30,7 +34,8 @@ import style from './product-list.component.scss';
 @InjectUser('user')
 export class ProductListComponent implements OnInit, OnDestroy {
   products: Observable<Product[]>;
-  
+  categories: Observable<Category[]>;
+
   // pagination related
   pageSize: Subject<number> = new Subject<number>();
   curPage: Subject<number> = new Subject<number>();
@@ -75,6 +80,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
             name: nameOrder
           }
         }).zone();
+        this.categories = Categories.find().zone();      
       });
     });
 
