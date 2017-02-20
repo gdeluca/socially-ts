@@ -7,7 +7,7 @@ import { Categories } from '../../../both/collections/categories.collection';
 
 import { SearchOptions } from '../../../both/search/search-options';
 
-Meteor.publish('productById', function(productId: string) {
+Meteor["publishComposite"]('productById', function(productId: string) {
  return {
     find: function() {
         return Products.find({ _id: productId })

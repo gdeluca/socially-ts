@@ -14,3 +14,4 @@ Categories.allow({
   update: loggedIn,
   remove: loggedIn
 });
+

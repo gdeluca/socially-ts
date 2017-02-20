@@ -28,7 +28,6 @@ import style from './product-details.component.scss';
   template,
   styles: [ style ],
 })
-@Injectable()
 @InjectUser('user')
 export class ProductDetailsComponent implements OnInit, OnDestroy {
   productId: string;
@@ -37,7 +36,6 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   productSub: Subscription;
   users: Observable<User>;
 
-  category: Category;
   availableCategories: Observable<Category[]>;
   categoriesSub: Subscription;
 
@@ -62,6 +60,11 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
           this.productSub.unsubscribe();
         }
 
+        if (this.categoriesSub) {
+          console.log('unsuscribe categories sub');
+          this.categoriesSub.unsubscribe();
+        }
+
         this.productSub = MeteorObservable.subscribe('productById', this.productId).subscribe(() => {
           MeteorObservable.autorun().subscribe(() => {
             this.product = Products.findOne(this.productId);
@@ -78,15 +81,18 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     console.log('destroy product details subscribers');
     this.paramsSub.unsubscribe();
+    this.productSub.unsubscribe();
     this.categoriesSub.unsubscribe();
   }
  
-  save() {
+  saveProduct(e) {
+    //e.preventDefault();
     if (!Meteor.userId()) {
       alert('Por favor ingrese al sistema para cambiar el producto');
       return; 
     }
 
+    console.log(this.product.categoryId);
     Products.update(this.product._id, {
       $set: { 
          name: this.product.name,
@@ -99,6 +105,11 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     });
  
     this.router.navigate(['/products']); 
+  }
+
+  onSelect($event){
+  //console.log($event);
+  console.log(this.product.categoryId);
   }
 
   isAdmin(): boolean {

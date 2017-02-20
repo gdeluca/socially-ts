@@ -3,7 +3,7 @@
     <legend>Ver y editar el producto:</legend>
     <!-- name, code, size, color, description -->
 
-    <form class="form-horizontal" *ngIf="product" (submit)="save()">
+    <form class="form-horizontal" *ngIf="product" (submit)="saveProduct($event)">
        
       <div class="form-group">
         <label>Nombre del producto</label>
@@ -31,13 +31,39 @@
       </div> 
 
       <div class="form-group">
-        <label>Categorias:</label>
-        <select [disabled]="!isAdmin" class="form-control" [ngModel]="product.category">
-          <option *ngFor="let category of product.categories | async">
-            {{category.name}}
+        <!-- <select class="form-control" ([ngModel])="product.categoryId">
+          <option *ngFor="let cat of availableCategories | async" [ngValue]="car">{{cat.name}}</option>
+         </select>
+         -->
+  
+        <!-- <select name="categorytab" class="form-control" [ngModel]="(selectedCategory | async)?.$value" (ngModelChange)="onSelect($event)">
+          <option *ngFor="let cat of availableCategories | async" [ngValue]="cat._id">
+            {{cat.name}}
           </option>
+        </select>  -->
+<!-- 
+        <select name="categorytab" class="form-control" [(ngModel)]="selectedCategory"
+        (ngModelChange)="onSelect($event)">
+          <option *ngFor="let cat of availableCategories | async" [ngValue]="cat" [selected]="cat._id === product.categoryId">{{cat.name}}
+          </option>
+        </select> 
+
+        <select [ngModel]="originalObject">
+          <option *ngFor="let object of objects" [ngValue]="object" [selected]="object.uniqueId === originalObject.uniqueId">{{object.name}}</option>
         </select>
-      </div> 
+         -->
+       <!--  <select ng-model="myModel.someObject"
+            ng-options="someObject.text for someObject in objectList track by someObject.key">
+        </select> -->
+
+        <select  name="categorytab" class="form-control" required [(ngModel)]="product.categoryId" (ngModelChange)="onSelect($event)">
+           <option *ngFor="let ct of availableCategories | async" 
+                [ngValue]="ct._id"   
+                [attr.selected]="product.categoryId==ct._id ? true : null"
+               >{{ct.name}}</option>
+        </select> 
+
+      </div>
 
       <div class="form-group">
         <button [disabled]="!isAdmin" type="submit" class="btn btn-primary">Save</button>

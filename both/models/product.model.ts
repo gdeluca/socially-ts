@@ -8,5 +8,8 @@ export interface Product extends CollectionObject {
   size: string;
   color: string;
   description: string;
+  price: number;
+  rate: number;
   categoryId: string;
+  active: boolean;
 }

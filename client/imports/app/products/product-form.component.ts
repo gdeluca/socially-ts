@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { InjectUser } from 'angular2-meteor-accounts-ui';
 
-import { Component, OnInit, ViewChild, Input, Injectable } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms'; 
 
 import { Products } from '../../../../both/collections/products.collection';
@@ -13,7 +13,6 @@ import template from './product-form.component.html';
   selector: 'product-form', 
   template
 })
-@Injectable()
 @InjectUser('user')
 export class ProductFormComponent implements OnInit {
   addForm: FormGroup;
