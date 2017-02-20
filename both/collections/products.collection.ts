@@ -4,7 +4,7 @@ import { Mongo } from 'meteor/mongo';
 
 
 import { Product } from '../models/product.model';
-import { ProductDetails } from '../collections/product-details.collection';
+import { OrderProducts } from '../collections/order-products.collection';
 import { Categories } from '../collections/categories.collection';
 
 
@@ -21,9 +21,6 @@ Products.allow({
 });
 
 Products.collection["helpers"]({ 
-  productDetails() {
-    return ProductDetails.findOne(this._id);
-  },
   category() {
     return Categories.collection.find({ _id: this.categoryId });
   }

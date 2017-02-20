@@ -1,15 +1,15 @@
 import { MongoObservable } from 'meteor-rxjs';
 import { Meteor } from 'meteor/meteor';
 
-import { ProductDetail } from '../models/product-detail.model';
+import { OrderProduct } from '../models/order-product.model';
 
-export const ProductDetails = new MongoObservable.Collection<ProductDetail>('productDetails');
+export const OrderProducts = new MongoObservable.Collection<OrderProduct>('orderProducts');
 
 function loggedIn() {
   return !!Meteor.user();
 }
  
-ProductDetails.allow({
+OrderProducts.allow({
   insert: loggedIn,
   update: loggedIn,
   remove: loggedIn
