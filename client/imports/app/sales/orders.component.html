@@ -1,0 +1,46 @@
+<div>
+  <h2 class="text-center">Ventas</h2>
+
+  <div class="form-inline">
+    <button type="button" class="form-control btn btn-primary ml-2" (click)="addOrder()"  [disabled]="orderCreated">
+    Nueva orden de venta
+    </button>
+    <button type="button" class="form-control btn btn-primary ml-2" (click)="deleteOrder()"  [hidden]="!orderCreated">
+    Cancelar orden
+    </button>
+  </div>
+
+  <div [hidden]="!orderCreated">
+    <order-details></order-details>
+  </div>
+
+  <div><hr></div>
+
+  <div class="row" [hidden]="orderCreated">
+    <h3 class="col-12 text-center">Ordenes de Venta</h3>
+    <!-- table-responsive table-striped table-bordered table-hover -->
+    <table class="table table-bordered table-hover ">
+      <thead class="thead-default">
+        <tr>
+          <th>Nº Orden</th>
+          <th>Total</th>
+          <th>Descuento</th>
+          <th>Estado</th>
+          <th>Vendedor</th>
+          <th>Ultimo Cambio</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+        <td><a [routerLink]="['orders/', order.orderNumber]">{{order.orderNumber}}</a></td>
+          <td>{{order.total}}</td>
+          <td>{{order.discount}}</td>
+          <td>{{order.status}}</td>
+          <td>{{order.sellerName}}</td>
+          <td>{{order.lastUpdate}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

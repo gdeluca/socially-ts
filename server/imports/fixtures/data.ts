@@ -153,40 +153,36 @@ export function loadData() {
       color: "Negro",
       brand: "Levis",
       model: "Top 4y",
-      description: "Calidad Levis",
       categoryId: "06"
     });
     Products.insert({
       _id: "02",
-      name: "Vortex 2017",
+      name: "Chupin clasico Vortex 2017",
       code: 100003,
       size: "XXL",
       color: "Azul",
       brand: "Cuerda",
       model: "AW55G",
-      description: "Chupin clasico",
       categoryId: "14"
     });
     Products.insert({
       _id: "03",
-      name: "Vortex 2017",
+      name: "Chupin clasico Vortex 2017",
       code: 100003,
       size: "XL",
       color: "Azul",
       brand: "Cuerda",
       model: "AW55G",
-      description: "Chupin clasico",
       categoryId: "14"
     });
     Products.insert({
       _id: "04",
-      name: "Vortex 2017",
+      name: "Chupin clasico Vortex 2017",
       code: 100003,
       size: "L",
       color: "Azul",
       brand: "Cuerda",
       model: "AW55G",
-      description: "Chupin clasico",
       categoryId: "14"
     });
 
@@ -289,7 +285,8 @@ export function loadData() {
       orderNumber: "00001",
       status: "started",
       localId: "01",
-      sellerId: userId
+      sellerId: userId,
+      lastUpdate: "2017-01-12T9:11:01Z"
     });
 
     OrderProducts.insert({
@@ -327,11 +324,12 @@ export function loadData() {
     //started submited reserved
     Orders.update({_id:"01"},{
       $set: { 
-        "orderProductIds": ["01", "02"],
-        "status": "submitted",
-        "subtotal": 500,
-        "taxes": 105,
-        "total": 605,
+        orderProductIds: ["01", "02"],
+        status: "submitted",
+        subtotal: 500,
+        taxes: 105,
+        total: 605,
+        lastUpdate: "2017-02-12T9:11:01Z"
       }
     });
 

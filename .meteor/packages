@@ -31,3 +31,4 @@ twbs:bootstrap@=4.0.0-alpha2
 reywood:publish-composite
 momentjs:moment
 dburles:collection-helpers
+fortawesome:fontawesome

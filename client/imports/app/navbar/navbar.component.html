@@ -9,13 +9,9 @@
     <ul class="nav navbar-nav mr-auto nav-pills">
       
       <li class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">
-        <a  class="nav-link" [routerLink]="['sales']">Ventas</a>
+        <a  class="nav-link" [routerLink]="['orders']">Ventas</a>
       </li>
       
-      <li class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">
-        <a  class="nav-link" [routerLink]="['adquisitions']">Compras</a>
-      </li>
- 
       <li class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">
         <a  class="nav-link" [routerLink]="['stock']">Stock</a>
       </li>
@@ -48,11 +44,11 @@
 
   </div>
 
-  <script type="text/javascript">
+ <!--  <script type="text/javascript">
     $(".nav a").on("click", function(){
    $(".nav").find(".active").removeClass("active");
    $(this).parent().addClass("active");
 });
-  </script>
+  </script> -->
 </nav>
 

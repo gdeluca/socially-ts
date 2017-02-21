@@ -1,7 +1,8 @@
 import { Meteor } from 'meteor/meteor';
-
 import { Route } from '@angular/router';
- 
+
+import { OrdersComponent } from './sales/orders.component';
+import { OrderDetailsComponent } from './sales/order-details.component'; 
 import { PartiesListComponent } from './parties/parties-list.component';
 import { PartyDetailsComponent } from './parties/party-details.component';
 import { ProductListComponent } from './products/product-list.component';
@@ -11,7 +12,9 @@ import { SignupComponent } from './auth/signup.component';
 
  
 export const routes: Route[] = [
-  { path: '', redirectTo: '/products', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
+  { path: '', redirectTo: '/orders', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
+  { path: 'orders', component: OrdersComponent , canActivate: ['canActivateForLoggedIn'] },
+  { path: 'orders/:orderId', component: OrderDetailsComponent , canActivate: ['canActivateForLoggedIn'] },
   { path: 'parties', component: PartiesListComponent , canActivate: ['canActivateForLoggedIn'] },
   { path: 'party/:partyId', component: PartyDetailsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'products', component: ProductListComponent, canActivate: ['canActivateForLoggedIn'] },

@@ -12,6 +12,7 @@ import { AppComponent } from './app.component';
 import { routes, ROUTES_PROVIDERS } from './app.routes';
 
 // project definitions, order matters
+import { SALES_DECLARATIONS } from './sales';
 import { PARTIES_DECLARATIONS } from './parties';
 import { PRODUCTS_DECLARATIONS } from './products';
 import { SHARED_DECLARATIONS } from './shared';
@@ -27,6 +28,7 @@ import { FocusDirective } from '../directives/focus.directive';
     AppComponent,
     DemoComponent,
     FocusDirective,
+    ...SALES_DECLARATIONS,
     ...PARTIES_DECLARATIONS,
     ...PRODUCTS_DECLARATIONS,
     ...SHARED_DECLARATIONS,

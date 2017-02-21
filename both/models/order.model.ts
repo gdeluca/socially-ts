@@ -8,6 +8,7 @@ export interface Order extends CollectionObject {
   discount?: number;
   status: string; //started submited reserved
   orderProductIds?: string[];
+  lastUpdate: string;
   localId: string;
   sellerId: string;
 }
