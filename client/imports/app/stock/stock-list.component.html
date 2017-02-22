@@ -1,0 +1,65 @@
+<div>
+  <h2 class="text-center">Stock</h2>
+
+  <div class="row">
+    <h3 class="col-12 text-center">Tabla de stock y precios</h3>
+    <!-- table-responsive table-striped table-bordered table-hover -->
+    <table class="table table-bordered table-hover ">
+      <thead class="thead-default">
+        <tr>
+          <th class="text-center">Codigo</th>
+          <th class="text-center">Descripcion</th>
+          <th class="text-center">Talle</th>
+          <th class="text-center">Cantidad</th>
+          <th class="text-center">Costo</th>
+          <th class="text-center" *ngFor="let local of locals">
+            Stock ({{local.name}})
+          </th>
+          <th class="text-center" *ngFor="let local of locals">
+            Contado ({{local.name}})
+          </th>
+          <th class="text-center" *ngFor="let local of locals">
+            Tarjeta ({{local.name}})
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let stock of stocks">
+          <td class="text-center"><a [routerLink]="['/product', product._id]">{{product.code}}</a></td>
+          <td class="text-center">{{product.name}}</td>
+          <td class="text-center">{{product.size}}</td>
+          <td class="text-center">{{stock.buyAmount}}</td>
+          <td class="text-center">${{stock.buyPrice}}</td>
+          <ng-container *ngFor="let localProduct of localProducts"> 
+            <ng-container *ngFor="let local of locals">
+              <ng-container *ngIf="localProduct.stockId == stock._id && localProduct.localId == local._id">
+                <td class="text-center">{{localProduct.amount}}</td>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngFor="let localProduct of localProducts"> 
+            <ng-container *ngFor="let local of locals">
+              <ng-container *ngIf="localProduct.stockId == stock._id && localProduct.localId == local._id">
+                <td class="text-center">${{localProduct.priceCash}}</td>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+          <ng-container *ngFor="let localProduct of localProducts"> 
+            <ng-container *ngFor="let local of locals">
+              <ng-container *ngIf="localProduct.stockId == stock._id && localProduct.localId == local._id">
+                <td class="text-center">${{localProduct.priceCard}}</td>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row"><hr></div>
+  <div class="row">
+    <div class="col span2">
+      <a class="btn btn-block btn-info" routerLink="/stock/create" routerLinkActive="active">Cargar stock</a>
+    </div>
+  </div>
+
+</div>

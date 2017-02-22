@@ -26,7 +26,8 @@ export class OrderDetailsComponent {
         'model': 'Campana',
         'color': 'Azul',
         'price': 340,
-        'quantity': 4
+        'quantity': 4,
+        'available': 30
       },
       { 'code': '5435345',
         'name': 'Remera Mangas Larga algodon',
@@ -35,7 +36,8 @@ export class OrderDetailsComponent {
         'model': 'Bind',
         'color': 'Negra',
         'price': 123,
-        'quantity': 1
+        'quantity': 1,
+        'available': 3
       }
     ];
   }
@@ -45,7 +47,9 @@ export class OrderDetailsComponent {
   }
    
   increaseAmount(product) {
-    product.quantity +=1;
+    if (product.available - product.quantity > 0) {
+      product.quantity +=1;
+    }
   }
 
   decreaseAmount(product) {
@@ -58,5 +62,5 @@ export class OrderDetailsComponent {
 
   }
 
-
+  cancelOrder(){}
 }

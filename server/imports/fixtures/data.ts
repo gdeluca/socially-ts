@@ -136,12 +136,12 @@ export function loadData() {
 
     Locals.insert({
       _id: "01",
-      name: 'El Molino',
+      name: 'Molino',
       address: '25 de mayo 1690'
     });
     Locals.insert({
       _id: "02",
-      name: 'Pumpu Store',
+      name: 'Pumpu',
       address: 'colon 1460'
     });
 
