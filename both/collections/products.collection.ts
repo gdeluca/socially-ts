@@ -4,7 +4,6 @@ import { Mongo } from 'meteor/mongo';
 
 
 import { Product } from '../models/product.model';
-import { OrderProducts } from '../collections/order-products.collection';
 import { Categories } from '../collections/categories.collection';
 
 

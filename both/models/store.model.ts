@@ -1,6 +1,6 @@
 import { CollectionObject } from './collection-object.model';
 
-export interface Local extends CollectionObject {
+export interface Store extends CollectionObject {
   name: string; 
   address: string;
 }

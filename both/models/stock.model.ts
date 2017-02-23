@@ -1,9 +1,12 @@
 import { CollectionObject } from './collection-object.model';
 
-export interface Stock extends CollectionObject { //rename to Purchases
-  buyPrice: number; //  pricePurchased
-  buyDate: string; //   datePurchased
-  buyAmount: number; // quantityPurchased amount keep tracks of bought merchandise, do not change over time
-  active: boolean;  // remove this
-  productId: string;
+export interface Stock extends CollectionObject {
+  quantity: number;
+  priceCash: number;
+  priceCard: number;
+  rateCash: number; // percentage
+  rateCard: number; // percentage
+  active: boolean;
+  storeId: string; 
+  productSizeId: string;
 }

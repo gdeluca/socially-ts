@@ -27,6 +27,16 @@
               <div *ngIf="signupForm.hasError('mismatchedPasswords')">Los Passwords no coinciden.</div>
             </div>
 
+            <!-- bug with multiple select here-->
+            <div class="form-group">
+              <select  class="form-control" formControlName="stores" required [(ngModel)]="selectedStore">
+                <option *ngFor="let store of stores | async" [ngValue]="store">{{store.name}}</option>
+              </select> 
+            </div>
+            <div class='form-text text-danger' *ngIf="signupForm.controls.stores.touched">
+              <div *ngIf="signupForm.hasError('required')">Debe seleccionar al menos 1 sucursal.</div>
+            </div>
+
           </div>
 
           <button type="submit" class="btn btn-primary" >Registrarse</button>

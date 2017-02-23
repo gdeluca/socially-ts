@@ -1,29 +1,70 @@
-import {Component, OnInit, NgZone} from '@angular/core';
+import {Component, OnInit, OnDestroy ,NgZone} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Meteor } from 'meteor/meteor';
- 
+
+// reactive
+import { Observable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
+import { MeteorObservable, ObservableCursor } from 'meteor-rxjs';
+
+import { Store } from '../../../../both/models/store.model';
+import { User } from '../../../../both/models/user.model';
+import { Stores } from '../../../../both/collections/stores.collection';
+import { UserStore } from '../../../../both/models/user-store.model';
+import { UserStores } from '../../../../both/collections/user-stores.collection';
+import { Users } from '../../../../both/collections/users.collection';
+
 import template from './login.component.html';
  
 @Component({
   selector: 'login',
   template
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
   loginForm: FormGroup;
   error: string;
- 
+
+  email: string;
+  stores: Observable<Store[]>;
+  userSub: Subscription;
+  selectedStore: Store;
+
   constructor(private router: Router, private zone: NgZone, private formBuilder: FormBuilder) {}
  
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
       email: ['', Validators.required],
-      password: ['', Validators.required]
+      password: ['', Validators.required],
+      store: ['', Validators.required]
     });
  
     this.error = '';
-  }
- 
+
+    this.userSub = MeteorObservable.subscribe('stores.useremail', this.email).subscribe(() => {
+      
+    console.log(this.email);
+    if (this.email) {
+      var user = Users.collection.find({'emails.address': this.email}).fetch();
+      console.log(user[0]._id);
+      let userStores = UserStores.find({userId: user[0]._id}).zone();
+      userStores.subscribe((userstores) => {
+        console.log(userstores);
+        let ids = userstores.map(function(userStore) {return userStore.storeId});
+        console.log(ids);
+        this.stores = Stores.find({_id: {$in: ids}}).zone();
+        this.stores.subscribe((stores) => {
+          console.log(stores);
+        });
+      });
+    }
+  })
+}
+
+  ngOnDestroy() {
+    this.userSub.unsubscribe();
+  } 
+
   login() {
     console.log(this.loginForm.valid);
             
@@ -34,10 +75,13 @@ export class LoginComponent implements OnInit {
             console.log(err);
             this.error = err;
           } else {
+
+
             this.router.navigate(['/']);
           }
         });
       });
     }
   }
+
 }

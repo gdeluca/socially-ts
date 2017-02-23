@@ -1,15 +1,15 @@
 import { MongoObservable } from 'meteor-rxjs';
 import { Meteor } from 'meteor/meteor';
 
-import { Local } from '../models/local.model';
+import { ProductSize } from '../models/product-size.model';
 
-export const Locals = new MongoObservable.Collection<Local>('locals');
+export const ProductSizes = new MongoObservable.Collection<ProductSize>('productSizes');
 
 function loggedIn() {
   return !!Meteor.user();
 }
  
-Locals.allow({
+ProductSizes.allow({
   insert: loggedIn,
   update: loggedIn,
   remove: loggedIn

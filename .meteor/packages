@@ -32,3 +32,5 @@ reywood:publish-composite
 momentjs:moment
 dburles:collection-helpers
 fortawesome:fontawesome
+session
+msavin:mongol

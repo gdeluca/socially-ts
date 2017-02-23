@@ -7,8 +7,8 @@ export interface Order extends CollectionObject {
   total?: number;
   discount?: number;
   status: string; //started submited reserved
-  orderProductIds?: string[];
   lastUpdate: string;
-  localId: string;
-  sellerId: string;
+  orderEntryIds?: string[];
+  userStoreId: string;
+  balanceId: string;
 }

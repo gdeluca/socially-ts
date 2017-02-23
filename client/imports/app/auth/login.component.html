@@ -9,13 +9,30 @@
             <div class="form-content">
               
               <div class="form-group">
-                <input id="email" class="form-control input-underline input-lg" type="text" formControlName="email" placeholder="Email">
+                <input id="email" class="form-control input-underline input-lg" type="text" formControlName="email" [(ngModel)]="email" placeholder="Email">
               </div>
 
               <div class="form-group">
                 <input id="password" class="form-control input-underline input-lg" type="password" formControlName="password" placeholder="Password">
               </div>
 
+              <div class="form-group">
+                <select 
+                  name="store" 
+                  class="form-control" 
+                  formControlName="store" 
+                  required 
+                  [(ngModel)]="selectedStore"
+                  >
+                  <option 
+                    *ngFor="let store of stores | async; let idx = index" 
+                    [attr.selected]="idx == 1" 
+                    [ngValue]="store._id">
+                    {{store.name}}
+                  </option>
+                </select> 
+              </div>
+              
             </div>
             
             <button type="submit" class="btn btn-primary">Ingresar</button>

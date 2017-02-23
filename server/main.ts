@@ -8,6 +8,7 @@ import { loadData } from './imports/fixtures/data';
 // load meteor publications
 import './imports/publications/parties'; 
 import './imports/publications/users'; 
+import './imports/publications/stores'; 
 import './imports/publications/products'; 
 import './imports/publications/categories'; 
 
