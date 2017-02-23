@@ -42,32 +42,33 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.error = '';
 
     this.userSub = MeteorObservable.subscribe('stores.useremail', this.email).subscribe(() => {
-      
-    console.log(this.email);
-    if (this.email) {
-      var user = Users.collection.find({'emails.address': this.email}).fetch();
-      console.log(user[0]._id);
-      let userStores = UserStores.find({userId: user[0]._id}).zone();
-      userStores.subscribe((userstores) => {
-        console.log(userstores);
-        let ids = userstores.map(function(userStore) {return userStore.storeId});
-        console.log(ids);
-        this.stores = Stores.find({_id: {$in: ids}}).zone();
-        this.stores.subscribe((stores) => {
-          console.log(stores);
+      console.log(this.email);
+      if (this.email) {
+        var user = Users.collection.find({'emails.address': this.email}).fetch();
+        
+        console.log(user[0]._id);
+        let userStores = UserStores.find({userId: user[0]._id}).zone();
+        userStores.subscribe((userstores) => {
+          console.log(userstores);
+          let ids = userstores.map(function(userStore) {return userStore.storeId});
+          console.log(ids);
+          this.stores = Stores.find({_id: {$in: ids}}).zone();
+          this.stores.subscribe((stores) => {
+            console.log(stores);
+          });
         });
-      });
-    }
-  })
+      }
+    })
 }
 
   ngOnDestroy() {
     this.userSub.unsubscribe();
   } 
 
-  login() {
-    console.log(this.loginForm.valid);
-            
+  login(event) {
+    // console.log(this.loginForm.value);
+    // console.log(this.selectedStore.name);
+        
     if (this.loginForm.valid) {
       Meteor.loginWithPassword(this.loginForm.value.email, this.loginForm.value.password, (err) => {
         this.zone.run(() => {
@@ -75,8 +76,8 @@ export class LoginComponent implements OnInit, OnDestroy {
             console.log(err);
             this.error = err;
           } else {
-
-
+            Session.set("currentUserEmail", this.loginForm.value.email);
+            Session.set("currentStoreName", this.selectedStore.name);
             this.router.navigate(['/']);
           }
         });

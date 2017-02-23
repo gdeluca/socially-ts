@@ -26,8 +26,7 @@
                   >
                   <option 
                     *ngFor="let store of stores | async; let idx = index" 
-                    [attr.selected]="idx == 1" 
-                    [ngValue]="store._id">
+                    [ngValue]="store">
                     {{store.name}}
                   </option>
                 </select> 

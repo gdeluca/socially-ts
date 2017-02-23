@@ -19,8 +19,24 @@ export class NavbarComponent {
     this.isCollapsed = !this.isCollapsed;
   }
 
-   logout() {
+  logout() {
     Meteor.logout();
   }
 
+  getCurrentStore(){
+    let val = Session.get("currentStoreName"); 
+    return (val != null)?val:'';
+  }
+
+  getCurrentUser(){
+    let val = Session.get("currentUserEmail"); 
+    return (val != null)?val:'';
+  }
+
+  isLoggedin(){
+    if (Meteor.userId()){
+      return true
+    }
+    return false;
+  }
 }

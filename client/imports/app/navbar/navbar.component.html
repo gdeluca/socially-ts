@@ -3,8 +3,14 @@
         aria-expanded="false">
       <span class="navbar-toggler-icon"></span>
   </button>
-
-  <a class="navbar-brand" href="#">Socially</a>
+  <div class="row">
+    <div class="col">
+      <a class="navbar-brand" href="#">Control App</a>
+    </div>
+    <div class="col mt-2" *ngIf="isLoggedin()" >
+      <h4>Logeado en {{getCurrentStore()}} como {{getCurrentUser()}}</h4> 
+    </div>
+  </div>
   <div class="navbar-collapse" id="navbar-collapse" [class.collapse]="isCollapsed">
     <ul class="nav navbar-nav mr-auto nav-pills">
       
