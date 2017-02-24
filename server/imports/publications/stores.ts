@@ -26,11 +26,10 @@ Meteor.publishComposite('stores.users', function(user_id: string) {
   }
 });
 
-
 Meteor.publishComposite('stores.useremail', function(email: string) {
  return {
     find: function() { 
-      return Users.collection.find({'emails.address': 'b@b.com'});
+      return Users.collection.find({'emails.address': email});
     },
     children: [{
       find: function(user) {

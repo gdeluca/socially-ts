@@ -1,0 +1,96 @@
+
+<!-- categories list -->
+<div class="card align-items-center">
+  <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+</div>
+<h3 class="col-12 text-center">Tabla de Categorias</h3>
+<div class="row">
+  <table class="table table-bordered table-hover ">
+    <thead class="thead-default">
+      <tr>
+        <th class="text-center">Update</th>
+        <th class="text-center">Nombre</th>
+        <th class="text-center">Seccion</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let category of categories | async; let rowIndex=index; trackBy:customTrackBy ">
+        <!-- edition buttons -->
+        <td>
+          <button 
+            [hidden]="currentIndex === rowIndex && editing"
+            type="button" 
+            class="btn btn-default" 
+            (click)="currentIndex=rowIndex;editing=true;">
+            <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="currentIndex != rowIndex || (currentIndex === rowIndex && !editing)"
+            type="button" 
+            class="btn btn-default" 
+            (click)="currentIndex=rowIndex;editing=false">
+            <span class="fa fa-check-square-o" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="currentIndex != rowIndex || (currentIndex === rowIndex && !editing)" 
+            type="button" 
+            class="btn btn-default" 
+            (click)="currentIndex=rowIndex;editing=false;">
+            <span class="fa fa-ban" aria-hidden="true"></span>
+          </button>
+        </td>
+        <!-- name field -->
+        <td 
+          [hidden]="currentIndex === rowIndex && editing"
+          class="text-center">
+          <a>{{category.name}}</a>
+        </td>
+        <td 
+          [hidden]="currentIndex != rowIndex || (currentIndex === rowIndex && !editing)"
+          class="text-center"><input type="text" name="name" class="form-control" [value]="category.name">
+        </td>
+        
+        <!-- sections field -->
+        <ng-container *ngFor="let section of sections | async"> 
+          <ng-container *ngIf="category.sectionId == section._id">
+            <td 
+              [hidden]="currentIndex === rowIndex && editing"
+              class="text-center">
+              <a [routerLink]="['/sections', section._id]">{{section.name}}</a>
+            </td>
+          </ng-container>
+        </ng-container>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+  <!-- submission form -->
+<div class="row">
+  <table class="table table-hover ">
+    <tbody>
+      <tr ng-form="myForm">
+        <!-- edition buttons -->
+        <td>
+          <button [hidden]="adding" type="button" class="btn btn-default" (click)="adding=true"><span class="fa fa-plus-square-o" aria-hidden="true"></span></button>
+          <button [hidden]="!adding" type="button" class="btn btn-default" (click)="adding=false"><span class="fa fa-minus-square-o" aria-hidden="true"></span></button>
+          <button [hidden]="!adding" type="button" class="btn btn-default" (click)="adding=false; saveCategory()"><span class="fa fa-check-square-o" aria-hidden="true"></span></button>
+        </td>
+        
+        <td class="text-center"><input [hidden]="!adding" type="text" name="name" class="form-control" placeholder="Nombre de Categoria" required ng-model="newCategory.name"></td>
+        <td class="text-center">
+          <select [hidden]="!adding" name="sectionOptions" class="form-control" required [(ngModel)]="newCategory.sectionId">
+            <option value="" disabled currentIndex hidden>Nombre de Seccion</option>
+            <option *ngFor="let section of sections | async" 
+              [ngValue]="section._id"   
+             >{{section.name}}</option>
+          </select> 
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card align-items-center">
+  <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+</div>

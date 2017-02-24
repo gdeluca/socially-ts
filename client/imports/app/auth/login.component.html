@@ -9,7 +9,7 @@
             <div class="form-content">
               
               <div class="form-group">
-                <input id="email" class="form-control input-underline input-lg" type="text" formControlName="email" [(ngModel)]="email" placeholder="Email">
+                <input id="email" class="form-control input-underline input-lg" type="text" formControlName="email" (blur)="updatesubscription($event.target.value)" placeholder="Email" >
               </div>
 
               <div class="form-group">

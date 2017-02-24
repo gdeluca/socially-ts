@@ -7,6 +7,7 @@ import { OrdersComponent } from './sales/orders.component';
 import { OrderDetailsComponent } from './sales/order-details.component'; 
 import { PartiesListComponent } from './parties/parties-list.component';
 import { PartyDetailsComponent } from './parties/party-details.component';
+import { CategoriesComponent } from './categories/categories.component';
 import { ProductListComponent } from './products/product-list.component';
 import { ProductDetailsComponent } from './products/product-details.component';
 import { LoginComponent } from './auth/login.component';
@@ -14,7 +15,7 @@ import { SignupComponent } from './auth/signup.component';
 
  
 export const routes: Route[] = [
-  { path: '', redirectTo: '/stock', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
+  { path: '', redirectTo: '/categories', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
   { path: 'stock/create', component: StockLoadComponent , canActivate: ['canActivateForLoggedIn'] },
   { path: 'stock', component: StockListComponent , canActivate: ['canActivateForLoggedIn'] },
   { path: 'orders', component: OrdersComponent , canActivate: ['canActivateForLoggedIn'] },
@@ -22,6 +23,7 @@ export const routes: Route[] = [
   { path: 'parties', component: PartiesListComponent , canActivate: ['canActivateForLoggedIn'] },
   { path: 'party/:partyId', component: PartyDetailsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'products', component: ProductListComponent, canActivate: ['canActivateForLoggedIn'] },
+  { path: 'categories', component: CategoriesComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'product/:productId', component: ProductDetailsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },

@@ -16,6 +16,7 @@ import { STOCKS_DECLARATIONS } from './stock';
 import { SALES_DECLARATIONS } from './sales';
 import { PARTIES_DECLARATIONS } from './parties';
 import { PRODUCTS_DECLARATIONS } from './products';
+import { CATEGORIES_DECLARATIONS } from './categories';
 import { SHARED_DECLARATIONS } from './shared';
 import { NAVBAR_DECLARATIONS } from './navbar';
 import { AUTH_DECLARATIONS } from "./auth/index";
@@ -33,6 +34,7 @@ import { FocusDirective } from '../directives/focus.directive';
     ...SALES_DECLARATIONS,
     ...PARTIES_DECLARATIONS,
     ...PRODUCTS_DECLARATIONS,
+    ...CATEGORIES_DECLARATIONS,
     ...SHARED_DECLARATIONS,
     ...NAVBAR_DECLARATIONS,
     ...AUTH_DECLARATIONS,    

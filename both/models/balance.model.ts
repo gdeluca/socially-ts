@@ -1,3 +1,4 @@
+
 import { CollectionObject } from './collection-object.model';
 
 // should be in open status to allow close

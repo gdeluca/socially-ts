@@ -40,12 +40,19 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
  
     this.error = '';
+    this.updatesubscription(this.loginForm.value.email);
+    
+}
 
-    this.userSub = MeteorObservable.subscribe('stores.useremail', this.email).subscribe(() => {
-      console.log(this.email);
-      if (this.email) {
-        var user = Users.collection.find({'emails.address': this.email}).fetch();
-        
+  updatesubscription(email){
+    if (email) {
+      if (this.userSub){
+        this.userSub.unsubscribe();
+      }
+      this.userSub = MeteorObservable.subscribe('stores.useremail', email).subscribe(() => {
+        console.log(email);
+        var user = Users.collection.find({'emails.address': email}).fetch();
+          
         console.log(user[0]._id);
         let userStores = UserStores.find({userId: user[0]._id}).zone();
         userStores.subscribe((userstores) => {
@@ -57,18 +64,15 @@ export class LoginComponent implements OnInit, OnDestroy {
             console.log(stores);
           });
         });
-      }
-    })
-}
+      })
+    }
+  }
 
   ngOnDestroy() {
     this.userSub.unsubscribe();
   } 
 
   login(event) {
-    // console.log(this.loginForm.value);
-    // console.log(this.selectedStore.name);
-        
     if (this.loginForm.valid) {
       Meteor.loginWithPassword(this.loginForm.value.email, this.loginForm.value.password, (err) => {
         this.zone.run(() => {
