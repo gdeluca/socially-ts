@@ -6,6 +6,14 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../both/search/search-options';
 
 
+Meteor.publishComposite('sections', function() {
+  return {
+    find: function() {
+      return Sections.find({});
+    }
+  }
+});
+
 Meteor.publishComposite('categories', function() {
   return {
     find: function() {
