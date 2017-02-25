@@ -22,11 +22,17 @@ Meteor.publishComposite('categories', function() {
   }
 });
 
-Meteor.publishComposite('categories.sections', function(options: SearchOptions) {
+Meteor.publishComposite('categories.sections', function(options: SearchOptions, filterField?: string, filterValue?: string) {
+  let query = {}
+  
+  if (filterField && filterValue) {
+    const searchRegEx = { '$regex': '.*' + ([filterValue] || '') + '.*', '$options': 'i' };
+    query = { [filterField]: searchRegEx }
+  }
   return {
     find: function() {
-    Counts.publish(this, 'numberOfCategories',Categories.collection.find({}, options), { noReady: true });
-    return Categories.find({}, options);
+    Counts.publish(this, 'numberOfCategories',Categories.collection.find(query , options), { noReady: true });
+    return Categories.find(query, options);
     },
     children: [{
       find: function(category) {

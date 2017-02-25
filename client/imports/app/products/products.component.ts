@@ -16,22 +16,24 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
 
 // model 
+import { Products } from '../../../../both/collections/products.collection';
 import { Categories } from '../../../../both/collections/categories.collection';
 import { Sections } from '../../../../both/collections/sections.collection';
+import { Product } from '../../../../both/models/product.model';
 import { Category } from '../../../../both/models/category.model';
 import { Section } from '../../../../both/models/section.model';
 
  
-import template from './categories.component.html';
-import style from './categories.component.scss';
+import template from './products.component.html';
+import style from './products.component.scss';
 
 @Component({
-  selector: 'categories',
+  selector: 'products',
   template,
   styles: [ style ],
 })
 @InjectUser('user')
-export class CategoriesComponent implements OnInit, OnDestroy {
+export class ProductsComponent implements OnInit, OnDestroy {
   
   // pagination related
   pageSize: Subject<number> = new Subject<number>();
@@ -46,20 +48,19 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   collectionCount: number = 0;
   PAGESIZE: number = 6; 
   
-  sectionsSub: Subscription;
+  categoriesSub: Subscription;
   paginatedSub: Subscription;
   optionsSub: Subscription;
   autorunSub: Subscription;
 
-
   user: Meteor.User;
-  editedCategory: Category = {sectionId:'', name:''};
+  editedProduct: Product = {code: 0, name: '', color: '', brand: '', model: '', categoryId : ''};
   adding: boolean = false;
   editing: boolean = false;
   selected: any;
+  products: Observable<Product[]>;
+  paginatedCategories: Observable<Category[]>;
   categories: Observable<Category[]>;
-  paginatedSections: Observable<Section[]>;
-  sections: Observable<Section[]>;
 
   complexForm : FormGroup;
 
@@ -68,8 +69,12 @@ export class CategoriesComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder
   ){
     this.complexForm = formBuilder.group({
-      name: ['', Validators.compose([Validators.required, Validators.minLength(5)])],
-      section: ['', Validators.required],
+      name: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
+      code: ['', Validators.compose([Validators.required, Validators.minLength(5)])],
+      color:[''],
+      brand: [''],
+      model: [''],
+      category: ['', Validators.required]
     });
   }
 
@@ -93,10 +98,10 @@ export class CategoriesComponent implements OnInit, OnDestroy {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('categories.sections', options, filterField, filterValue)
+      this.paginatedSub = MeteorObservable.subscribe('products.categories', options, filterField, filterValue)
         .subscribe(() => {
-          this.categories = Categories.find({}).zone();
-          this.paginatedSections = Sections.find({}).zone();
+          this.products = Products.find({}).zone();
+          this.paginatedCategories = Categories.find({}).zone();
       });
       
     });
@@ -109,17 +114,17 @@ export class CategoriesComponent implements OnInit, OnDestroy {
     this.filterValue.next(''); 
 
 
-    if (this.sectionsSub) {
-        this.sectionsSub.unsubscribe();
-      }
-      this.sectionsSub = MeteorObservable.subscribe('sections')
-        .subscribe(() => {
-          this.sections = Sections.find({}).zone();
-      });
+    if (this.categoriesSub) {
+        this.categoriesSub.unsubscribe();
+    }
+    this.categoriesSub = MeteorObservable.subscribe('categories')
+      .subscribe(() => {
+        this.categories = Categories.find({}).zone();
+    });
     
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
-      this.collectionCount = Counts.get('numberOfCategories');
+      this.collectionCount = Counts.get('numberOfproducts');
       this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
     });
 
@@ -141,26 +146,34 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   onPageChanged(page: number): void {
     this.curPage.next(page);
   }
-
-  update = function(category){
-    Categories.update(category._id, {
+ 
+  update = function(product){
+    Products.update(product._id, {
       $set: { 
-         name: category.name,
-         sectionId: category.sectionId,
+         name: product.name,
+         code: product.code,
+         color: product.color,
+         brand: product.brand,
+         model: product.model,
+         categoryId: product.categoryId
       }
     });
   }
 
-  saveCategory(value: any){
+  save(value: any){
     if (!Meteor.userId()) {
-      alert('Ingrese al sistema para guardar la categoria');
+      alert('Ingrese al sistema para poder guardar');
       return;
     }
 
     if (this.complexForm.valid) {
-      Categories.insert({
+      Products.insert({
         name: this.complexForm.value.name, 
-        sectionId: this.complexForm.value.section._id 
+        code: this.complexForm.value.code, 
+        color: this.complexForm.value.color, 
+        brand: this.complexForm.value.brand, 
+        model: this.complexForm.value.model, 
+        categoryId: this.complexForm.value.category._id
       });
       this.complexForm.reset();
     }
@@ -183,36 +196,3 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   }
 
 }
-
-
-  // categories: Category[];
-  // sections: Section[];
-
-// constructor(
-  //   private paginationService: PaginationService
-  // ) {
-    // this.categories = [
-    //   { "_id" : "01", "name" : "Shorts", "sectionId" : "01" },
-    //   { "_id" : "02", "name" : "Panatalon Largo", "sectionId" : "01" },
-    //   { "_id" : "03", "name" : "Pantalon Corto", "sectionId" : "01" },
-    //   { "_id" : "04", "name" : "Calza", "sectionId" : "01" },
-    //   { "_id" : "05", "name" : "Pollera", "sectionId" : "02" },
-    //   { "_id" : "06", "name" : "Remera Mangas Corta", "sectionId" : "03" },
-    //   { "_id" : "07", "name" : "Remera Mangas Larga", "sectionId" : "03" },
-    //   { "_id" : "08", "name" : "Camisa", "sectionId" : "03" },
-    //   { "_id" : "09", "name" : "Blusa", "sectionId" : "03" },
-    //   { "_id" : "10", "name" : "Musculosa", "sectionId" : "03" },
-    //   { "_id" : "11", "name" : "Pupera", "sectionId" : "03" },
-    //   { "_id" : "12", "name" : "Saco Sport", "sectionId" : "04" },
-    //   { "_id" : "13", "name" : "Rompeviento", "sectionId" : "05" },
-    //   { "_id" : "14", "name" : "Chupin", "sectionId" : "01" },
-    // ];
-
-    // this.sections = [
-    //   { "_id" : "01", "name" : "Pantalon" },
-    //   { "_id" : "02", "name" : "Vestido" },
-    //   { "_id" : "03", "name" : "Remera" },
-    //   { "_id" : "04", "name" : "Saco" },
-    //   { "_id" : "05", "name" : "Campera" },
-    // ];
-  // }

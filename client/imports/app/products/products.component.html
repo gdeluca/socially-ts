@@ -1,0 +1,435 @@
+<div class="card align-items-center">
+  <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+</div>
+
+<!-- categories list -->
+<h3 class="col-12 text-center">Tabla de Productos</h3>
+<div class="row">
+  <table class="table table-bordered table-hover table-striped ">
+    <thead class="thead-default">
+      <tr>
+        <th class="text-center">Actualizar</th>
+        
+        <!-- name header -->
+        <th class="text-center">Descripcion
+          <button 
+            [hidden]="sortingIndex !== 'up1'" 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='down1';changeSortOrder(1, 'name')">
+            <span class="fa fa-chevron-up" aria-hidden="true"></span>
+          </button>
+          <button 
+              [hidden]="sortingIndex !== 'down1'" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="sortingIndex='up1';changeSortOrder(1, 'name')">
+              <span class="fa fa-chevron-down" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="sortingIndex === 'down1' || sortingIndex === 'up1' " 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='up1';changeSortOrder(-1, 'name')">
+            <span class="fa fa-sort" aria-hidden="true"></span>
+          </button>
+        </th>
+
+        <!-- code header -->
+        <th class="text-center">Codigo
+          <button 
+            [hidden]="sortingIndex !== 'up2'" 
+            type="button" av
+            (click)="sortingIndex='down2';changeSortOrder(1, 'name')">
+            <span class="fa fa-chevron-up" aria-hidden="true"></span>
+          </button>
+          <button 
+              [hidden]="sortingIndex !== 'down2'" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="sortingIndex='up2';changeSortOrder(1, 'name')">
+              <span class="fa fa-chevron-down" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="sortingIndex === 'down2' || sortingIndex === 'up2' " 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='up2';changeSortOrder(-1, 'name')">
+            <span class="fa fa-sort" aria-hidden="true"></span>
+          </button>
+        </th>
+
+        <!-- color header -->
+        <th class="text-center">Color
+          <button 
+            [hidden]="sortingIndex !== 'up3'" 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='down3';changeSortOrder(1, 'name')">
+            <span class="fa fa-chevron-up" aria-hidden="true"></span>
+          </button>
+          <button 
+              [hidden]="sortingIndex !== 'down3'" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="sortingIndex='up3';changeSortOrder(1, 'name')">
+              <span class="fa fa-chevron-down" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="sortingIndex === 'down3' || sortingIndex === 'up3' " 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='up3';changeSortOrder(-1, 'name')">
+            <span class="fa fa-sort" aria-hidden="true"></span>
+          </button>
+        </th>
+
+
+        <!-- brand header -->
+        <th class="text-center">Marca
+          <button 
+            [hidden]="sortingIndex !== 'up4'" 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='down4';changeSortOrder(1, 'name')">
+            <span class="fa fa-chevron-up" aria-hidden="true"></span>
+          </button>
+          <button 
+              [hidden]="sortingIndex !== 'down4'" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="sortingIndex='up4';changeSortOrder(1, 'name')">
+              <span class="fa fa-chevron-down" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="sortingIndex === 'down4' || sortingIndex === 'up4' " 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='up4';changeSortOrder(-1, 'name')">
+            <span class="fa fa-sort" aria-hidden="true"></span>
+          </button>
+        </th>
+
+        <!-- model header -->
+        <th class="text-center">Modelo
+          <button 
+            [hidden]="sortingIndex !== 'up5'" 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='down5';changeSortOrder(1, 'name')">
+            <span class="fa fa-chevron-up" aria-hidden="true"></span>
+          </button>
+          <button 
+              [hidden]="sortingIndex !== 'down5'" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="sortingIndex='up5';changeSortOrder(1, 'name')">
+              <span class="fa fa-chevron-down" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="sortingIndex === 'down5' || sortingIndex === 'up5' " 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='up5';changeSortOrder(-1, 'name')">
+            <span class="fa fa-sort" aria-hidden="true"></span>
+          </button>
+        </th>
+
+        <!-- cateory header -->
+        <th class="text-center">Categoria
+          <button 
+            [hidden]="sortingIndex !== 'up6'" 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='down6';changeSortOrder(1, 'sectionId')">
+            <span class="fa fa-chevron-up" aria-hidden="true"></span>
+          </button>
+          <button 
+              [hidden]="sortingIndex !== 'down6'" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="sortingIndex='up6';changeSortOrder(-1, 'sectionId')">
+              <span class="fa fa-chevron-down" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="sortingIndex === 'down6' || sortingIndex === 'up6' " 
+            type="button" 
+            class="btn btn-default" 
+            (click)="sortingIndex='up6';changeSortOrder(-1, 'sectionId')">
+            <span class="fa fa-sort" aria-hidden="true"></span>
+          </button>
+        </th>
+
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of products | async; let rowIndex=index; ">
+        <!-- action buttons for main form -->
+        <td>
+          <button 
+            [hidden]="currentIndex === rowIndex && editing"
+            type="button" 
+            class="btn btn-default" 
+            (click)="currentIndex=rowIndex; editing=true;editedProduct=copy(product)">
+            <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+            type="button" 
+            class="btn btn-default" 
+            (click)="currentIndex=rowIndex; editing=false; update(editedProduct)">
+            <span class="fa fa-check-square-o" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)" 
+            type="button" 
+            class="btn btn-default" 
+            (click)="currentIndex=rowIndex; editing=false;">
+            <span class="fa fa-ban" aria-hidden="true"></span>
+          </button>
+        </td>
+
+        <!-- name field -->
+        <!-- display mode-->
+        <td 
+          [hidden]="currentIndex === rowIndex && editing"
+          class="text-center">
+          <a>{{product.name}}</a>
+        </td>
+        <!-- editing mode-->
+        <td 
+          [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+          class="text-center">
+          <input 
+            type="text" 
+            name="name-{{rowIndex}}" 
+            class="form-control" 
+            [(ngModel)]="editedProduct.name">
+        </td>
+        
+        <!-- code field -->
+        <!-- display mode-->
+        <td 
+          [hidden]="currentIndex === rowIndex && editing"
+          class="text-center">
+          <a>{{product.code}}</a>
+        </td>
+        <!-- editing mode-->
+        <td 
+          [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+          class="text-center">
+          <input 
+            type="text" 
+            name="name-{{rowIndex}}" 
+            class="form-control" 
+            [(ngModel)]="editedProduct.code">
+        </td>
+
+        <!-- color field -->
+        <!-- display mode-->
+        <td 
+          [hidden]="currentIndex === rowIndex && editing"
+          class="text-center">
+          <a>{{product.color}}</a>
+        </td>
+        <!-- editing mode-->
+        <td 
+          [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+          class="text-center">
+          <input 
+            type="text" 
+            name="name-{{rowIndex}}" 
+            class="form-control" 
+            [(ngModel)]="editedProduct.color">
+        </td>
+        
+        <!-- brand field -->
+        <!-- display mode-->
+        <td 
+          [hidden]="currentIndex === rowIndex && editing"
+          class="text-center">
+          <a>{{product.brand}}</a>
+        </td>
+        <!-- editing mode-->
+        <td 
+          [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+          class="text-center">
+          <input 
+            type="text" 
+            name="name-{{rowIndex}}" 
+            class="form-control" 
+            [(ngModel)]="editedProduct.brand">
+        </td>
+
+        <!-- model field -->
+        <!-- display mode-->
+        <td 
+          [hidden]="currentIndex === rowIndex && editing"
+          class="text-center">
+          <a>{{product.model}}</a>
+        </td>
+        <!-- editing mode-->
+        <td 
+          [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+          class="text-center">
+          <input 
+            type="text" 
+            name="name-{{rowIndex}}" 
+            class="form-control" 
+            [(ngModel)]="editedProduct.model">
+        </td>
+
+        <!-- categories field-->
+        <ng-container *ngFor="let category of categories | async"> 
+          <ng-container *ngIf="product.categoryId === category._id">
+            <!-- display mode fields -->
+            <td 
+              [hidden]="currentIndex === rowIndex && editing"
+              class="text-center">
+              <a [routerLink]="['/categories', category._id]">{{category.name}}</a>
+            </td>
+            <!-- editing mode fields -->
+            <td 
+                [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)">
+              <select 
+                name="select-{{rowIndex}}" class="form-control" required  
+                [(ngModel)]="editedProduct.categoryId">
+                <option value="" disabled currentIndex hidden>Nombre de Categoria</option>
+                <option *ngFor="let category of categories | async" 
+                [ngValue]="category._id">{{category.name}}</option>
+              </select> 
+            </td>
+          </ng-container>
+        </ng-container>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="row-fluid">
+
+  <!-- submission form -->
+  <form [formGroup]="complexForm" (ngSubmit)="submitForm(complexForm.value)">
+    <table class="table table-hover">
+      <tbody>
+        <tr ng-form="myForm">
+          <!-- action buttons for submision form -->
+          <td>
+            <button 
+              [hidden]="adding" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="adding=true">
+              <span class="fa fa-plus-square-o" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="!adding" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="adding=false;complexForm.reset()">
+              <span class="fa fa-minus-square-o" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="!adding" 
+              [disabled]="!complexForm.valid" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="adding=false; save(complexForm.value)">
+              <span class="fa fa-check-square-o" aria-hidden="true"></span>
+            </button>
+          </td> 
+
+          <!-- form fields name -->
+          <td class="text-center" 
+              [ngClass]="{'has-error':!complexForm.controls['name'].valid && complexForm.controls['name'].touched}">
+              <input 
+                [hidden]="!adding" 
+                type="text" 
+                name="name" 
+                class="form-control" 
+                placeholder="Descripcion" [formControl]="complexForm.controls['name']">
+                <!-- The hasError method will tell us if an error exists -->
+                <div *ngIf="complexForm.controls['name'].hasError('required') && complexForm.controls['name'].touched" 
+                class="alert alert-danger">
+                  Falta un nombre de producto.
+                </div>
+                <div *ngIf="complexForm.controls['name'].hasError('minlength') && complexForm.controls['name'].touched" 
+                class="alert alert-danger">
+                  La categoria debe ser al menos 3 caracteres.
+                </div>
+          </td>
+
+          <!-- form fields code -->
+          <td class="text-center" 
+              [ngClass]="{'has-error':!complexForm.controls['code'].valid && complexForm.controls['code'].touched}">
+              <input 
+                [hidden]="!adding" 
+                type="text" 
+                name="code" 
+                class="form-control" 
+                placeholder="Codigo" [formControl]="complexForm.controls['code']">
+                <!-- The hasError method will tell us if an error exists -->
+                <div *ngIf="complexForm.controls['code'].hasError('required') && complexForm.controls['code'].touched" 
+                class="alert alert-danger">
+                  Falta el codigo del producto.
+                </div>
+                <div *ngIf="complexForm.controls['code'].hasError('minlength') && complexForm.controls['name'].touched" 
+                class="alert alert-danger">
+                  El codigo debe se de al menos 5 digitos.
+                </div>
+          </td>
+
+          <!-- form fields color -->
+          <td class="text-center" 
+              [ngClass]="{'has-error':!complexForm.controls['color'].valid && complexForm.controls['color'].touched}">
+              <input 
+                [hidden]="!adding" 
+                type="text" 
+                name="color" 
+                class="form-control" 
+                placeholder="Codigo" [formControl]="complexForm.controls['color']">
+          </td>
+          <!-- form fields brand -->
+          <td class="text-center" 
+              [ngClass]="{'has-error':!complexForm.controls['brand'].valid && complexForm.controls['brand'].touched}">
+              <input 
+                [hidden]="!adding" 
+                type="text" 
+                name="brand" 
+                class="form-control" 
+                placeholder="Codigo" [formControl]="complexForm.controls['brand']">
+          </td>
+          <!-- form fields model -->
+          <td class="text-center" 
+              [ngClass]="{'has-error':!complexForm.controls['model'].valid && complexForm.controls['model'].touched}">
+              <input 
+                [hidden]="!adding" 
+                type="text" 
+                name="model" 
+                class="form-control" 
+                placeholder="Codigo" [formControl]="complexForm.controls['model']">
+          </td>
+          <!-- category -->
+          <td class="text-center">
+            <select 
+              [hidden]="!adding" 
+              name="sectionOptions" 
+              class="form-control" 
+               [formControl]="complexForm.controls['category']">
+                <option value="" disabled currentIndex hidden>
+                  Nombre de Seccion
+                </option>
+                <option *ngFor="let category of categories | async" [ngValue]="category">
+                  {{category.name}}
+                </option>
+            </select> 
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</div>
+<div class="card align-items-center">
+  <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+</div>
+
