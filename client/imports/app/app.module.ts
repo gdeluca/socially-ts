@@ -4,6 +4,7 @@ import { DemoComponent } from "./demo/demo.component";
 import { DemoDataService } from "./demo/demo-data.service";
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 import { AccountsModule } from 'angular2-meteor-accounts-ui';
 import { Ng2PaginationModule } from 'ng2-pagination';
@@ -11,16 +12,17 @@ import { Ng2PaginationModule } from 'ng2-pagination';
 import { AppComponent } from './app.component';
 import { routes, ROUTES_PROVIDERS } from './app.routes';
 
+
 // project definitions, order matters
 import { STOCKS_DECLARATIONS } from './stock';
 import { SALES_DECLARATIONS } from './sales';
 import { PARTIES_DECLARATIONS } from './parties';
 import { PRODUCTS_DECLARATIONS } from './products';
 import { CATEGORIES_DECLARATIONS } from './categories';
+import { SECTIONS_DECLARATIONS } from './sections';
 import { SHARED_DECLARATIONS } from './shared';
 import { NAVBAR_DECLARATIONS } from './navbar';
 import { AUTH_DECLARATIONS } from "./auth/index";
-import { CommonModule } from '@angular/common';
 
 import { FocusDirective } from '../directives/focus.directive';
 
@@ -36,6 +38,7 @@ import { FocusDirective } from '../directives/focus.directive';
     ...PARTIES_DECLARATIONS,
     ...PRODUCTS_DECLARATIONS,
     ...CATEGORIES_DECLARATIONS,
+    ...SECTIONS_DECLARATIONS,
     ...SHARED_DECLARATIONS,
     ...NAVBAR_DECLARATIONS,
     ...AUTH_DECLARATIONS,    

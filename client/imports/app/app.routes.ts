@@ -7,6 +7,7 @@ import { OrdersComponent } from './sales/orders.component';
 import { OrderDetailsComponent } from './sales/order-details.component'; 
 import { PartiesListComponent } from './parties/parties-list.component';
 import { PartyDetailsComponent } from './parties/party-details.component';
+import { SectionsComponent } from './sections/sections.component';
 import { CategoriesComponent } from './categories/categories.component';
 import { ProductListComponent } from './products/product-list.component';
 import { ProductsComponent } from './products/products.component';
@@ -25,6 +26,7 @@ export const routes: Route[] = [
   { path: 'party/:partyId', component: PartyDetailsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'products', component: ProductsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'categories', component: CategoriesComponent, canActivate: ['canActivateForLoggedIn'] },
+  { path: 'sections', component: SectionsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'product/:productId', component: ProductDetailsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },

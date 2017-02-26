@@ -17,24 +17,22 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
 
 // model 
-import { Categories } from '../../../../both/collections/categories.collection';
 import { Sections } from '../../../../both/collections/sections.collection';
-import { Category } from '../../../../both/models/category.model';
 import { Section } from '../../../../both/models/section.model';
 import { Dictionary } from '../../../../both/models/dictionary';
 
 
  
-import template from './categories.component.html';
-import style from './categories.component.scss';
+import template from './sections.component.html';
+import style from './sections.component.scss';
 
 @Component({
-  selector: 'categories',
+  selector: 'sections',
   template,
   styles: [ style ],
 })
 @InjectUser('user')
-export class CategoriesComponent implements OnInit, OnDestroy {
+export class SectionsComponent implements OnInit, OnDestroy {
   
   // pagination related
   pageSize: Subject<number> = new Subject<number>();
@@ -49,25 +47,21 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   collectionCount: number = 0;
   PAGESIZE: number = 6; 
   
-  sectionsSub: Subscription;
   paginatedSub: Subscription;
   optionsSub: Subscription;
   autorunSub: Subscription;
 
 
   user: Meteor.User;
-  editedCategory: Category = {sectionId:'', name:''};
+  editedSection: Section = {name:''};
   adding: boolean = false;
   editing: boolean = false;
   selected: any;
-  categories: Observable<Category[]>;
-  paginatedSections: Observable<Section[]>;
   sections: Observable<Section[]>;
 
-  // name, sortfield, touple
+  // name <-> sortfield, touple
   headers: Dictionary[] = [
     {'key': 'Nombre', 'value': 'name'},
-    {'key': 'Seccion', 'value':'sectionId'}
   ];
   complexForm : FormGroup;
 
@@ -77,7 +71,6 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   ){
     this.complexForm = formBuilder.group({
       name: ['', Validators.compose([Validators.required, Validators.minLength(5)])],
-      section: ['', Validators.required],
     });
   }
 
@@ -101,17 +94,11 @@ export class CategoriesComponent implements OnInit, OnDestroy {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('categories.sections', options, filterField, filterValue)
+      this.paginatedSub = MeteorObservable.subscribe('sections.with.counter', options, filterField, filterValue)
         .subscribe(() => {
-          this.categories = Categories.find({}).zone();
-          this.paginatedSections = Sections.find({}).zone();
+          this.sections = Sections.find({}).zone();
       });
       
-    });
-
-    this.autorunSub = MeteorObservable.autorun().subscribe(() => {
-      this.collectionCount = Counts.get('numberOfCategories');
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
     });
 
     this.pageSize.next(this.PAGESIZE);
@@ -121,14 +108,11 @@ export class CategoriesComponent implements OnInit, OnDestroy {
     this.filterField.next('name');
     this.filterValue.next('');
 
-    if (this.sectionsSub) {
-        this.sectionsSub.unsubscribe();
-      }
-      this.sectionsSub = MeteorObservable.subscribe('sections')
-        .subscribe(() => {
-          this.sections = Sections.find({}).zone();
-      });
-    
+    this.autorunSub = MeteorObservable.autorun().subscribe(() => {
+      this.collectionCount = Counts.get('numberOfSections');
+      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+    });
+
     this.paginationService.register({
       id: this.paginationService.defaultId(),
       itemsPerPage: this.PAGESIZE,
@@ -148,25 +132,23 @@ export class CategoriesComponent implements OnInit, OnDestroy {
     this.curPage.next(page);
   }
 
-  update = function(category){
-    Categories.update(category._id, {
+  update = function(Section){
+    Sections.update(Section._id, {
       $set: { 
-         name: category.name,
-         sectionId: category.sectionId,
+         name: Section.name
       }
     });
   }
 
-  saveCategory(value: any){
+  save(value: any){
     if (!Meteor.userId()) {
-      alert('Ingrese al sistema para guardar la categoria');
+      alert('Ingrese al sistema para poder guardar');
       return;
     }
 
     if (this.complexForm.valid) {
-      Categories.insert({
-        name: this.complexForm.value.name, 
-        sectionId: this.complexForm.value.section._id 
+      Sections.insert({
+        name: this.complexForm.value.name
       });
       this.complexForm.reset();
     }
@@ -180,9 +162,9 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   search(field: string, value: string): void {
     console.log(field);
     console.log(value);
-    // this.curPage.next(1);
-    // this.filterField.next(field);
-    // this.filterValue.next(value); 
+    this.curPage.next(1);
+    this.filterField.next(field);
+    this.filterValue.next(value); 
   }
   
   changeSortOrder(direction: string, fieldName: string): void {
@@ -191,36 +173,3 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   }
 
 }
-
-
-  // categories: Category[];
-  // sections: Section[];
-
-// constructor(
-  //   private paginationService: PaginationService
-  // ) {
-    // this.categories = [
-    //   { "_id" : "01", "name" : "Shorts", "sectionId" : "01" },
-    //   { "_id" : "02", "name" : "Panatalon Largo", "sectionId" : "01" },
-    //   { "_id" : "03", "name" : "Pantalon Corto", "sectionId" : "01" },
-    //   { "_id" : "04", "name" : "Calza", "sectionId" : "01" },
-    //   { "_id" : "05", "name" : "Pollera", "sectionId" : "02" },
-    //   { "_id" : "06", "name" : "Remera Mangas Corta", "sectionId" : "03" },
-    //   { "_id" : "07", "name" : "Remera Mangas Larga", "sectionId" : "03" },
-    //   { "_id" : "08", "name" : "Camisa", "sectionId" : "03" },
-    //   { "_id" : "09", "name" : "Blusa", "sectionId" : "03" },
-    //   { "_id" : "10", "name" : "Musculosa", "sectionId" : "03" },
-    //   { "_id" : "11", "name" : "Pupera", "sectionId" : "03" },
-    //   { "_id" : "12", "name" : "Saco Sport", "sectionId" : "04" },
-    //   { "_id" : "13", "name" : "Rompeviento", "sectionId" : "05" },
-    //   { "_id" : "14", "name" : "Chupin", "sectionId" : "01" },
-    // ];
-
-    // this.sections = [
-    //   { "_id" : "01", "name" : "Pantalon" },
-    //   { "_id" : "02", "name" : "Vestido" },
-    //   { "_id" : "03", "name" : "Remera" },
-    //   { "_id" : "04", "name" : "Saco" },
-    //   { "_id" : "05", "name" : "Campera" },
-    // ];
-  // }

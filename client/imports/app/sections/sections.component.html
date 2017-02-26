@@ -2,8 +2,8 @@
   <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
 </div>
 
-<!-- categories list -->
-<h3 class="col-12 text-center">Tabla de Categorias</h3>
+<!-- entities list -->
+<h3 class="col-12 text-center">Secciones</h3>
 <div class="row">
   <table class="table table-bordered table-hover table-striped ">
     <thead class="thead-default">
@@ -52,21 +52,23 @@
           </td>
         </ng-container> 
       </tr>
-      <tr *ngFor="let category of categories | async; let rowIndex=index; ">
+
+      <!-- table body -->
+      <tr *ngFor="let section of sections | async; let rowIndex=index; ">
         <!-- action buttons for main form -->
         <td>
           <button 
             [hidden]="currentIndex === rowIndex && editing"
             type="button" 
             class="btn btn-default" 
-            (click)="currentIndex=rowIndex; editing=true;editedCategory=copy(category)">
+            (click)="currentIndex=rowIndex; editing=true;editedSection=copy(section)">
             <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
           </button>
           <button 
             [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
             type="button" 
             class="btn btn-default" 
-            (click)="currentIndex=rowIndex; editing=false; update(editedCategory)">
+            (click)="currentIndex=rowIndex; editing=false; update(editedSection)">
             <span class="fa fa-check-square-o" aria-hidden="true"></span>
           </button>
           <button 
@@ -82,7 +84,7 @@
         <td 
           [hidden]="currentIndex === rowIndex && editing"
           class="text-center">
-          <a>{{category.name}}</a>
+          <a>{{section.name}}</a>
         </td>
         <!-- editing mode-->
         <td 
@@ -92,31 +94,8 @@
             type="text" 
             name="name-{{rowIndex}}" 
             class="form-control" 
-            [(ngModel)]="editedCategory.name">
+            [(ngModel)]="editedSection.name">
         </td>
-        
-        <!-- sections field-->
-        <ng-container *ngFor="let section of paginatedSections | async"> 
-          <ng-container *ngIf="category.sectionId === section._id">
-            <!-- display mode fields -->
-            <td 
-              [hidden]="currentIndex === rowIndex && editing"
-              class="text-center">
-              <a [routerLink]="['/sections', section._id]">{{section.name}}</a>
-            </td>
-            <!-- editing mode fields -->
-            <td 
-                [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)">
-              <select 
-                name="select-{{rowIndex}}" class="form-control" required  
-                [(ngModel)]="editedCategory.sectionId">
-                <option value="" disabled currentIndex hidden>Nombre de Seccion</option>
-                <option *ngFor="let section of sections | async" 
-                [ngValue]="section._id">{{section.name}}</option>
-              </select> 
-            </td>
-          </ng-container>
-        </ng-container>
       </tr>
     </tbody>
   </table>
@@ -150,42 +129,28 @@
               [disabled]="!complexForm.valid" 
               type="button" 
               class="btn btn-default" 
-              (click)="adding=false; saveCategory(complexForm.value)">
+              (click)="adding=false; save(complexForm.value)">
               <span class="fa fa-check-square-o" aria-hidden="true"></span>
             </button>
           </td> 
           <!-- adding mode fields -->
           <td class="text-center" 
-              [ngClass]="{'has-error':!complexForm.controls['name'].valid && complexForm.controls['name'].touched}">
-              <input 
-                [hidden]="!adding" 
-                type="text" 
-                name="name" 
-                class="form-control" 
-                placeholder="Nombre de Categoria" [formControl]="complexForm.controls['name']">
-                <!-- The hasError method will tell us if an error exists -->
-                <div *ngIf="complexForm.controls['name'].hasError('required') && complexForm.controls['name'].touched" 
-                class="alert alert-danger">
-                  Incluya un nombre de categoria.
-                </div>
-                <div *ngIf="complexForm.controls['name'].hasError('minlength') && complexForm.controls['name'].touched" 
-                class="alert alert-danger">
-                  La categoria debe tener al menos 5 catacteres.
-                </div>
-          </td>
-          <td class="text-center">
-            <select 
+            [ngClass]="{'has-error':!complexForm.controls['name'].valid && complexForm.controls['name'].touched}">
+            <input 
               [hidden]="!adding" 
-              name="sectionOptions" 
+              type="text" 
+              name="name" 
               class="form-control" 
-               [formControl]="complexForm.controls['section']">
-                <option value="" disabled currentIndex hidden>
-                  Nombre de Seccion
-                </option>
-                <option *ngFor="let section of sections | async" [ngValue]="section">
-                  {{section.name}}
-                </option>
-            </select> 
+              placeholder="Nombre de Seccion" [formControl]="complexForm.controls['name']">
+              <!-- The hasError method will tell us if an error exists -->
+              <div *ngIf="complexForm.controls['name'].hasError('required') && complexForm.controls['name'].touched" 
+              class="alert alert-danger">
+                Incluya un nombre.
+              </div>
+              <div *ngIf="complexForm.controls['name'].hasError('minlength') && complexForm.controls['name'].touched" 
+              class="alert alert-danger">
+                El campo debe tener al menos 5 caracteres.
+              </div>
           </td>
         </tr>
       </tbody>

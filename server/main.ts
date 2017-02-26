@@ -11,6 +11,7 @@ import './imports/publications/users';
 import './imports/publications/stores'; 
 import './imports/publications/products'; 
 import './imports/publications/categories'; 
+import './imports/publications/sections'; 
 
 
 // load meteor methods. e.g: to use latency compensation 
