@@ -10,6 +10,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
 import { Subject } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/combineLatest';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
@@ -20,6 +21,8 @@ import { Categories } from '../../../../both/collections/categories.collection';
 import { Sections } from '../../../../both/collections/sections.collection';
 import { Category } from '../../../../both/models/category.model';
 import { Section } from '../../../../both/models/section.model';
+import { Dictionary } from '../../../../both/models/dictionary';
+
 
  
 import template from './categories.component.html';
@@ -40,7 +43,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   sortField: Subject<string> = new Subject<string>();
 
   filterField: Subject<string> = new Subject<string>();
-  filterValue: Subject<string> = new Subject<string>();
+  filterValue: Subject<string> = new Subject<string>('');
 
 
   collectionCount: number = 0;
@@ -61,6 +64,11 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   paginatedSections: Observable<Section[]>;
   sections: Observable<Section[]>;
 
+  // name, sortfield, touple
+  headers: Dictionary[] = [
+    {'key': 'Nombre', 'value': 'name'},
+    {'key': 'Seccion', 'value':'sectionId'}
+  ];
   complexForm : FormGroup;
 
   constructor(
@@ -103,11 +111,10 @@ export class CategoriesComponent implements OnInit, OnDestroy {
 
     this.pageSize.next(this.PAGESIZE);
     this.curPage.next(1);
-    this.sortDirection.next(1);
     this.sortField.next('name');
+    this.sortDirection.next(1);
     this.filterField.next('name');
-    this.filterValue.next(''); 
-
+    this.filterValue.next('');
 
     if (this.sectionsSub) {
         this.sectionsSub.unsubscribe();

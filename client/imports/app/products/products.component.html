@@ -6,160 +6,34 @@
 <h3 class="col-12 text-center">Tabla de Productos</h3>
 <div class="row">
   <table class="table table-bordered table-hover table-striped ">
-    <thead class="thead-default">
+    <thead class="thead-default"> 
+      <!-- headers for sorting -->
       <tr>
-        <th class="text-center">Actualizar</th>
-        
-        <!-- name header -->
-        <th class="text-center">Descripcion
+        <th class="text-center">Modificar</th>
+        <th  class="text-center" *ngFor="let header of headers; let colIndex = index; ">
+          {{header.key}}
           <button 
-            [hidden]="sortingIndex !== 'up1'" 
+            [hidden]="idx !== colIndex || direction !== 'up'" 
             type="button" 
             class="btn btn-default" 
-            (click)="sortingIndex='down1';changeSortOrder(1, 'name')">
+            (click)="idx = colIndex; direction = 'down';changeSortOrder(1, header.value)">
             <span class="fa fa-chevron-up" aria-hidden="true"></span>
           </button>
           <button 
-              [hidden]="sortingIndex !== 'down1'" 
+              [hidden]="idx !== colIndex || direction !== 'down'" 
               type="button" 
-              class="btn btn-default" 
-              (click)="sortingIndex='up1';changeSortOrder(1, 'name')">
+              class="btn btn-default"  
+              (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
               <span class="fa fa-chevron-down" aria-hidden="true"></span>
           </button>
           <button 
-            [hidden]="sortingIndex === 'down1' || sortingIndex === 'up1' " 
+            [hidden]="direction && idx === colIndex " 
             type="button" 
-            class="btn btn-default" 
-            (click)="sortingIndex='up1';changeSortOrder(-1, 'name')">
+            class="btn btn-default"   
+            (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
             <span class="fa fa-sort" aria-hidden="true"></span>
-          </button>
+          </button>        
         </th>
-
-        <!-- code header -->
-        <th class="text-center">Codigo
-          <button 
-            [hidden]="sortingIndex !== 'up2'" 
-            type="button" av
-            (click)="sortingIndex='down2';changeSortOrder(1, 'name')">
-            <span class="fa fa-chevron-up" aria-hidden="true"></span>
-          </button>
-          <button 
-              [hidden]="sortingIndex !== 'down2'" 
-              type="button" 
-              class="btn btn-default" 
-              (click)="sortingIndex='up2';changeSortOrder(1, 'name')">
-              <span class="fa fa-chevron-down" aria-hidden="true"></span>
-          </button>
-          <button 
-            [hidden]="sortingIndex === 'down2' || sortingIndex === 'up2' " 
-            type="button" 
-            class="btn btn-default" 
-            (click)="sortingIndex='up2';changeSortOrder(-1, 'name')">
-            <span class="fa fa-sort" aria-hidden="true"></span>
-          </button>
-        </th>
-
-        <!-- color header -->
-        <th class="text-center">Color
-          <button 
-            [hidden]="sortingIndex !== 'up3'" 
-            type="button" 
-            class="btn btn-default" 
-            (click)="sortingIndex='down3';changeSortOrder(1, 'name')">
-            <span class="fa fa-chevron-up" aria-hidden="true"></span>
-          </button>
-          <button 
-              [hidden]="sortingIndex !== 'down3'" 
-              type="button" 
-              class="btn btn-default" 
-              (click)="sortingIndex='up3';changeSortOrder(1, 'name')">
-              <span class="fa fa-chevron-down" aria-hidden="true"></span>
-          </button>
-          <button 
-            [hidden]="sortingIndex === 'down3' || sortingIndex === 'up3' " 
-            type="button" 
-            class="btn btn-default" 
-            (click)="sortingIndex='up3';changeSortOrder(-1, 'name')">
-            <span class="fa fa-sort" aria-hidden="true"></span>
-          </button>
-        </th>
-
-
-        <!-- brand header -->
-        <th class="text-center">Marca
-          <button 
-            [hidden]="sortingIndex !== 'up4'" 
-            type="button" 
-            class="btn btn-default" 
-            (click)="sortingIndex='down4';changeSortOrder(1, 'name')">
-            <span class="fa fa-chevron-up" aria-hidden="true"></span>
-          </button>
-          <button 
-              [hidden]="sortingIndex !== 'down4'" 
-              type="button" 
-              class="btn btn-default" 
-              (click)="sortingIndex='up4';changeSortOrder(1, 'name')">
-              <span class="fa fa-chevron-down" aria-hidden="true"></span>
-          </button>
-          <button 
-            [hidden]="sortingIndex === 'down4' || sortingIndex === 'up4' " 
-            type="button" 
-            class="btn btn-default" 
-            (click)="sortingIndex='up4';changeSortOrder(-1, 'name')">
-            <span class="fa fa-sort" aria-hidden="true"></span>
-          </button>
-        </th>
-
-        <!-- model header -->
-        <th class="text-center">Modelo
-          <button 
-            [hidden]="sortingIndex !== 'up5'" 
-            type="button" 
-            class="btn btn-default" 
-            (click)="sortingIndex='down5';changeSortOrder(1, 'name')">
-            <span class="fa fa-chevron-up" aria-hidden="true"></span>
-          </button>
-          <button 
-              [hidden]="sortingIndex !== 'down5'" 
-              type="button" 
-              class="btn btn-default" 
-              (click)="sortingIndex='up5';changeSortOrder(1, 'name')">
-              <span class="fa fa-chevron-down" aria-hidden="true"></span>
-          </button>
-          <button 
-            [hidden]="sortingIndex === 'down5' || sortingIndex === 'up5' " 
-            type="button" 
-            class="btn btn-default" 
-            (click)="sortingIndex='up5';changeSortOrder(-1, 'name')">
-            <span class="fa fa-sort" aria-hidden="true"></span>
-          </button>
-        </th>
-
-        <!-- cateory header -->
-        <th class="text-center">Categoria
-          <button 
-            [hidden]="sortingIndex !== 'up6'" 
-            type="button" 
-            class="btn btn-default" 
-            (click)="sortingIndex='down6';changeSortOrder(1, 'sectionId')">
-            <span class="fa fa-chevron-up" aria-hidden="true"></span>
-          </button>
-          <button 
-              [hidden]="sortingIndex !== 'down6'" 
-              type="button" 
-              class="btn btn-default" 
-              (click)="sortingIndex='up6';changeSortOrder(-1, 'sectionId')">
-              <span class="fa fa-chevron-down" aria-hidden="true"></span>
-          </button>
-          <button 
-            [hidden]="sortingIndex === 'down6' || sortingIndex === 'up6' " 
-            type="button" 
-            class="btn btn-default" 
-            (click)="sortingIndex='up6';changeSortOrder(-1, 'sectionId')">
-            <span class="fa fa-sort" aria-hidden="true"></span>
-          </button>
-        </th>
-
       </tr>
     </thead>
     <tbody>
@@ -387,7 +261,7 @@
                 type="text" 
                 name="color" 
                 class="form-control" 
-                placeholder="Codigo" [formControl]="complexForm.controls['color']">
+                placeholder="Color" [formControl]="complexForm.controls['color']">
           </td>
           <!-- form fields brand -->
           <td class="text-center" 
@@ -397,7 +271,7 @@
                 type="text" 
                 name="brand" 
                 class="form-control" 
-                placeholder="Codigo" [formControl]="complexForm.controls['brand']">
+                placeholder="Marca" [formControl]="complexForm.controls['brand']">
           </td>
           <!-- form fields model -->
           <td class="text-center" 
@@ -407,7 +281,7 @@
                 type="text" 
                 name="model" 
                 class="form-control" 
-                placeholder="Codigo" [formControl]="complexForm.controls['model']">
+                placeholder="Modelo" [formControl]="complexForm.controls['model']">
           </td>
           <!-- category -->
           <td class="text-center">
@@ -417,7 +291,7 @@
               class="form-control" 
                [formControl]="complexForm.controls['category']">
                 <option value="" disabled currentIndex hidden>
-                  Nombre de Seccion
+                  Categoria
                 </option>
                 <option *ngFor="let category of categories | async" [ngValue]="category">
                   {{category.name}}

@@ -11,6 +11,10 @@ import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/combineLatest';
+import { CommonModule } from '@angular/common';
+import { NgModule } from "@angular/core";
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
@@ -22,6 +26,9 @@ import { Sections } from '../../../../both/collections/sections.collection';
 import { Product } from '../../../../both/models/product.model';
 import { Category } from '../../../../both/models/category.model';
 import { Section } from '../../../../both/models/section.model';
+
+import { Dictionary } from '../../../../both/models/dictionary';
+
 
  
 import template from './products.component.html';
@@ -44,6 +51,15 @@ export class ProductsComponent implements OnInit, OnDestroy {
   filterField: Subject<string> = new Subject<string>();
   filterValue: Subject<string> = new Subject<string>();
 
+   // name, sortfield, touple
+  headers: Dictionary[] = [
+    {'key': 'Descripcion', 'value': 'name'},
+    {'key': 'Codigo', 'value':'code'},
+    {'key': 'Color', 'value':'color'},
+    {'key': 'Marca', 'value':'brand'},
+    {'key': 'Modelo', 'value':'model'},
+    {'key': 'Categoria', 'value':'categoryId'},
+  ];
 
   collectionCount: number = 0;
   PAGESIZE: number = 6; 

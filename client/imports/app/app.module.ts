@@ -20,6 +20,7 @@ import { CATEGORIES_DECLARATIONS } from './categories';
 import { SHARED_DECLARATIONS } from './shared';
 import { NAVBAR_DECLARATIONS } from './navbar';
 import { AUTH_DECLARATIONS } from "./auth/index";
+import { CommonModule } from '@angular/common';
 
 import { FocusDirective } from '../directives/focus.directive';
 
@@ -54,6 +55,7 @@ import { FocusDirective } from '../directives/focus.directive';
   
   // Modules
   imports: [
+    CommonModule,
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
