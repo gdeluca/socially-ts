@@ -40,23 +40,17 @@
     <tbody>
       <tr>
         <td></td>
-        <td class="text-center">
-          <input 
-            type="text" 
-            class="col-3" 
-            placeholder="Nombre"
-            #nameFilter
-            (blur)="search('name', nameFilter.value)">
-        </td>
-        <td class="text-center">
-          <input 
-            type="text" 
-            name="seccion" 
-            class="col-3" 
-            placeholder="Seccion"
-            #sectionFilter
-            (blur)="search('sectionId', sectionFilter.value)">
-        </td>
+        <ng-container *ngFor="let header of headers; let colIndex = index; ">
+          <td class="text-center">
+            <input 
+              type="text" 
+              class="col-3" 
+              name=filter-{{header.key}}
+              placeholder={{header.key}}
+              #tmp
+              (blur)="search(header.value, tmp.value)">
+          </td>
+        </ng-container> 
       </tr>
       <tr *ngFor="let category of categories | async; let rowIndex=index; ">
         <!-- action buttons for main form -->

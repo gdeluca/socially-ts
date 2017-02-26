@@ -37,6 +37,20 @@
       </tr>
     </thead>
     <tbody>
+      <tr>
+        <td></td>
+        <ng-container *ngFor="let header of headers; let colIndex = index; ">
+          <td class="text-center">
+            <input 
+              type="text" 
+              class="col-9" 
+              name=filter-{{header.key}}
+              placeholder={{header.key}}
+              #tmp
+              (blur)="search(header.value, tmp.value)">
+          </td>
+        </ng-container> 
+      </tr>
       <tr *ngFor="let product of products | async; let rowIndex=index; ">
         <!-- action buttons for main form -->
         <td>

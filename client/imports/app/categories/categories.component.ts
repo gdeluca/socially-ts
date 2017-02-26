@@ -179,9 +179,11 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   }
 
   search(field: string, value: string): void {
-    this.curPage.next(1);
-    this.filterField.next(field);
-    this.filterValue.next(value); 
+    console.log(field);
+    console.log(value);
+    // this.curPage.next(1);
+    // this.filterField.next(field);
+    // this.filterValue.next(value); 
   }
   
   changeSortOrder(direction: string, fieldName: string): void {

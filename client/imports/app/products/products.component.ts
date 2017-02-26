@@ -201,6 +201,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   search(field: string, value: string): void {
+    console.log(field);
+    console.log(value);
     this.curPage.next(1);
     this.filterField.next(field);
     this.filterValue.next(value); 
