@@ -27,14 +27,6 @@
       </li>
 
       <li class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">
-        <a  class="nav-link" [routerLink]="['categories']">Categorias</a>
-      </li>
-
-      <li class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">
-        <a  class="nav-link" [routerLink]="['sections']">Secciones</a>
-      </li>
-            
-      <li class="nav-item" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}">
         <a  class="nav-link disabled" [routerLink]="['transactions']">Registros</a>
       </li>
 
@@ -42,6 +34,18 @@
         <a  class="nav-link" [routerLink]="['parties']">Test</a>
       </li>
      
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Configuracion
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['sections']">Secciones</a>
+          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['categories']">Categorias</a>
+          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['users']">Usuarios</a>
+          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['stores']">Sucursales</a>
+        </div>
+      </li>
+
     </ul>
     <form class="form-inline my-2 my-lg-0" [hidden]="user">
         <a class="form-control mr-sm-2"  [routerLink]="['/login']" >Login</a>

@@ -6,21 +6,26 @@ import { UserStores } from '../../../both/collections/user-stores.collection';
 import { User } from '../../../both/models/user.model';
 import { Users } from '../../../both/collections/users.collection';
 
+import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../both/search/search-options';
 
 
-Meteor.publish('stores', function() {
-  return Stores.find({});
+Meteor.publishComposite('stores', function() {
+  return {
+    find: function() {
+      return Stores.collection.find({});
+    }
+  }
 });
-
+ 
 Meteor.publishComposite('stores.users', function(user_id: string) {
  return {
     find: function() {
-        return UserStores.find({ userId: user_id })
+        return UserStores.collection.find({ userId: user_id })
     }, 
     children: [{
         find: function(userStore) {
-            return Stores.find({_id: userStore.storeId});
+            return Stores.collection.find({_id: userStore.storeId});
         }
     }]
   }
@@ -41,5 +46,20 @@ Meteor.publishComposite('stores.useremail', function(email: string) {
         }
       }]
     }]
+  }
+});
+
+Meteor.publishComposite('stores.with.counter', function(options: SearchOptions, filterField?: string, filterValue?: string) {
+  let query = {}
+  
+  if (filterField && filterValue) {
+    const searchRegEx = { '$regex': '.*' + ([filterValue] || '') + '.*', '$options': 'i' };
+    query = { [filterField]: searchRegEx }
+  }
+  return {
+    find: function() {
+    Counts.publish(this, 'numberOfStores',Stores.collection.find(query , options), { noReady: true });
+    return Stores.find(query, options);
+    }
   }
 });

@@ -17,22 +17,22 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
 
 // model 
-import { Sections } from '../../../../both/collections/sections.collection';
-import { Section } from '../../../../both/models/section.model';
+import { Stores } from '../../../../both/collections/stores.collection';
+import { Store } from '../../../../both/models/store.model';
 import { Dictionary } from '../../../../both/models/dictionary';
 
 
  
-import template from './sections.component.html';
-import style from './sections.component.scss';
+import template from './stores.component.html';
+import style from './stores.component.scss';
 
 @Component({
-  selector: 'sections',
+  selector: 'stores',
   template,
   styles: [ style ],
 })
 @InjectUser('user')
-export class SectionsComponent implements OnInit, OnDestroy {
+export class StoresComponent implements OnInit, OnDestroy {
   
   // pagination related
   pageSize: Subject<number> = new Subject<number>();
@@ -53,15 +53,16 @@ export class SectionsComponent implements OnInit, OnDestroy {
 
 
   user: Meteor.User;
-  editedSection: Section = {name:''};
+  editedEntity: Store = {name:'', address:''};
   adding: boolean = false;
   editing: boolean = false;
   selected: any;
-  sections: Observable<Section[]>;
+  stores: Observable<Store[]>; 
 
   // name <-> sortfield, touple
   headers: Dictionary[] = [
-    {'key': 'Nombre', 'value': 'name'},
+    {'key': 'Sucursal', 'value': 'name'}, 
+    {'key': 'Direccion', 'value': 'address'}, 
   ];
   complexForm : FormGroup;
 
@@ -70,7 +71,8 @@ export class SectionsComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder
   ){
     this.complexForm = formBuilder.group({
-      name: ['', Validators.compose([Validators.required, Validators.minLength(5)])],
+      name: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
+      address: ['', Validators.required],
     });
   }
 
@@ -94,9 +96,9 @@ export class SectionsComponent implements OnInit, OnDestroy {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('sections.with.counter', options, filterField, filterValue)
+      this.paginatedSub = MeteorObservable.subscribe('stores.with.counter', options, filterField, filterValue)
         .subscribe(() => {
-          this.sections = Sections.find({}).zone();
+          this.stores = Stores.find({}).zone();
       });
       
     });
@@ -109,7 +111,7 @@ export class SectionsComponent implements OnInit, OnDestroy {
     this.filterValue.next('');
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
-      this.collectionCount = Counts.get('numberOfSections');
+      this.collectionCount = Counts.get('numberOfStores');
       this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
     });
 
@@ -132,10 +134,11 @@ export class SectionsComponent implements OnInit, OnDestroy {
     this.curPage.next(page);
   }
 
-  update = function(Section){
-    Sections.update(Section._id, {
+  update = function(store){
+    Stores.update(store._id, {
       $set: { 
-         name: Section.name
+         name: store.name,
+         address: store.address
       }
     });
   }
@@ -147,8 +150,9 @@ export class SectionsComponent implements OnInit, OnDestroy {
     }
 
     if (this.complexForm.valid) {
-      Sections.insert({
-        name: this.complexForm.value.name
+      Stores.insert({
+        name: this.complexForm.value.name,
+        address: this.complexForm.value.address
       });
       this.complexForm.reset();
     }

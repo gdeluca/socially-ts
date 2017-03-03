@@ -1,0 +1,194 @@
+<div class="card align-items-center">
+  <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+</div>
+
+<!-- entities list -->
+<h3 class="col-12 text-center">Sucursales</h3>
+<div class="row">
+  <table class="table table-bordered table-hover table-striped ">
+    <thead class="thead-default">
+
+       <!-- headers for sorting -->
+      <tr>
+        <th class="text-center">Modificar</th>
+        <th  class="text-center" *ngFor="let header of headers; let colIndex = index; ">
+          {{header.key}}
+          <button 
+            [hidden]="idx !== colIndex || direction !== 'up'" 
+            type="button" 
+            class="btn btn-default" 
+            (click)="idx = colIndex; direction = 'down';changeSortOrder(1, header.value)">
+            <span class="fa fa-chevron-up" aria-hidden="true"></span>
+          </button>
+          <button 
+              [hidden]="idx !== colIndex || direction !== 'down'" 
+              type="button" 
+              class="btn btn-default"  
+              (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
+              <span class="fa fa-chevron-down" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="direction && idx === colIndex " 
+            type="button" 
+            class="btn btn-default"   
+            (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+            <span class="fa fa-sort" aria-hidden="true"></span>
+          </button>        
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td></td>
+        <ng-container *ngFor="let header of headers; let colIndex = index; ">
+          <td class="text-center">
+            <input 
+              type="text" 
+              class="col-3" 
+              name=filter-{{header.key}}
+              placeholder={{header.key}}
+              #tmp
+              (blur)="search(header.value, tmp.value)">
+          </td>
+        </ng-container> 
+      </tr>
+
+      <!-- table body -->
+      <tr *ngFor="let store of stores | async; let rowIndex=index; ">
+        <!-- action buttons for main form -->
+        <td>
+          <button 
+            [hidden]="currentIndex === rowIndex && editing"
+            type="button" 
+            class="btn btn-default" 
+            (click)="currentIndex=rowIndex; editing=true;editedEntity=copy(store)">
+            <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+            type="button" 
+            class="btn btn-default" 
+            (click)="currentIndex=rowIndex; editing=false; update(editedEntity)">
+            <span class="fa fa-check-square-o" aria-hidden="true"></span>
+          </button>
+          <button 
+            [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)" 
+            type="button" 
+            class="btn btn-default" 
+            (click)="currentIndex=rowIndex; editing=false;">
+            <span class="fa fa-ban" aria-hidden="true"></span>
+          </button>
+        </td>
+        <!-- name field -->
+        <!-- display mode-->
+        <td 
+          [hidden]="currentIndex === rowIndex && editing"
+          class="text-center">
+          <a>{{store.name}}</a>
+        </td>
+        <!-- editing mode-->
+        <td 
+          [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+          class="text-center">
+          <input 
+            type="text" 
+            name="name-{{rowIndex}}" 
+            class="form-control" 
+            [(ngModel)]="editedEntity.name">
+        </td>
+        <!-- address field -->
+        <!-- display mode-->
+        <td 
+          [hidden]="currentIndex === rowIndex && editing"
+          class="text-center">
+          <a>{{store.address}}</a>
+        </td>
+        <!-- editing mode-->
+        <td 
+          [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+          class="text-center">
+          <input 
+            type="text" 
+            name="address-{{rowIndex}}" 
+            class="form-control" 
+            [(ngModel)]="editedEntity.address">
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="row-fluid">
+
+  <!-- submission form -->
+  <form [formGroup]="complexForm" (ngSubmit)="submitForm(complexForm.value)">
+    <table class="table table-hover">
+      <tbody>
+        <tr ng-form="myForm">
+          <!-- action buttons for submision form -->
+          <td>
+            <button 
+              [hidden]="adding" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="adding=true">
+              <span class="fa fa-plus-square-o" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="!adding" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="adding=false;complexForm.reset()">
+              <span class="fa fa-minus-square-o" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="!adding" 
+              [disabled]="!complexForm.valid" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="adding=false; save(complexForm.value)">
+              <span class="fa fa-check-square-o" aria-hidden="true"></span>
+            </button>
+          </td> 
+          <!-- adding mode fields -->
+          <td class="text-center" 
+            [ngClass]="{'has-error':!complexForm.controls['name'].valid && complexForm.controls['name'].touched}">
+            <input 
+              [hidden]="!adding" 
+              type="text" 
+              name="name" 
+              class="form-control" 
+              placeholder="Nombre de la sucursal" [formControl]="complexForm.controls['name']">
+              <!-- The hasError method will tell us if an error exists -->
+              <div *ngIf="complexForm.controls['name'].hasError('required') && complexForm.controls['name'].touched" 
+              class="alert alert-danger">
+                Incluya un nombre.
+              </div>
+              <div *ngIf="complexForm.controls['name'].hasError('minlength') && complexForm.controls['name'].touched" 
+              class="alert alert-danger">
+                El campo debe tener al menos 3 caracteres.
+              </div>
+          </td>
+          <td class="text-center" 
+            [ngClass]="{'has-error':!complexForm.controls['address'].valid && complexForm.controls['name'].touched}">
+            <input 
+              [hidden]="!adding" 
+              type="text" 
+              name="address" 
+              class="form-control" 
+              placeholder="Direccion" [formControl]="complexForm.controls['address']">
+              <!-- The hasError method will tell us if an error exists -->
+              <div *ngIf="complexForm.controls['address'].hasError('required') && complexForm.controls['name'].touched" 
+              class="alert alert-danger">
+                Incluya una direccion.
+              </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</div>
+<div class="card align-items-center">
+  <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+</div>
+

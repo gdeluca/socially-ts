@@ -3,6 +3,9 @@
 /// <reference types="@types/underscore" />
 /// <reference types="@types/chai" />
 /// <reference types="@types/mocha" />
+/// <reference types="zone.js" />
+/// <reference types="meteor-typings" />
+/// <reference types="@types/meteor-publish-composite" />
 
 declare module "*.html" {
   const template: string;

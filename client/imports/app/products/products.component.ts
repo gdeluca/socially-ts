@@ -140,15 +140,18 @@ export class ProductsComponent implements OnInit, OnDestroy {
     
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
-      this.collectionCount = Counts.get('numberOfproducts');
+      this.collectionCount = Counts.get('numberOfProducts');
       this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+      console.log(this.collectionCount);
+
     });
 
+    console.log(this.collectionCount);
     this.paginationService.register({
       id: this.paginationService.defaultId(),
       itemsPerPage: this.PAGESIZE,
       currentPage: 1,
-      totalItems: 30,
+      totalItems: this.collectionCount,
     });
 
   }

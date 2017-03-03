@@ -13,13 +13,15 @@ import { AppComponent } from './app.component';
 import { routes, ROUTES_PROVIDERS } from './app.routes';
 
 
-// project definitions, order matters
+// project definitions, module inport order matters
 import { STOCKS_DECLARATIONS } from './stock';
 import { SALES_DECLARATIONS } from './sales';
 import { PARTIES_DECLARATIONS } from './parties';
 import { PRODUCTS_DECLARATIONS } from './products';
 import { CATEGORIES_DECLARATIONS } from './categories';
 import { SECTIONS_DECLARATIONS } from './sections';
+import { STORES_DECLARATIONS } from './stores';
+import { USERS_DECLARATIONS } from './users';
 import { SHARED_DECLARATIONS } from './shared';
 import { NAVBAR_DECLARATIONS } from './navbar';
 import { AUTH_DECLARATIONS } from "./auth/index";
@@ -39,6 +41,8 @@ import { FocusDirective } from '../directives/focus.directive';
     ...PRODUCTS_DECLARATIONS,
     ...CATEGORIES_DECLARATIONS,
     ...SECTIONS_DECLARATIONS,
+    ...STORES_DECLARATIONS,
+    ...USERS_DECLARATIONS,
     ...SHARED_DECLARATIONS,
     ...NAVBAR_DECLARATIONS,
     ...AUTH_DECLARATIONS,    

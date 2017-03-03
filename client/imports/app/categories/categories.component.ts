@@ -129,11 +129,12 @@ export class CategoriesComponent implements OnInit, OnDestroy {
           this.sections = Sections.find({}).zone();
       });
     
+
     this.paginationService.register({
       id: this.paginationService.defaultId(),
       itemsPerPage: this.PAGESIZE,
       currentPage: 1,
-      totalItems: 30,
+      totalItems: this.collectionCount,
     });
 
   }

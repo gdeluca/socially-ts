@@ -8,6 +8,8 @@ import { OrderDetailsComponent } from './sales/order-details.component';
 import { PartiesListComponent } from './parties/parties-list.component';
 import { PartyDetailsComponent } from './parties/party-details.component';
 import { SectionsComponent } from './sections/sections.component';
+import { StoresComponent } from './stores/stores.component';
+import { UsersComponent } from './users/users.component';
 import { CategoriesComponent } from './categories/categories.component';
 import { ProductListComponent } from './products/product-list.component';
 import { ProductsComponent } from './products/products.component';
@@ -17,19 +19,21 @@ import { SignupComponent } from './auth/signup.component';
 
  
 export const routes: Route[] = [
-  { path: '', redirectTo: '/products', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
-  { path: 'stock/create', component: StockLoadComponent , canActivate: ['canActivateForLoggedIn'] },
-  { path: 'stock', component: StockListComponent , canActivate: ['canActivateForLoggedIn'] },
-  { path: 'orders', component: OrdersComponent , canActivate: ['canActivateForLoggedIn'] },
+  { path: '', redirectTo: '/users', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
+  { path: 'categories', component: CategoriesComponent, canActivate: ['canActivateForLoggedIn'] },
+  { path: 'login', component: LoginComponent },
+  { path: 'orders', component: OrdersComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'orders/:orderId', component: OrderDetailsComponent , canActivate: ['canActivateForLoggedIn'] },
-  { path: 'parties', component: PartiesListComponent , canActivate: ['canActivateForLoggedIn'] },
+  { path: 'parties', component: PartiesListComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'party/:partyId', component: PartyDetailsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'products', component: ProductsComponent, canActivate: ['canActivateForLoggedIn'] },
-  { path: 'categories', component: CategoriesComponent, canActivate: ['canActivateForLoggedIn'] },
-  { path: 'sections', component: SectionsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'product/:productId', component: ProductDetailsComponent, canActivate: ['canActivateForLoggedIn'] },
-  { path: 'login', component: LoginComponent },
+  { path: 'sections', component: SectionsComponent, canActivate: ['canActivateForLoggedIn'] },
+  { path: 'stock', component: StockListComponent, canActivate: ['canActivateForLoggedIn'] },
+  { path: 'stock/create', component: StockLoadComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'signup', component: SignupComponent },
+  { path: 'stores', component: StoresComponent, canActivate: ['canActivateForLoggedIn'] },
+  { path: 'users', component: UsersComponent, canActivate: ['canActivateForLoggedIn'] },
 
 
 ]; 
