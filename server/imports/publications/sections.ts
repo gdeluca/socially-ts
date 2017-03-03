@@ -8,7 +8,7 @@ import { SearchOptions } from '../../../both/search/search-options';
 Meteor.publishComposite('sections', function() {
   return {
     find: function() {
-      return Sections.find({});
+      return Sections.collection.find({});
     }
   }
 });
@@ -23,7 +23,7 @@ Meteor.publishComposite('sections.with.counter', function(options: SearchOptions
   return {
     find: function() {
     Counts.publish(this, 'numberOfSections',Sections.collection.find(query , options), { noReady: true });
-    return Sections.find(query, options);
+    return Sections.collection.find(query, options);
     }
   }
 });

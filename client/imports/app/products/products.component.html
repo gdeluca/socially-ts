@@ -108,7 +108,7 @@
           class="text-center">
           <input 
             type="text" 
-            name="name-{{rowIndex}}" 
+            name="code-{{rowIndex}}" 
             class="form-control" 
             [(ngModel)]="editedProduct.code">
         </td>
@@ -126,7 +126,7 @@
           class="text-center">
           <input 
             type="text" 
-            name="name-{{rowIndex}}" 
+            name="color-{{rowIndex}}" 
             class="form-control" 
             [(ngModel)]="editedProduct.color">
         </td>
@@ -144,9 +144,27 @@
           class="text-center">
           <input 
             type="text" 
-            name="name-{{rowIndex}}" 
+            name="brand-{{rowIndex}}" 
             class="form-control" 
             [(ngModel)]="editedProduct.brand">
+        </td>
+
+        <!-- provider field -->
+        <!-- display mode-->
+        <td 
+          [hidden]="currentIndex === rowIndex && editing"
+          class="text-center">
+          <a>{{product.provider}}</a>
+        </td>
+        <!-- editing mode-->
+        <td 
+          [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+          class="text-center">
+          <input 
+            type="text" 
+            name="provider-{{rowIndex}}" 
+            class="form-control" 
+            [(ngModel)]="editedProduct.provider">
         </td>
 
         <!-- model field -->
@@ -162,7 +180,7 @@
           class="text-center">
           <input 
             type="text" 
-            name="name-{{rowIndex}}" 
+            name="model-{{rowIndex}}" 
             class="form-control" 
             [(ngModel)]="editedProduct.model">
         </td>
@@ -180,7 +198,7 @@
             <td 
                 [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)">
               <select 
-                name="select-{{rowIndex}}" class="form-control" required  
+                name="selectCategory-{{rowIndex}}" class="form-control" required  
                 [(ngModel)]="editedProduct.categoryId">
                 <option value="" disabled currentIndex hidden>Nombre de Categoria</option>
                 <option *ngFor="let category of categories | async" 
@@ -287,6 +305,20 @@
                 class="form-control" 
                 placeholder="Marca" [formControl]="complexForm.controls['brand']">
           </td>
+          <!-- form fields provider -->
+          <td class="text-center" 
+              [ngClass]="{'has-error':!complexForm.controls['provider'].valid && complexForm.controls['provider'].touched}">
+              <input 
+                [hidden]="!adding" 
+                type="text" 
+                name="provider" 
+                class="form-control" 
+                placeholder="Nombre del Proveedor" [formControl]="complexForm.controls['provider']">
+          </td>
+          <div *ngIf="complexForm.controls['provider'].hasError('required') && complexForm.controls['provider'].touched" 
+                class="alert alert-danger">
+                  Falta el nombre del proveedor.
+          </div>
           <!-- form fields model -->
           <td class="text-center" 
               [ngClass]="{'has-error':!complexForm.controls['model'].valid && complexForm.controls['model'].touched}">

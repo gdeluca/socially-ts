@@ -59,7 +59,7 @@ Meteor.publishComposite('stores.with.counter', function(options: SearchOptions, 
   return {
     find: function() {
     Counts.publish(this, 'numberOfStores',Stores.collection.find(query , options), { noReady: true });
-    return Stores.find(query, options);
+    return Stores.collection.find(query, options);
     }
   }
 });

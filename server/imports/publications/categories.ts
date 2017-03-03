@@ -8,10 +8,10 @@ import { SearchOptions } from '../../../both/search/search-options';
 Meteor.publishComposite('categories', function() {
   return {
     find: function() {
-      return Categories.find({});
-    }
+      return Categories.collection.find({});
+    } 
   }
-});
+}); 
 
 Meteor.publishComposite('categories.sections', function(options: SearchOptions, filterField?: string, filterValue?: string) {
   let query = {}
@@ -23,11 +23,11 @@ Meteor.publishComposite('categories.sections', function(options: SearchOptions, 
   return {
     find: function() {
     Counts.publish(this, 'numberOfCategories',Categories.collection.find(query , options), { noReady: true });
-    return Categories.find(query, options);
+    return Categories.collection.find(query, options);
     },
     children: [{
       find: function(category) {
-        return Sections.find({_id: category.sectionId});
+        return Sections.collection.find({_id: category.sectionId});
       }
     }]
   }

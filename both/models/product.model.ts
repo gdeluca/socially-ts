@@ -6,5 +6,6 @@ export interface Product extends CollectionObject {
   color: string;
   brand: string;
   model: string;
+  provider: string;
   categoryId: string;
 }

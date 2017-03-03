@@ -8,12 +8,14 @@ import { CommonModule } from '@angular/common';
 
 import { AccountsModule } from 'angular2-meteor-accounts-ui';
 import { Ng2PaginationModule } from 'ng2-pagination';
+import { MomentModule } from 'angular2-moment';
 
 import { AppComponent } from './app.component';
 import { routes, ROUTES_PROVIDERS } from './app.routes';
 
 
-// project definitions, module inport order matters
+// project definitions, module inport order mattersç
+import { BALANCES_DECLARATIONS } from './balances';
 import { STOCKS_DECLARATIONS } from './stock';
 import { SALES_DECLARATIONS } from './sales';
 import { PARTIES_DECLARATIONS } from './parties';
@@ -35,6 +37,7 @@ import { FocusDirective } from '../directives/focus.directive';
     AppComponent,
     DemoComponent,
     FocusDirective,
+    ...BALANCES_DECLARATIONS,
     ...STOCKS_DECLARATIONS,
     ...SALES_DECLARATIONS,
     ...PARTIES_DECLARATIONS,
@@ -69,6 +72,7 @@ import { FocusDirective } from '../directives/focus.directive';
     RouterModule.forRoot(routes),
     AccountsModule,
     Ng2PaginationModule,
+    MomentModule,
   ],
   
   // Main Component

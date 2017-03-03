@@ -1,25 +1,28 @@
 import { Meteor } from 'meteor/meteor';
 import { Route } from '@angular/router';
 
-import { StockLoadComponent } from './stock/stock-load.component';
-import { StockListComponent } from './stock/stock-list.component';
-import { OrdersComponent } from './sales/orders.component';
-import { OrderDetailsComponent } from './sales/order-details.component'; 
 import { PartiesListComponent } from './parties/parties-list.component';
 import { PartyDetailsComponent } from './parties/party-details.component';
-import { SectionsComponent } from './sections/sections.component';
-import { StoresComponent } from './stores/stores.component';
-import { UsersComponent } from './users/users.component';
+
 import { CategoriesComponent } from './categories/categories.component';
+import { BalanceResumeComponent } from './balances/balance-resume.component';
+import { LoginComponent } from './auth/login.component';
+import { OrderDetailsComponent } from './sales/order-details.component'; 
+import { OrdersComponent } from './sales/orders.component';
 import { ProductListComponent } from './products/product-list.component';
 import { ProductsComponent } from './products/products.component';
 import { ProductDetailsComponent } from './products/product-details.component';
-import { LoginComponent } from './auth/login.component';
+import { SectionsComponent } from './sections/sections.component';
 import { SignupComponent } from './auth/signup.component';
+import { StockLoadComponent } from './stock/stock-load.component';
+import { StockListComponent } from './stock/stock-list.component';
+import { StoresComponent } from './stores/stores.component';
+import { UsersComponent } from './users/users.component';
 
  
 export const routes: Route[] = [
-  { path: '', redirectTo: '/users', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
+  { path: '', redirectTo: '/balances', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
+  { path: 'balances', component: BalanceResumeComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'categories', component: CategoriesComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'login', component: LoginComponent },
   { path: 'orders', component: OrdersComponent, canActivate: ['canActivateForLoggedIn'] },
@@ -41,4 +44,4 @@ export const routes: Route[] = [
 export const ROUTES_PROVIDERS = [{
   provide: 'canActivateForLoggedIn',
   useValue: () => !! Meteor.userId()
-}];
+}]; 

@@ -173,6 +173,7 @@ export function loadData() {
     // 2 balance open or close
     Balances.insert({
       _id: "01",
+      balanceNumber: 2100001,
       storeId: "01",
       cashExistence: 500, 
       operation: "close", // open // close // extraction // deposit
@@ -180,6 +181,7 @@ export function loadData() {
     });
     Balances.insert({
       _id: "02",
+      balanceNumber: 2100002,
       storeId: "01",
       cashExistence: 500,
       operation: "open", // open // close // extraction // deposit
@@ -187,6 +189,7 @@ export function loadData() {
     });
     Balances.insert({
       _id: "03",
+      balanceNumber: 2100003,
       storeId: "01",
       cashExistence: 1500,
       operation: "open", // open // close // extraction // deposit
@@ -214,6 +217,7 @@ export function loadData() {
       color: "Negro",
       brand: "Levis",
       model: "Top 4y",
+      provider: "richard",
       categoryId: "06"
     });
     Products.insert({
@@ -224,6 +228,7 @@ export function loadData() {
       color: "Azul",
       brand: "Cuerda",
       model: "AW55G",
+      provider: "jhonny",
       categoryId: "14"
     });
    
@@ -404,6 +409,7 @@ export function loadData() {
     // 6: update balance test
     Balances.insert({
       _id: "03",
+      balanceNumber: 2100004,
       storeId: "01",
       cashExistence: 500,
       cashFlow: -100,
@@ -412,6 +418,7 @@ export function loadData() {
     }); 
     Balances.insert({
       _id: "04",
+      balanceNumber: 2100005,
       storeId: "01",
       cashExistence: 400,
       cashFlow: 50,
@@ -445,7 +452,8 @@ export function loadData() {
 
     // to the end of day close the balance
     Balances.insert({
-      _id: "03",
+      _id: "04",
+      balanceNumber: 2100006,
       storeId: "01",
       cashExistence: 1125.3,
       operation: "close", // open // close // extraction // deposit

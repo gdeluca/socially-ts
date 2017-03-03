@@ -57,6 +57,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     {'key': 'Codigo', 'value':'code'},
     {'key': 'Color', 'value':'color'},
     {'key': 'Marca', 'value':'brand'},
+    {'key': 'Proveedor', 'value':'provider'},
     {'key': 'Modelo', 'value':'model'},
     {'key': 'Categoria', 'value':'categoryId'},
   ];
@@ -70,7 +71,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   autorunSub: Subscription;
 
   user: Meteor.User;
-  editedProduct: Product = {code: 0, name: '', color: '', brand: '', model: '', categoryId : ''};
+  editedProduct: Product = {code: 0, name: '', color: '', brand: '', model: '', categoryId : '', provider:''};
   adding: boolean = false;
   editing: boolean = false;
   selected: any;
@@ -90,6 +91,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       color:[''],
       brand: [''],
       model: [''],
+      provider: ['', Validators.required],
       category: ['', Validators.required]
     });
   }
@@ -174,6 +176,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
          color: product.color,
          brand: product.brand,
          model: product.model,
+         provider: product.provider,
          categoryId: product.categoryId
       }
     });
@@ -192,6 +195,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         color: this.complexForm.value.color, 
         brand: this.complexForm.value.brand, 
         model: this.complexForm.value.model, 
+        provider: this.complexForm.value.provider, 
         categoryId: this.complexForm.value.category._id
       });
       this.complexForm.reset();
