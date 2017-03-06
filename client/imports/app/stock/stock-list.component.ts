@@ -61,21 +61,26 @@ export class StockListComponent implements OnInit, OnDestroy {
     {'key': 'Descripcion', 'value': 'name'},
     {'key': 'Color', 'value':'color'},
     {'key': 'Talle', 'value':'size'},
+    {'key': 'Cantidad', 'value':'quantity'},
+    {'key': 'Proveedor', 'value':'provider'},
+    {'key': 'Costo', 'value':'cost'},
     {'key': 'Contado', 'value':'cashPayment'},
     {'key': 'Tarjeta', 'value':'cardPayment'},
   ];
 
   collectionCount: number = 0;
-  PAGESIZE: number = 6; 
+  PAGESIZE: number = 6;  
   
   paginatedSub: Subscription;
   optionsSub: Subscription;
   autorunSub: Subscription;
+  categoriesSub: Subscription;
+  sectionsSub: Subscription;
 
   user: Meteor.User;
-  editedProductStock: any = {code:'', description:'', color:'', size:'', contado:'', tarjeta:'', storeQuantity:[]};
+  editedProductStock: any = {code:'', description:'', color:'', size:'', provider:'', cost:'', contado:'', tarjeta:'', storeQuantity:[]};
   editing: boolean = false;
-  product: any;
+  selectedCategory: Category;
 
   stocks: Observable<Stock[]>;
   productSizes: Observable<ProductSize[]>;
@@ -83,6 +88,7 @@ export class StockListComponent implements OnInit, OnDestroy {
   categories: Observable<Category[]>;
   section: Observable<Section[]>;
   stores: Observable<Store[]>;
+
 
   constructor(
     private paginationService: PaginationService
@@ -113,11 +119,19 @@ export class StockListComponent implements OnInit, OnDestroy {
           this.stocks = Stocks.find({}).zone();
           this.productSizes = ProductSizes.find({}).zone();
           this.products = Products.find({}).zone();
-          this.categories = Categories.find({}).zone();
           this.section = Sections.find({}).zone();
           this.stores = Stores.find({}).zone();
       });
       
+      this.categoriesSub = MeteorObservable.subscribe('categories')
+        .subscribe(() => {
+          this.categories = Categories.find({}).zone();
+      });
+      this.sectionsSub = MeteorObservable.subscribe('sections')
+        .subscribe(() => {
+          this.section = Sections.find({}).zone();
+      });
+
     });
 
     this.pageSize.next(this.PAGESIZE);
@@ -145,6 +159,8 @@ export class StockListComponent implements OnInit, OnDestroy {
     this.paginatedSub.unsubscribe();
     this.optionsSub.unsubscribe(); 
     this.autorunSub.unsubscribe();
+    this.categoriesSub.unsubscribe();
+    this.sectionsSub.unsubscribe();
   } 
 
   onPageChanged(page: number): void {
@@ -162,6 +178,16 @@ export class StockListComponent implements OnInit, OnDestroy {
         active: stock.active,
         storeId: stock.storeId, 
         productSizeId: stock.productSizeId
+
+    //       {'key': 'Codigo', 'value':'code'},
+    // {'key': 'Descripcion', 'value': 'name'},
+    // {'key': 'Color', 'value':'color'},
+    // {'key': 'Talle', 'value':'size'},
+    // {'key': 'Cantidad', 'value':'quantity'},
+    // {'key': 'Proveedor', 'value':'provider'},
+    // {'key': 'Costo', 'value':'cost'},
+    // {'key': 'Contado', 'value':'cashPayment'},
+    // {'key': 'Tarjeta', 'value':'cardPayment'},
       }
     });
   }

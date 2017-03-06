@@ -6,12 +6,17 @@ import { loadData } from './imports/fixtures/data';
 
 
 // load meteor publications
-import './imports/publications/parties'; 
-import './imports/publications/users'; 
-import './imports/publications/stores'; 
-import './imports/publications/products'; 
+import './imports/publications/parties';
+
 import './imports/publications/categories'; 
+import './imports/publications/counters'; 
+import './imports/publications/products'; 
 import './imports/publications/sections'; 
+import './imports/publications/stores'; 
+import './imports/publications/stocks'; 
+import './imports/publications/tags'; 
+import './imports/publications/users'; 
+
 
 
 // load meteor methods. e.g: to use latency compensation 

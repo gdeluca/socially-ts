@@ -18,12 +18,12 @@ import { Store } from '../../../both/models/store.model';
 
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../both/search/search-options';
+import { SearchOptions } from '../../../both/search/search-options';
 
 Meteor.publishComposite('stocks', function() {
  return {
     find: function() { 
-      return Stocks.collection.find({});
+      return Stocks.collection.find({}); 
     },
     children: [
       {
