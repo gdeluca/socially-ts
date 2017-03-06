@@ -12,6 +12,10 @@ import { MeteorObservable } from 'meteor-rxjs';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/combineLatest';
+import 'rxjs/add/operator/mergeMap';
+import { Meteor } from 'meteor/meteor';
+import 'rxjs/add/operator/map';
+
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
@@ -33,7 +37,7 @@ import { User } from '../../../../both/models/user.model';
 import template from './users.component.html';
 import style from './users.component.scss';
 
-@Component({
+@Component({ 
   selector: 'users',
   template,
   styles: [ style ],
@@ -61,7 +65,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
 
   user: Meteor.User;
-  editedUser: any = {username:'', email:'',_id:''};
+  editedUser: any = {username:'', email:'',_id:'', storeIds:[]};
   adding: boolean = false;
   editing: boolean = false;
   users: Observable<User[]>; // users from the collection related to current page
@@ -76,7 +80,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   headers: Dictionary[] = [
     {'key': 'Nombre de Usuario', 'value':'username'},
     {'key': 'Email', 'value':'email'},
-    {'key': 'Sucursal', 'value':'storeId'},
+    {'key': 'Sucursal', 'value':'storeIds'},
   ];
   complexForm : FormGroup;
 
@@ -120,153 +124,7 @@ export class UsersComponent implements OnInit, OnDestroy {
           this.users = Users.find({}).zone();
           this.paginatedStores = Stores.find({}).zone();
           this.paginatedUserStores = UserStores.find({}).zone();
-         // this.findStoresForUser();
- 
-           // var source = 
-           //   Observable.combineLatest(
-           //     this.users,
-           //     this.paginatedStores, 
-           //     this.paginatedUserStores,
-           //     function (users, stores, userstores) {
-           //       return  stores.map(store => {return store}) ;
-           //     });
-
-           //  source.subscribe(x => {
-           //    this.st =  x;
-           //    console.log(x);
-           //  });  
-             
-
-             // const combined = Observable
-             //    .combineLatest(
-             //        this.users,
-             //        this.paginatedStores,
-             //        this.paginatedUserStores
-             //    );
-             // const subscribe = combined.subscribe(latestValues => {
-             //      const [users, paginatedStores, paginatedUserStores] = latestValues;
-             // console.log(
-             //      `Timer One Latest: ${users}, 
-             //       Timer Two Latest: ${paginatedStores}, 
-             //       Timer Three Latest: ${paginatedUserStores}`
-             //     );
-             //  });
-
-
-             // let eventSource  =
-             //   this.users.distinctUntilChanged()
-             //   .concat(this.paginatedStores.distinctUntilChanged())
-             //   .concat(this.paginatedUserStores.distinctUntilChanged())
-             //   .subscribe((val) => {
-             //     console.log(val);
-             //   });
-
-            const combined = Observable.combineLatest(
-             this.users.distinctUntilChanged(),
-             this.paginatedStores.distinctUntilChanged(),
-             this.paginatedUserStores.distinctUntilChanged(),
-             (users: User[], paginatedStores: Store[], paginatedUserStores: UserStore[]) => {
-
-               users.map(user => { 
-                 return paginatedStores
-                   .map(paginatedStore => { 
-                     return paginatedUserStores
-                     .filter(paginatedUserStore => {
-                       paginatedUserStore.storeId == paginatedStore._id &&
-                       paginatedUserStore.userId == user._id
-                     })
-                     .map(paginatedUserStore => {
-                        return paginatedStore.name;
-                     })
-                   })
-                 })
-               })
-
-            // const subscribe = combined.subscribe(latestValuesProject => {
-            //       const [val] = latestValuesProject;
-            //       console.log(val);
-            //       //this.st =  Observable.from(paginatedStores as Store[]);
-            //     });
-
-
-               // this.users.distinctUntilChanged()
-             //   .map(user => {
-             //     this.paginatedStores.distinctUntilChanged()
-             //     .map(paginatedStore => {
-             //       this.paginatedUserStores.distinctUntilChanged()
-             //       .map(paginatedUserStore => {
-             //         paginatedUserStore.filter(() =>
-             //           paginatedUserStore.storeId == paginatedStore._id &&
-             //           paginatedUserStore.userId == user._id
-             //       })
-             //     })
-             //    })
-             // })
-
-
-
-
-             // const combined = Observable
-             //    .combineLatest(
-             //        this.users.distinctUntilChanged(),
-             //        this.paginatedStores.distinctUntilChanged(),
-             //        this.paginatedUserStores.distinctUntilChanged(),
-             //    (users, paginatedStores, paginatedUserStores) => {
-             //      return paginatedStores.map(paginatedStore => {
-             //        return users.map(user => { 
-             //          return paginatedUserStores.filter(paginatedUserStore => {
-             //            paginatedUserStore.storeId == paginatedStore._id &&
-             //            paginatedUserStore.userId == user._id
-             //          }) 
-             //        })
-             //      })
-             //      // return `Timer One (Proj) Latest: ${users}, 
-             //      //         Timer Two (Proj) Latest: ${paginatedStores}, 
-             //      //         Timer Three (Proj) Latest: ${paginatedUserStores}`
-             //    }) 
-
-             //    const subscribe = combined.subscribe(latestValuesProject => {
-             //      const [users, paginatedStores, paginatedUserStores] = latestValuesProject;
-             //      console.log(latestValuesProject);
-             //      //this.st =  Observable.from(paginatedStores as Store[]);
-             //    });
-
-
-             // const subscribe2 = combined.subscribe(latestValues => {
-             //      const [users, paginatedStores, paginatedUserStores] = latestValues;
-             //    console.log(
-             //      `Timer One Latest: ${users}, 
-             //       Timer Two Latest: ${paginatedStores}, 
-             //       Timer Three Latest: ${paginatedUserStores}`
-             //     );
-             //  });
-
-
-           //   .map(res => this.join( res[0], res[1] )))
-           // this.st.subscribe(x => console.log(x),
-           // error => console.error(error),
-           // () => console.log('done'));
-
-            // .map(res => { 
-            //   let users = res[0];
-            //   let paginatedStores = res[1];
-            //   let paginatedUserStores = res[2]; 
-            //   this.st = Observable.from(paginatedStores) ;  
-              // return users.map(user => {
-              //    this.st = Observable.from(paginatedUserStores.map(paginatedUserStore => { 
-              //     return paginatedStores.filter(paginatedStore => {
-              //         paginatedUserStore.storeId == paginatedStore._id &&
-              //         paginatedUserStore.userId == user._id
-              //       }) 
-              //     })) 
-              //   })
-              // }); 
-              //return
-
-
           });
- 
-      
     });
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
@@ -299,25 +157,6 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   }
 
-  //  join(stores, userstores){
-  //    console.log('a');
-  //   return stores.map(store => {
-  //     return userstores
-  //     .filter(userstore => userstore.storeId == store._id)
-  //     .map(userstore => {
-  //       return {
-  //         id: store._id,
-  //         title: store.name,
-  //         user_id: userstore.userId,
-  //       }
-  //     })
-  //   }).reduce((a,b) =>{
-  //     console.log('test');
-  //     return a.concat(b);
-  //   }, []);
-  // }
-
-  
   ngOnDestroy() {
     this.paginatedSub.unsubscribe();
     this.optionsSub.unsubscribe(); 
@@ -329,97 +168,42 @@ export class UsersComponent implements OnInit, OnDestroy {
   }
  
   update = function(user){
+    console.log(this.editedUser);
     console.log(user);
-    /*Users.update(user._id,
-      $set: { 
-        emails[0].address: user.email,
-        username: user.username,
-
-      }
-    });*/
-  } 
-
-  findStoreNamesForUser(user: User){
-
-    // console.log(this.userStores);
-    // let val =  this.userStores[user._id];
-    // let arr = val.map(item => item.name).join(", ");
-    // return arr;
-  }
-
-  findStoresForUser(){
-    console.log('sds'); 
-
-    this.users.mapTo(this.paginatedStores).combineAll().subscribe((val)=> {
-      console.log('Example 1: Basic concat:', val);
-    });
-
-
-    /*this.users.subscribe((users: User[]) => {
-      // console.log('user');
-      this.paginatedStores.subscribe((paginatedStore: Store[]) => {
-        // console.log('paginatestore');
-        this.paginatedUserStores.subscribe((paginatedUserStore: UserStore[]) => {
-          // console.log('paginatedUserStore');
-            console.log(1);
-            console.log(users);
-              console.log(paginatedStore);
-                console.log(paginatedUserStore);
-          for (let user of users) {
-            for (let pStore of paginatedStore) {
-              for (let pUserStore of paginatedUserStore) {
-                // console.log(pUserStore.storeId);
-                // console.log(pStore._id);
-                // console.log('AND');
-                // console.log(pUserStore.userId);
-                // console.log(user._id);
-                if (pUserStore.storeId === pStore._id && pUserStore.userId === user._id) {
-                  let container = this.userStores[user._id]; 
-                  if (!container) {
-                    container = new Container([pStore]);
-                  } else {
-                    container.add(pStore);
-                  }
-                  console.log(pStore);
-                  this.userStores[user._id] = container; 
-                 //  console.log(container);
-                 // console.log(this.userStores);
-                }
-              }
-            }
-          }
-        }) 
-      })
-    })*/
-    // console.log(this.userStores);
-  }
-
-  updateUserAndUserStores = function(user, stores: Store[]){
-    let storesIds = stores.map(store => store._id);
-    let userStoresIdsInDB = UserStores.collection.find({userId: user._id}).map(us => us.storeId);
-    let userStoresToAdd = storesIds.filter(item => userStoresIdsInDB.indexOf(item) < 0);
-    let userStoresToRemove = userStoresIdsInDB.filter(item => storesIds.indexOf(item) < 0);
     
-    for (let storeId of userStoresToAdd) {
-      UserStores.insert({
-        userId: user._id,
-        storeId: storeId
-      });  
-    }
-    for (let storeId of userStoresToRemove) {
-      UserStores.remove({
-        userId: user._id,
-        storeId: storeId
-      });  
-    }
-    Users.update(
-      {userId: user._id},
-      { $set: { 
-         email: user.email,
+    // console.log(user);
+    Users.update({_id: user._id}, {
+      $set: { 
+        username: user.username
       }
-    });
-  }
+    }); 
+    var currentStoreIds=[];
+    UserStores.find({userId: user._id}).mergeMap(userStores => {
+      return userStores.map(userStore => {
+        return userStore.storeId})}).subscribe(res => {currentStoreIds.push(res)});
 
+    var newStoreIds = [];
+    if (user.storeIds) {
+      newStoreIds = user.storeIds.map(ids => {return ids._id})
+      // console.log('new ids ' + newStoreIds);
+
+    }
+    var storeIdsToRemove = currentStoreIds.filter(x => newStoreIds.indexOf(x) == -1);
+    var storeIdsToAdd = newStoreIds.filter(x => currentStoreIds.indexOf(x) == -1);
+
+    for (let storeId of storeIdsToAdd) {
+      // console.log('adding ' + storeId);
+      UserStores.insert({userId: user._id, storeId: storeId});
+    }
+
+    for (let storeId of storeIdsToRemove) {
+      // console.log('removing ' + storeId);
+      UserStores.find({userId: user._id, storeId: storeId})
+        .mergeMap(userStores => {return userStores })
+        .subscribe((userStore: UserStore) => {
+        UserStores.remove(userStore._id)})    
+    } 
+  }
 
  saveUser() {
     if (!Meteor.userId()) {

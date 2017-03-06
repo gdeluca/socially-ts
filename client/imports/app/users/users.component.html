@@ -120,13 +120,13 @@
         <td 
           [hidden]="currentIndex === rowIndex && editing"
           class="text-center">
-   <!-- <ng-container *ngFor="let store of paginatedStores | async; "> 
+   <ng-container *ngFor="let store of paginatedStores | async; "> 
             <ng-container *ngFor="let userStores of paginatedUserStores | async"> 
               <ng-container *ngIf="userStores.storeId === store._id && userStores.userId === user._id">
                   |{{store.name}}|
               </ng-container>
             </ng-container>
-          </ng-container> -->
+          </ng-container>
         </td>
        
         <!-- editing mode fields -->
@@ -134,10 +134,12 @@
           [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing) ">
             <select multiple 
               name="select-{{rowIndex}}" class="form-control" required  
-              [(ngModel)]="editedUser.storeId">
+              [(ngModel)]="editedUser.storeIds">
               <option value="" disabled currentIndex hidden>Sucursal</option>
               <option *ngFor="let store of stores | async" 
-              [ngValue]="store">{{store.name}}</option>
+              (ngModel)="editedUser.storeIds"
+              [ngValue]="store">
+              {{store.name}}</option>
             </select> 
          </td>
 
