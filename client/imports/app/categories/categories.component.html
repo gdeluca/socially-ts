@@ -17,7 +17,7 @@
             [hidden]="idx !== colIndex || direction !== 'up'" 
             type="button" 
             class="btn btn-default" 
-            (click)="idx = colIndex; direction = 'down';changeSortOrder(1, header.value)">
+            (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
             <span class="fa fa-chevron-up" aria-hidden="true"></span>
           </button>
           <button 

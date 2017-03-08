@@ -14,6 +14,8 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/publishLast';
+
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
@@ -52,16 +54,27 @@ export class StockListComponent implements OnInit, OnDestroy {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
 
-  filterField: Subject<string> = new Subject<string>();
-  filterValue: Subject<string> = new Subject<string>();
+  filters: Subject<any> = new Subject<any>();
+
+  filtersParams: any = {
+    'barCode': '',
+    'name':  '',
+    'color': '',
+    'size': '',
+    'provider': '',
+    'cost': '',
+    'cashPayment': '',
+    'cardPayment': '',
+    'categoryId': '',
+    'sectionId': ''
+  };
 
   // name <-> sortfield, touple
   headers: Dictionary[] = [
-    {'key': 'Codigo', 'value':'code'},
+    {'key': 'Codigo', 'value':'barCode'},
     {'key': 'Descripcion', 'value': 'name'},
     {'key': 'Color', 'value':'color'},
     {'key': 'Talle', 'value':'size'},
-    {'key': 'Cantidad', 'value':'quantity'},
     {'key': 'Proveedor', 'value':'provider'},
     {'key': 'Costo', 'value':'cost'},
     {'key': 'Contado', 'value':'cashPayment'},
@@ -69,16 +82,27 @@ export class StockListComponent implements OnInit, OnDestroy {
   ];
 
   collectionCount: number = 0;
-  PAGESIZE: number = 6;  
+  PAGESIZE: number = 15;  
   
   paginatedSub: Subscription;
   optionsSub: Subscription;
   autorunSub: Subscription;
   categoriesSub: Subscription;
   sectionsSub: Subscription;
+  storesSub: Subscription;
 
   user: Meteor.User;
-  editedProductStock: any = {code:'', description:'', color:'', size:'', provider:'', cost:'', contado:'', tarjeta:'', storeQuantity:[]};
+  emptyStock: any = 
+    {
+      barCode:'', 
+      description:'', 
+      color:'', 
+      size:'', 
+      provider:'', 
+      quantity:[{stockId:'', storeId:'', quantity:'', priceCash:'', priceCard:'', lastCostPrice:''}]
+    };
+
+  editedStock: any;
   editing: boolean = false;
   selectedCategory: Category;
 
@@ -86,9 +110,8 @@ export class StockListComponent implements OnInit, OnDestroy {
   productSizes: Observable<ProductSize[]>;
   products: Observable<Product[]>;
   categories: Observable<Category[]>;
-  section: Observable<Section[]>;
+  sections: Observable<Section[]>;
   stores: Observable<Store[]>;
-
 
   constructor(
     private paginationService: PaginationService
@@ -100,9 +123,8 @@ export class StockListComponent implements OnInit, OnDestroy {
       this.curPage,
       this.sortDirection,
       this.sortField,
-      this.filterField,
-      this.filterValue
-    ).subscribe(([pageSize, curPage, sortDirection, sortField, filterField, filterValue]) => {
+      this.filters
+    ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
       const options: SearchOptions = {
         limit: pageSize as number,
         skip: ((curPage as number) - 1) * (pageSize as number),
@@ -114,32 +136,38 @@ export class StockListComponent implements OnInit, OnDestroy {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('stocks', options, filterField, filterValue)
+      this.paginatedSub = MeteorObservable.subscribe('stocks', options, filters)
         .subscribe(() => {
           this.stocks = Stocks.find({}).zone();
           this.productSizes = ProductSizes.find({}).zone();
           this.products = Products.find({}).zone();
-          this.section = Sections.find({}).zone();
-          this.stores = Stores.find({}).zone();
-      });
-      
-      this.categoriesSub = MeteorObservable.subscribe('categories')
-        .subscribe(() => {
           this.categories = Categories.find({}).zone();
-      });
-      this.sectionsSub = MeteorObservable.subscribe('sections')
-        .subscribe(() => {
-          this.section = Sections.find({}).zone();
+
       });
 
     });
 
+    if (this.sectionsSub) {
+      this.sectionsSub.unsubscribe();
+    } 
+    this.sectionsSub = MeteorObservable.subscribe('sections')
+      .subscribe(() => {
+        this.sections = Sections.find({}).zone();
+    });
+
+    if (this.storesSub) {
+      this.storesSub.unsubscribe();
+    } 
+    this.storesSub = MeteorObservable.subscribe('stores')
+      .subscribe(() => {
+        this.stores = Stores.find({}).zone();
+    });
+
     this.pageSize.next(this.PAGESIZE);
     this.curPage.next(1);
-    this.sortField.next('code');
+    this.sortField.next('barCode');
     this.sortDirection.next(1);
-    this.filterField.next('code');
-    this.filterValue.next('');
+    this.filters.next('');
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfStocks');
@@ -159,69 +187,76 @@ export class StockListComponent implements OnInit, OnDestroy {
     this.paginatedSub.unsubscribe();
     this.optionsSub.unsubscribe(); 
     this.autorunSub.unsubscribe();
-    this.categoriesSub.unsubscribe();
     this.sectionsSub.unsubscribe();
+    this.storesSub.unsubscribe();
   } 
 
   onPageChanged(page: number): void {
     this.curPage.next(page);
   }
 
-  update = function(stock){
-    Stocks.update(stock._id, {
-      $set: { 
-        quantity: stock.quantity,
-        priceCash: stock.priceCash,
-        priceCard: stock.priceCard,
-        rateCash: stock.rateCash,
-        rateCard: stock.rateCard,
-        active: stock.active,
-        storeId: stock.storeId, 
-        productSizeId: stock.productSizeId
+  /* save values to database */
+  update = function(editedStock){
 
-    //       {'key': 'Codigo', 'value':'code'},
-    // {'key': 'Descripcion', 'value': 'name'},
-    // {'key': 'Color', 'value':'color'},
-    // {'key': 'Talle', 'value':'size'},
-    // {'key': 'Cantidad', 'value':'quantity'},
-    // {'key': 'Proveedor', 'value':'provider'},
-    // {'key': 'Costo', 'value':'cost'},
-    // {'key': 'Contado', 'value':'cashPayment'},
-    // {'key': 'Tarjeta', 'value':'cardPayment'},
+    for (let stock of editedStock.quantity) {
+
+      if (stock.quantity && stock.stockId) {
+        Stocks.update(stock.stockId, {
+          $set: { 
+            storeId: stock.storeId, 
+            quantity: stock.quantity,
+            priceCash: stock.priceCash,
+            priceCard: stock.priceCard,
+            rateCash: stock.rateCash,
+            rateCard: stock.rateCard,
+            lastCostPrice: stock.lastCostPrice
+          }
+        });
       }
-    });
-  }
-
-  save(value: any){
-    if (!Meteor.userId()) {
-      alert('Ingrese al sistema para poder guardar');
-      return;
     }
-
-    // if (this.complexForm.valid) {
-    //   Sections.insert({
-    //     name: this.complexForm.value.name
-    //   });
-    //   this.complexForm.reset();
-    // }
-    console.log(value);
+    editedStock = this.copy(this.emptyStock);
   }
 
   copy(original: any){
     return Object.assign({}, original)
   }
 
-  search(field: string, value: string): void {
-    console.log(field);
-    console.log(value);
-    this.curPage.next(1);
-    this.filterField.next(field);
-    this.filterValue.next(value); 
+  /* update edited stock model */
+  updateEditedStock(editedStock: any, stock:Stock, storeId:string, quantity:number){
+    if (quantity) {
+      editedStock.quantity.push(
+        {
+          stockId: stock._id, 
+          storeId: storeId, 
+          quantity: quantity,
+          priceCash: stock.priceCash,
+          priceCard: stock.priceCard,
+          rateCash: stock.rateCash,
+          rateCard: stock.rateCard,
+          lastCostPrice: stock.lastCostPrice
+        }
+      );
+    }
+    // console.log(editedStock);
   }
+
   
   changeSortOrder(direction: string, fieldName: string): void {
     this.sortDirection.next(parseInt(direction));
     this.sortField.next(fieldName);
   }
 
+  search(field: string, value: string): void {
+    console.log(value);
+    // no value change on blur
+    if (this.filtersParams[field] === value) {
+      return;
+    }
+    this.filtersParams[field] = value
+
+    this.curPage.next(1);
+    this.filters.next(this.filtersParams);
+  }
+
 }
+ 

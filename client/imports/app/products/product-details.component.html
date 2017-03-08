@@ -1,7 +1,7 @@
 <div class="row ma-party-details-container">
   <div class="col-sm-6 col-sm-offset-3">
     <legend>Ver y editar el producto:</legend>
-    <!-- name, code, size, color, description -->
+    <!-- name, barCode, size, color, description -->
 
     <form class="form-horizontal" *ngIf="product" (submit)="saveProduct($event)">
        
@@ -12,7 +12,7 @@
  
       <div class="form-group">
         <label>Codigo de producto</label>
-        <input [disabled]="!isAdmin" type="text" [(ngModel)]="product.code" name="code" class="form-control">
+        <input [disabled]="!isAdmin" type="text" [(ngModel)]="product.barCode" name="barCode" class="form-control">
       </div>
 
       <div class="form-group">

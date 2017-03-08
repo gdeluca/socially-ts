@@ -172,6 +172,8 @@ export class StoresComponent implements OnInit, OnDestroy {
   }
   
   changeSortOrder(direction: string, fieldName: string): void {
+    console.log(direction);
+    console.log(fieldName);
     this.sortDirection.next(parseInt(direction));
     this.sortField.next(fieldName);
   }

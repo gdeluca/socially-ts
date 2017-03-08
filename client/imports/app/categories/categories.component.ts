@@ -64,6 +64,11 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   paginatedSections: Observable<Section[]>;
   sections: Observable<Section[]>;
 
+  filters: any = {
+    'name':  '',
+    'sectionId': ''
+  };
+
   // name, sortfield, touple
   headers: Dictionary[] = [
     {'key': 'Nombre', 'value': 'name'},
@@ -160,7 +165,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
 
   saveCategory(value: any){
     if (!Meteor.userId()) {
-      alert('Ingrese al sistema para guardar la categoria');
+      alert('Ingrese al sistema para guardar');
       return;
     }
 
@@ -179,11 +184,14 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   }
 
   search(field: string, value: string): void {
-    console.log(field);
-    console.log(value);
-    // this.curPage.next(1);
-    // this.filterField.next(field);
-    // this.filterValue.next(value); 
+    if (this.filters[field] === value) {
+      return;
+    }
+    this.filters[field] = value;
+    
+    this.curPage.next(1);
+    this.filterField.next(field);
+    this.filterValue.next(value); 
   }
   
   changeSortOrder(direction: string, fieldName: string): void {
@@ -192,36 +200,3 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   }
 
 }
-
-
-  // categories: Category[];
-  // sections: Section[];
-
-// constructor(
-  //   private paginationService: PaginationService
-  // ) {
-    // this.categories = [
-    //   { "_id" : "01", "name" : "Shorts", "sectionId" : "01" },
-    //   { "_id" : "02", "name" : "Panatalon Largo", "sectionId" : "01" },
-    //   { "_id" : "03", "name" : "Pantalon Corto", "sectionId" : "01" },
-    //   { "_id" : "04", "name" : "Calza", "sectionId" : "01" },
-    //   { "_id" : "05", "name" : "Pollera", "sectionId" : "02" },
-    //   { "_id" : "06", "name" : "Remera Mangas Corta", "sectionId" : "03" },
-    //   { "_id" : "07", "name" : "Remera Mangas Larga", "sectionId" : "03" },
-    //   { "_id" : "08", "name" : "Camisa", "sectionId" : "03" },
-    //   { "_id" : "09", "name" : "Blusa", "sectionId" : "03" },
-    //   { "_id" : "10", "name" : "Musculosa", "sectionId" : "03" },
-    //   { "_id" : "11", "name" : "Pupera", "sectionId" : "03" },
-    //   { "_id" : "12", "name" : "Saco Sport", "sectionId" : "04" },
-    //   { "_id" : "13", "name" : "Rompeviento", "sectionId" : "05" },
-    //   { "_id" : "14", "name" : "Chupin", "sectionId" : "01" },
-    // ];
-
-    // this.sections = [
-    //   { "_id" : "01", "name" : "Pantalon" },
-    //   { "_id" : "02", "name" : "Vestido" },
-    //   { "_id" : "03", "name" : "Remera" },
-    //   { "_id" : "04", "name" : "Saco" },
-    //   { "_id" : "05", "name" : "Campera" },
-    // ];
-  // }

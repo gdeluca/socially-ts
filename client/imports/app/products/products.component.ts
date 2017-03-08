@@ -51,10 +51,19 @@ export class ProductsComponent implements OnInit, OnDestroy {
   filterField: Subject<string> = new Subject<string>();
   filterValue: Subject<string> = new Subject<string>();
 
+  filters: any = {
+    'name':  '',
+    'barCode': '',
+    'color': '',
+    'brand': '',
+    'provider': '',
+    'model': ''
+  };
+
    // name, sortfield, touple
   headers: Dictionary[] = [
     {'key': 'Descripcion', 'value': 'name'},
-    {'key': 'Codigo', 'value':'code'},
+    {'key': 'Codigo', 'value':'barCode'},
     {'key': 'Color', 'value':'color'},
     {'key': 'Marca', 'value':'brand'},
     {'key': 'Proveedor', 'value':'provider'},
@@ -71,7 +80,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   autorunSub: Subscription;
 
   user: Meteor.User;
-  editedProduct: Product = {code: 0, name: '', color: '', brand: '', model: '', categoryId : '', provider:''};
+  editedProduct: Product = {barCode: '0', name: '', color: '', brand: '', model: '', categoryId : '', provider:''};
   adding: boolean = false;
   editing: boolean = false;
   selected: any;
@@ -87,7 +96,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ){
     this.complexForm = formBuilder.group({
       name: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
-      code: ['', Validators.compose([Validators.required, Validators.minLength(5)])],
+      barCode: ['', Validators.compose([Validators.required, Validators.minLength(12)])],
       color:[''],
       brand: [''],
       model: [''],
@@ -172,7 +181,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     Products.update(product._id, {
       $set: { 
          name: product.name,
-         code: product.code,
+         barCode: product.barCode,
          color: product.color,
          brand: product.brand,
          model: product.model,
@@ -191,7 +200,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     if (this.complexForm.valid) {
       Products.insert({
         name: this.complexForm.value.name, 
-        code: this.complexForm.value.code, 
+        barCode: this.complexForm.value.barCode, 
         color: this.complexForm.value.color, 
         brand: this.complexForm.value.brand, 
         model: this.complexForm.value.model, 
@@ -208,11 +217,15 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   search(field: string, value: string): void {
-    console.log(field);
-    console.log(value);
+    if (this.filters[field] === value) {
+      return;
+    }
+    this.filters[field] = value;
+
     this.curPage.next(1);
     this.filterField.next(field);
     this.filterValue.next(value); 
+
   }
   
   changeSortOrder(direction: string, fieldName: string): void {

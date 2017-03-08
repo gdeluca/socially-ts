@@ -2,6 +2,7 @@ import { CollectionObject } from './collection-object.model';
 
 export interface Stock extends CollectionObject {
   quantity: number;
+  lastCostPrice: number;
   priceCash: number;
   priceCard: number;
   rateCash: number; // percentage

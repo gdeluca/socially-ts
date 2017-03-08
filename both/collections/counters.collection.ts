@@ -15,3 +15,11 @@ Counters.allow({
   remove: loggedIn
 });
 
+const counterCollections = ['balance','purchase', 'sales'];
+
+function getNext(type) {
+  if (type.indexOf(counterCollections) > -1) {
+    Counters.upsert({type: type}, {$set:{$inc: {lastCode: 1}}});
+    return Counters.findOne({type: type});
+  }
+}
