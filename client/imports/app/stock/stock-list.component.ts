@@ -110,12 +110,31 @@ export class StockListComponent implements OnInit, OnDestroy {
   productSizes: Observable<ProductSize[]>;
   products: Observable<Product[]>;
   categories: Observable<Category[]>;
-  sections: Observable<Section[]>;
   stores: Observable<Store[]>;
 
+  allCategories: Observable<Category[]>;
+  allSections: Observable<Section[]>;
+
+
+  complexForm : FormGroup;
+
   constructor(
-    private paginationService: PaginationService
-  ) { }
+    private paginationService: PaginationService, 
+    private formBuilder: FormBuilder
+  ){
+    this.complexForm = formBuilder.group({
+      barCode:     ['', Validators.compose([Validators.required, Validators.minLength(12)])],
+      name:        ['', Validators.compose([Validators.required, Validators.minLength(3)])],
+      color:       [''],
+      size:        [''],
+      provider:    [''],
+      cost:        ['', Validators.required],
+      cashPayment: ['', Validators.required],
+      cardPayment: ['', Validators.required],
+      category:    ['', Validators.required],
+      section:     ['', Validators.required],
+    });
+  }
  
    ngOnInit() {
     this.optionsSub = Observable.combineLatest(
@@ -152,7 +171,7 @@ export class StockListComponent implements OnInit, OnDestroy {
     } 
     this.sectionsSub = MeteorObservable.subscribe('sections')
       .subscribe(() => {
-        this.sections = Sections.find({}).zone();
+        this.allSections = Sections.find({}).zone();
     });
 
     if (this.storesSub) {
@@ -161,6 +180,14 @@ export class StockListComponent implements OnInit, OnDestroy {
     this.storesSub = MeteorObservable.subscribe('stores')
       .subscribe(() => {
         this.stores = Stores.find({}).zone();
+    });
+
+    if (this.categoriesSub) {
+      this.categoriesSub.unsubscribe();
+    } 
+    this.categoriesSub = MeteorObservable.subscribe('categories')
+      .subscribe(() => {
+        this.allCategories = Categories.find({}).zone();
     });
 
     this.pageSize.next(this.PAGESIZE);
@@ -188,6 +215,7 @@ export class StockListComponent implements OnInit, OnDestroy {
     this.optionsSub.unsubscribe(); 
     this.autorunSub.unsubscribe();
     this.sectionsSub.unsubscribe();
+    this.categoriesSub.unsubscribe();
     this.storesSub.unsubscribe();
   } 
 

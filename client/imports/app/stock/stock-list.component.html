@@ -37,7 +37,7 @@
           (ngModelChange)="search('sectionId', selectedSection)"
           >
           <option value="" selected>Filtrar por Seccion</option>
-          <option *ngFor="let section of sections | async" 
+          <option *ngFor="let section of allSections | async" 
           [ngValue]="section._id"
           >{{section.name}}</option>
         </select> 
@@ -46,8 +46,10 @@
       <div class=" ml-4 mt-4">
         <input 
           type="text" 
-          name="name" 
+          name="barCodeLookup" 
           class="form-control" 
+          [(ngModel)]="selectedCode"
+          (ngModelChange)="search('barCode', selectedCode)"
           placeholder="Buscar por Codigo">
       </div>
 
@@ -257,6 +259,191 @@
   </div>
 
   <div class="row"><hr></div>
+
+  <div class="row">
+
+     <!-- submission form -->
+    <form [formGroup]="complexForm" (ngSubmit)="submitForm(complexForm.value)">
+      <table class="table table-hover">
+        <tbody>
+          <tr ng-form="myForm">
+            <!-- action buttons for submision form -->
+            <td>
+              <button 
+                [hidden]="adding" 
+                type="button" 
+                class="btn btn-default" 
+                (click)="adding=true">
+                <span class="fa fa-plus-square-o" aria-hidden="true"></span>
+              </button>
+              <button 
+                [hidden]="!adding" 
+                type="button" 
+                class="btn btn-default" 
+                (click)="adding=false;complexForm.reset()">
+                <span class="fa fa-minus-square-o" aria-hidden="true"></span>
+              </button>
+              <button 
+                [hidden]="!adding" 
+                [disabled]="!complexForm.valid" 
+                type="button" 
+                class="btn btn-default" 
+                (click)="adding=false; save(complexForm.value)">
+                <span class="fa fa-check-square-o" aria-hidden="true"></span>
+              </button>
+            </td> 
+
+            <!-- form fields barcode -->
+            <td class="text-center" 
+              [ngClass]="{'has-error':!complexForm.controls['barCode'].valid && complexForm.controls['barCode'].touched}">
+              <input 
+                [hidden]="!adding" 
+                type="text" 
+                name="name" 
+                class="form-control" 
+                placeholder="Descripcion" [formControl]="complexForm.controls['barCode']">
+                <!-- The hasError method will tell us if an error exists -->
+                <div *ngIf="complexForm.controls['barCode'].hasError('required') && complexForm.controls['barCode'].touched" 
+                class="alert alert-danger">
+                  Falto el codigo
+                </div>
+                <div *ngIf="complexForm.controls['barCode'].hasError('minlength') && complexForm.controls['barCode'].touched" 
+                class="alert alert-danger">
+                  El codigo debe ser de 12 digitos.
+                </div>
+            </td>
+
+            <!-- form field name -->
+            <td class="text-center" 
+                [ngClass]="{'has-error':!complexForm.controls['name'].valid && complexForm.controls['name'].touched}">
+                <input 
+                  [hidden]="!adding" 
+                  type="text" 
+                  name="name" 
+                  class="form-control" 
+                  placeholder="Codigo" [formControl]="complexForm.controls['name']">
+                  <!-- The hasError method will tell us if an error exists -->
+                  <div *ngIf="complexForm.controls['barCode'].hasError('required') && complexForm.controls['name'].touched" 
+                  class="alert alert-danger">
+                    Falta la descripcion
+                  </div>
+                  <div *ngIf="complexForm.controls['barCode'].hasError('minlength') && complexForm.controls['name'].touched" 
+                  class="alert alert-danger">
+                    El la descripccion debe tener como minimo 5 cracteres
+                  </div>
+            </td>
+
+            <!-- form fields color -->
+            <td class="text-center" 
+                [ngClass]="{'has-error':!complexForm.controls['color'].valid && complexForm.controls['color'].touched}">
+                <input 
+                  [hidden]="!adding" 
+                  type="text" 
+                  name="color" 
+                  class="form-control" 
+                  placeholder="Color" [formControl]="complexForm.controls['color']">
+                  <div *ngIf="complexForm.controls['color'].hasError('required') && complexForm.controls['color'].touched" 
+                  class="alert alert-danger">
+                    Falto el campo color
+                  </div>
+            </td>
+
+            <!-- form fields size -->
+            <td class="text-center" 
+                [ngClass]="{'has-error':!complexForm.controls['size'].valid && complexForm.controls['size'].touched}">
+                <input 
+                  [hidden]="!adding" 
+                  type="text" 
+                  name="size" 
+                  class="form-control" 
+                  placeholder="Talle" [formControl]="complexForm.controls['size']">
+            </td>
+
+            <!-- form fields provider -->
+            <td class="text-center" 
+                [ngClass]="{'has-error':!complexForm.controls['provider'].valid && complexForm.controls['provider'].touched}">
+                <input 
+                  [hidden]="!adding" 
+                  type="text" 
+                  name="provider" 
+                  class="form-control" 
+                  placeholder="Nombre del Proveedor" [formControl]="complexForm.controls['provider']">
+            </td>
+            <div *ngIf="complexForm.controls['provider'].hasError('required') && complexForm.controls['provider'].touched" 
+                  class="alert alert-danger">
+                    Falta el nombre del proveedor.
+            </div>
+
+            <!-- form fields cost -->
+            <td class="text-center" 
+                [ngClass]="{'has-error':!complexForm.controls['cost'].valid && complexForm.controls['cost'].touched}">
+                <input 
+                  [hidden]="!adding" 
+                  type="text" 
+                  name="cost" 
+                  class="form-control" 
+                  placeholder="Costo al comprar" [formControl]="complexForm.controls['cost']">
+                  
+            </td>
+
+             <!-- form fields cashPayment -->
+            <td class="text-center" 
+                [ngClass]="{'has-error':!complexForm.controls['cashPayment'].valid && complexForm.controls['cashPayment'].touched}">
+                <input 
+                  [hidden]="!adding" 
+                  type="text" 
+                  name="cashPayment" 
+                  class="form-control" 
+                  placeholder="Precio efectivo" [formControl]="complexForm.controls['cashPayment']">
+            </td>
+
+             <!-- form fields cardPayment -->
+            <td class="text-center" 
+                [ngClass]="{'has-error':!complexForm.controls['cardPayment'].valid && complexForm.controls['cardPayment'].touched}">
+                <input 
+                  [hidden]="!adding" 
+                  type="text" 
+                  name="cardPayment" 
+                  class="form-control" 
+                  placeholder="Precio de Lista" [formControl]="complexForm.controls['cardPayment']">
+            </td>
+
+            <!-- field category -->
+            <td class="text-center">
+              <select 
+                [hidden]="!adding" 
+                name="categoryOptions" 
+                class="form-control" 
+                 [formControl]="complexForm.controls['category']">
+                  <option value="" disabled currentIndex hidden>
+                    Categoria
+                  </option>
+                  <option *ngFor="let category of allCategories | async" [ngValue]="category">
+                    {{category.name}}
+                  </option>
+              </select> 
+            </td>
+
+            <!-- field section -->
+            <td class="text-center">
+              <select 
+                [hidden]="!adding" 
+                name="sectionOptions" 
+                class="form-control" 
+                 [formControl]="complexForm.controls['section']">
+                  <option value="" disabled currentIndex hidden>
+                    Seccion
+                  </option>
+                  <option *ngFor="let section of allSections | async" [ngValue]="section">
+                    {{section.name}}
+                  </option>
+              </select> 
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </div>
   <div class="row">
     <div class="col span2">
       <a class="btn btn-block btn-info" routerLink="/stock/create" routerLinkActive="active">Cargar stock</a>
