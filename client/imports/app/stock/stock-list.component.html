@@ -2,13 +2,13 @@
   <div class="row">
     <h3 class="col-12 text-center">Stock y precios</h3>
 
-    <!-- form header -->
+    <!-- form header filtering components-->
     <div  class="form-inline">
       
       <div class=" ml-4 mt-4">
         <div class="form-check">
           <label class="form-check-label">
-            <input type="checkbox" class="form-check-input" (click)="doShowSizes(!showSizes)" >
+            <input type="checkbox" checked class="form-check-input" (click)="doShowSizes(!showSizes)" >
             Mostrar talles
           </label>
         </div>
@@ -18,7 +18,6 @@
         <select 
           name="selectCategory" 
           class="form-control" 
-          placeholder="Select State"
           [(ngModel)]="selectedCategory"
           (ngModelChange)="search('categoryId', selectedCategory)"
           >
@@ -52,7 +51,6 @@
           (ngModelChange)="search('barCode', selectedCode)"
           placeholder="Buscar por Codigo">
       </div>
-
     </div>
   </div>
   <div class="row">
@@ -65,9 +63,9 @@
     <!-- stock content -->
     <table class="table table-bordered table-hover ">
       <thead class="thead-default">
-        <!-- headers for sorting -->
         <tr>
-        <th class="text-center">#</th>
+          <!-- headers for sorting -->
+          <th class="text-center">#</th>
           <th  class="text-center" *ngFor="let header of headers; let colIndex = index; ">
             {{header.key}}
            <!--  <button 
@@ -117,13 +115,12 @@
               <span class="fa fa-sort" aria-hidden="true"></span>
             </button>-->
           </th> 
-
         </tr>
 
       </thead>
       <tbody>
 
-        <!-- filter fields headers -->
+        <!-- filter fields on table header -->
         <tr>
         <td class="text-center"></td>
           <ng-container *ngFor="let header of headers; let colIndex=index; ">
@@ -172,9 +169,8 @@
 
               <td 
                 class="text-center">
-                <a [routerLink]="['/products', product.barCode]">{{product.barCode}}</a>
+                <a [routerLink]="['/products', product.code]">{{productSize.barCode}}</a>
               </td>
-
               <td 
                 class="text-center">
                 <a>{{product.name}}</a>
@@ -198,7 +194,7 @@
               <ng-container *ngFor="let stock of stocks | async;  "> 
                 <ng-container *ngIf="productSize._id == stock.productSizeId ">
                   <ng-container *ngFor="let store of stores | async; let stockIndex=index; ">
-                    <ng-container *ngIf=" store._id == stock.storeId">
+                    <ng-container *ngIf="store._id == stock.storeId">
                       <ng-container *ngIf="stockIndex == 0 ">
                         <td
                           class="text-center">
@@ -242,7 +238,7 @@
                           name="quantity-{{stockIndex}}-{{storeIndex}}" 
                           class="form-control" 
                           [value]="stock.quantity" 
-                          (input)="updateEditedStock(editedStock,stock,store._id,$event.target.value)">
+                          (input)="updateEditedStock(editedStock,stock,store._id, $event.target.value)">
                       </td>
                           
                     </ng-container> 
@@ -257,12 +253,9 @@
       </tbody>
     </table>
   </div>
-<!-- 
-  <div class="row"><hr></div> -->
-
+<!-- <div class="row"><hr></div> -->
   <div class="row">
-
-     <!-- submission form -->
+    <!-- submission form -->
     <form [formGroup]="complexForm" (ngSubmit)="submitForm(complexForm.value)">
       <table class="table table-hover">
         <tbody>
@@ -388,6 +381,9 @@
                   <div *ngIf="complexForm.controls['cost'].hasError('required') && complexForm.controls['cost'].touched" class="alert alert-danger">
                     Precio de Costo
                   </div>
+                  <div *ngIf="complexForm.controls['cost'].hasError('invalidNumber') && complexForm.controls['cost'].touched" class="alert alert-danger">
+                    El valor debe ser numerico.
+                  </div>
               </td>
 
                <!-- form fields cashPayment -->
@@ -402,6 +398,9 @@
                   <div *ngIf="complexForm.controls['cashPayment'].hasError('required') && complexForm.controls['cashPayment'].touched" class="alert alert-danger">
                     Precio de Contado
                   </div>
+                  <div *ngIf="complexForm.controls['cashPayment'].hasError('invalidNumber') && complexForm.controls['cashPayment'].touched" class="alert alert-danger">
+                    El valor debe ser numerico.
+                  </div>
               </td>
 
               <!-- form fields cardPayment -->
@@ -415,6 +414,9 @@
                     placeholder="Precio de Lista" [formControl]="complexForm.controls['cardPayment']">
                   <div *ngIf="complexForm.controls['cardPayment'].hasError('required') && complexForm.controls['cardPayment'].touched" class="alert alert-danger">
                     Precio de Lista
+                  </div>
+                  <div *ngIf="complexForm.controls['cardPayment'].hasError('invalidNumber') && complexForm.controls['cardPayment'].touched" class="alert alert-danger">
+                    El valor debe ser numerico.
                   </div>
               </td>
 

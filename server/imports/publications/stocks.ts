@@ -21,8 +21,8 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../both/search/search-options';
 
 const stockFields = ['cost', 'cashPayment', 'cardPayment'];
-const productFields = ['barCode','name','color','provider','categoryId'];
-const productSizeFields = ['size'];
+const productFields = ['code','name','color','provider','categoryId'];
+const productSizeFields = ['barCode','size'];
 const categoryFields = ['sectionId'];
 
 
@@ -43,6 +43,7 @@ function getSelectorFilter(filterFields:string[], filters: any) {
       } 
     }
    
+    // workarround: join doesn't work 
     if (selectors.length > 0) {
       if (selectors.length == 1) {
         result = selectors[0];

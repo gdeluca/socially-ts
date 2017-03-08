@@ -92,12 +92,12 @@
             [(ngModel)]="editedProduct.name">
         </td>
         
-        <!-- barCode field -->
+        <!-- code field -->
         <!-- display mode-->
         <td 
           [hidden]="currentIndex === rowIndex && editing"
           class="text-center">
-          <a>{{product.barCode}}</a>
+          <a>{{product.code}}</a>
         </td>
         <!-- editing mode-->
         <td 
@@ -105,9 +105,9 @@
           class="text-center">
           <input 
             type="text" 
-            name="barCode-{{rowIndex}}" 
+            name="code-{{rowIndex}}" 
             class="form-control" 
-            [(ngModel)]="editedProduct.barCode">
+            [(ngModel)]="editedProduct.code">
         </td>
 
         <!-- color field -->
@@ -237,7 +237,7 @@
               [disabled]="!complexForm.valid" 
               type="button" 
               class="btn btn-default" 
-              (click)="adding=false; save(complexForm.value)">
+              (click)="adding=false; save(complexForm)">
               <span class="fa fa-check-square-o" aria-hidden="true"></span>
             </button>
           </td> 
@@ -262,21 +262,21 @@
                 </div>
           </td>
 
-          <!-- form fields barCode -->
+          <!-- form fields code -->
           <td class="text-center" 
-              [ngClass]="{'has-error':!complexForm.controls['barCode'].valid && complexForm.controls['barCode'].touched}">
+              [ngClass]="{'has-error':!complexForm.controls['code'].valid && complexForm.controls['code'].touched}">
               <input 
                 [hidden]="!adding" 
                 type="text" 
-                name="barCode" 
+                name="code" 
                 class="form-control" 
-                placeholder="Codigo" [formControl]="complexForm.controls['barCode']">
+                placeholder="Codigo" [formControl]="complexForm.controls['code']">
                 <!-- The hasError method will tell us if an error exists -->
-                <div *ngIf="complexForm.controls['barCode'].hasError('required') && complexForm.controls['barCode'].touched" 
+                <div *ngIf="complexForm.controls['code'].hasError('required') && complexForm.controls['code'].touched" 
                 class="alert alert-danger">
                   Falta el codigo del producto.
                 </div>
-                <div *ngIf="complexForm.controls['barCode'].hasError('minlength') && complexForm.controls['name'].touched" 
+                <div *ngIf="complexForm.controls['code'].hasError('minlength') && complexForm.controls['code'].touched" 
                 class="alert alert-danger">
                   El codigo debe se de al menos 5 digitos.
                 </div>

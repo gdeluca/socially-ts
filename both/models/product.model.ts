@@ -1,7 +1,7 @@
 import { CollectionObject } from './collection-object.model';
 
 export interface Product extends CollectionObject {
-  barCode:string;
+  code:string;
   name: string;
   color: string;
   brand?: string;

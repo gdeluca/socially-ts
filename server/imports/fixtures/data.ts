@@ -73,6 +73,17 @@ export function loadData() {
         },
         isDefault: true,
         roles: ['admin']
+      },
+      {
+        username: 'b',
+        password: 'b',
+        email: 'b@b.com',
+        profile: {
+          firstName: 'b',
+          lastName: 'b'
+        },
+        isDefault: true,
+        roles: ['admin']
       }
     ];
 
@@ -83,6 +94,10 @@ export function loadData() {
   
     var user_id_1 = Accounts.createUser(users[1]);
     Meteor.users.update(user_id_1, {
+        $set: { "emails.0.verified": true}
+    });  
+     var user_id_2 = Accounts.createUser(users[2]);
+    Meteor.users.update(user_id_2, {
         $set: { "emails.0.verified": true}
     });  
 
@@ -196,12 +211,22 @@ export function loadData() {
       userId: user_id_1,
       storeId: "02"
     });
+    UserStores.insert({
+      _id: "03",
+      userId: user_id_2,
+      storeId: "01"
+    });
+    UserStores.insert({
+      _id: "04",
+      userId: user_id_2,
+      storeId: "02"
+    });
 
     // 3: products
     Products.insert({
       _id: "01",
       name: "Clasico",
-      barCode: "101010101010",
+      code: "1010101010",
       color: "Negro",
       brand: "Levis",
       model: "2016",
@@ -211,7 +236,7 @@ export function loadData() {
     Products.insert({
       _id: "02",
       name: "Vortex Recto",
-      barCode: "101011101012",
+      code: "1222133010",
       color: "Azul",
       brand: "Cuerda",
       model: "2017",
@@ -221,7 +246,7 @@ export function loadData() {
     Products.insert({
       _id: "04",
       name: "Chomba Dama",
-      barCode: "101110101032",
+      code: "1010111011",
       color: "Negro",
       brand: "Evase",
       model: "2017",
@@ -231,7 +256,7 @@ export function loadData() {
     Products.insert({
       _id: "03",
       name: "Remere Manga Larga",
-      barCode: "101210101032",
+      code: "1013111011",
       color: "Acuarela",
       brand: "Jaspe",
       model: "2017",
@@ -285,21 +310,25 @@ export function loadData() {
     ProductSizes.insert({
       _id: "01",
        productId: "01",
+       barCode: "101010101033",
        size: "33"
     });
     ProductSizes.insert({
       _id: "02",
        productId: "02",
+       barCode: "122213301070",
        size: "S"
     });
     ProductSizes.insert({
       _id: "03",
        productId: "02",
+       barCode: "122213301073",       
        size: "L"
     });
     ProductSizes.insert({
       _id: "04",
        productId: "02",
+       barCode: "122213301074", 
        size: "XL"
     });
 

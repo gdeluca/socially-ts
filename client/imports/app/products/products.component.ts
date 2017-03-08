@@ -53,7 +53,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   filters: any = {
     'name':  '',
-    'barCode': '',
+    'code': '',
     'color': '',
     'brand': '',
     'provider': '',
@@ -63,7 +63,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
    // name, sortfield, touple
   headers: Dictionary[] = [
     {'key': 'Descripcion', 'value': 'name'},
-    {'key': 'Codigo', 'value':'barCode'},
+    {'key': 'Codigo', 'value':'code'},
     {'key': 'Color', 'value':'color'},
     {'key': 'Marca', 'value':'brand'},
     {'key': 'Proveedor', 'value':'provider'},
@@ -80,7 +80,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   autorunSub: Subscription;
 
   user: Meteor.User;
-  editedProduct: Product = {barCode: '0', name: '', color: '', brand: '', model: '', categoryId : '', provider:''};
+  editedProduct: Product = {code: '0', name: '', color: '', brand: '', model: '', categoryId : '', provider:''};
   adding: boolean = false;
   editing: boolean = false;
   selected: any;
@@ -96,7 +96,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ){
     this.complexForm = formBuilder.group({
       name: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
-      barCode: ['', Validators.compose([Validators.required, Validators.minLength(12)])],
+      code: ['', Validators.compose([Validators.required, Validators.minLength(12)])],
       color:[''],
       brand: [''],
       model: [''],
@@ -181,7 +181,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     Products.update(product._id, {
       $set: { 
          name: product.name,
-         barCode: product.barCode,
+         code: product.code,
          color: product.color,
          brand: product.brand,
          model: product.model,
@@ -191,25 +191,25 @@ export class ProductsComponent implements OnInit, OnDestroy {
     });
   }
 
-  save(value: any){
+  save(form: FormGroup){
     if (!Meteor.userId()) {
       alert('Ingrese al sistema para poder guardar');
       return;
     }
-
-    if (this.complexForm.valid) {
+    let values = form.value;
+    if (form.valid) {
       Products.insert({
-        name: this.complexForm.value.name, 
-        barCode: this.complexForm.value.barCode, 
-        color: this.complexForm.value.color, 
-        brand: this.complexForm.value.brand, 
-        model: this.complexForm.value.model, 
-        provider: this.complexForm.value.provider, 
-        categoryId: this.complexForm.value.category._id
+        name: values.name, 
+        code: values.code, 
+        color: values.color, 
+        brand: values.brand, 
+        model: values.model, 
+        provider: values.provider, 
+        categoryId: values.category._id
       });
-      this.complexForm.reset();
+      form.reset();
     }
-    console.log(value);
+    console.log(values);
   }
 
   copy(original: any){

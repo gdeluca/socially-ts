@@ -21,7 +21,7 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
 
 // collections
-import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
+import { ProductSizes, getMappingSize } from '../../../../both/collections/product-sizes.collection';
 import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Products } from '../../../../both/collections/products.collection';
 import { Categories } from '../../../../both/collections/categories.collection';
@@ -37,6 +37,7 @@ import { Section } from '../../../../both/models/section.model';
 import { Store } from '../../../../both/models/store.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
+import { isNumeric } from '../validators/validators';
 
 import template from "./stock-list.component.html";
 import style from "./stock-list.component.scss";
@@ -128,9 +129,9 @@ export class StockListComponent implements OnInit, OnDestroy {
       color:       ['', Validators.required],
       size:        ['', Validators.required],
       provider:    ['', Validators.required],
-      cost:        ['', Validators.required],
-      cashPayment: ['', Validators.required],
-      cardPayment: ['', Validators.required],
+      cost:        ['', Validators.compose([Validators.required, isNumeric])],
+      cashPayment: ['', Validators.compose([Validators.required, isNumeric])],
+      cardPayment: ['', Validators.compose([Validators.required, isNumeric])],
       category:    ['', Validators.required],
       section:     ['', Validators.required],
     });
@@ -241,6 +242,8 @@ export class StockListComponent implements OnInit, OnDestroy {
         });
       }
     }
+
+    // clean after insert
     editedStock = this.copy(this.emptyStock);
   }
 
@@ -249,11 +252,17 @@ export class StockListComponent implements OnInit, OnDestroy {
       alert('Ingrese al sistema para poder guardar');
       return;
     } 
-
     if (form.valid) {
-      let values = form.value;      
+      let values = form.value;
+
+      // last two characters are reserved for product size
+      let productCode =  values.barCode.substring(0, 10);
+      let size = values.size.toUpperCase();
+      let barCode = productCode + getMappingSize(values.size);
+
+      console.log('product code', productCode);
       // find a product
-      let product = Products.findOne({barCode: values.barCode});
+      let product = Products.findOne({code: productCode});
       console.log('found product', product);
       if (product) {
           // if exists update the product information
@@ -269,13 +278,17 @@ export class StockListComponent implements OnInit, OnDestroy {
         // update or insert the product size information
         let productSizeId = '';
 
-          console.log('looking for productSize with ', {productId: product._id, size: values.size});
-        let productSize = ProductSizes.findOne({productId: product._id, size: values.size});
+        console.log('looking for productSize with ', {productId: product._id, size: size});
+        let productSize = ProductSizes.findOne(
+          {productId: product._id, size: size, barCode: barCode}
+        );
         if (productSize) {
           console.log('productSize found', productSize);
           productSizeId = productSize._id;
         } else {
-          productSizeId = ProductSizes.collection.insert({productId: product._id, size: values.size});
+          productSizeId = ProductSizes.collection.insert(
+            {productId: product._id, size: size, barCode: barCode}
+          );
           console.log('productSize created', productSize);
         }
 
@@ -283,7 +296,9 @@ export class StockListComponent implements OnInit, OnDestroy {
 
         // update or insert the stocks related to all the stores
         stores.forEach(function(store: Store){
-          let stock = Stocks.findOne({productSizeId: productSizeId, storeId: store._id, active: true}); 
+          let stock = Stocks.findOne(
+            {productSizeId: productSizeId, storeId: store._id, active: true}
+          ); 
           if (stock) { 
             console.log('stock found', stock);
             Stocks.update(stock._id, {
@@ -313,8 +328,9 @@ export class StockListComponent implements OnInit, OnDestroy {
 
       // if the product is missed create a new one
       } else {
+        console.log('inseting product');
         let productId = Products.collection.insert({
-          barCode: values.barCode,
+          code: productCode,
           name: values.name,
           color: values.color,
           brand: values.brand,
@@ -323,13 +339,18 @@ export class StockListComponent implements OnInit, OnDestroy {
           categoryId: values.category._id
         });
 
+        console.log('inseting product size');
         // insert the product size information
-        let productSizeId = ProductSizes.collection.insert({productId: productId, size: values.size});
+        let productSizeId = ProductSizes.collection.insert(
+            {productId: productId, size: size, barCode: barCode}
+        );
         
         let stores = Stores.find({}).fetch();
 
         // insert the stocks related to all the stores
         stores.forEach(function(store: Store){
+          console.log('inseting stock for store: ',store);
+
           Stocks.insert({
             quantity: 0,
             lastCostPrice: +values.cost,

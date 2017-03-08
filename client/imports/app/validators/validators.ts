@@ -8,6 +8,13 @@ export function emailValidator(control: FormControl): {[key: string]: any} {
   }
 }
 
+export function isNumeric(control: FormControl): {[key: string]: any} {
+  if (control.value && isNaN(control.value)) {
+    return { invalidNumber: true }
+  }
+}
+
+
 // FORM GROUP VALIDATORS
 export function matchingPasswords(passwordKey: string, confirmPasswordKey: string) {
   return (group: FormGroup): {[key: string]: any} => {
@@ -21,3 +28,4 @@ export function matchingPasswords(passwordKey: string, confirmPasswordKey: strin
     }
   }
 }
+

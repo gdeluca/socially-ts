@@ -95,7 +95,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     console.log(this.product.categoryId);
     Products.update(this.product._id, {
       $set: { 
-         barCode: this.product.barCode,
+         code: this.product.code,
          name: this.product.name,
          color: this.product.color,
          brand: this.product.brand,
