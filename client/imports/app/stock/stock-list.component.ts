@@ -95,7 +95,7 @@ export class StockListComponent implements OnInit, OnDestroy {
   emptyStock: any = 
     {
       barCode:'', 
-      description:'', 
+      name:'', 
       color:'', 
       size:'', 
       provider:'', 
@@ -125,9 +125,9 @@ export class StockListComponent implements OnInit, OnDestroy {
     this.complexForm = formBuilder.group({
       barCode:     ['', Validators.compose([Validators.required, Validators.minLength(12)])],
       name:        ['', Validators.compose([Validators.required, Validators.minLength(3)])],
-      color:       [''],
-      size:        [''],
-      provider:    [''],
+      color:       ['', Validators.required],
+      size:        ['', Validators.required],
+      provider:    ['', Validators.required],
       cost:        ['', Validators.required],
       cashPayment: ['', Validators.required],
       cardPayment: ['', Validators.required],
@@ -225,7 +225,6 @@ export class StockListComponent implements OnInit, OnDestroy {
 
   /* save values to database */
   update = function(editedStock){
-
     for (let stock of editedStock.quantity) {
 
       if (stock.quantity && stock.stockId) {
@@ -243,6 +242,110 @@ export class StockListComponent implements OnInit, OnDestroy {
       }
     }
     editedStock = this.copy(this.emptyStock);
+  }
+
+  save(form: FormGroup){
+    if (!Meteor.userId()) {
+      alert('Ingrese al sistema para poder guardar');
+      return;
+    } 
+
+    if (form.valid) {
+      let values = form.value;      
+      // find a product
+      let product = Products.findOne({barCode: values.barCode});
+      console.log('found product', product);
+      if (product) {
+          // if exists update the product information
+         Products.update(product._id, {
+          $set: { 
+            name: values.name,
+            color: values.color,
+            provider: values.provider,
+            categoryId: values.category._id
+          }
+        })
+
+        // update or insert the product size information
+        let productSizeId = '';
+
+          console.log('looking for productSize with ', {productId: product._id, size: values.size});
+        let productSize = ProductSizes.findOne({productId: product._id, size: values.size});
+        if (productSize) {
+          console.log('productSize found', productSize);
+          productSizeId = productSize._id;
+        } else {
+          productSizeId = ProductSizes.collection.insert({productId: product._id, size: values.size});
+          console.log('productSize created', productSize);
+        }
+
+        let stores = Stores.find({}).fetch();
+
+        // update or insert the stocks related to all the stores
+        stores.forEach(function(store: Store){
+          let stock = Stocks.findOne({productSizeId: productSizeId, storeId: store._id, active: true}); 
+          if (stock) { 
+            console.log('stock found', stock);
+            Stocks.update(stock._id, {
+              $set: { 
+                lastCostPrice: +values.cost,
+                priceCash: +values.cashPayment,
+                priceCard: +values.cardPayment,
+                rateCash: (+values.cashPayment/(+values.cost))*100,
+                rateCard: (+values.cardPayment/(+values.cost))*100,
+              }
+           })
+          } else {
+            console.log('stock inserting ');
+            Stocks.insert({
+              quantity: 0,
+              lastCostPrice: +values.cost,
+              priceCash: +values.cashPayment,
+              priceCard: +values.cardPayment,
+              rateCash: (+values.cashPayment/(+values.cost))*100,
+              rateCard: (+values.cardPayment/(+values.cost))*100,
+              storeId: store._id,
+              active: true,
+              productSizeId: productSizeId
+            })
+          }
+        }) 
+
+      // if the product is missed create a new one
+      } else {
+        let productId = Products.collection.insert({
+          barCode: values.barCode,
+          name: values.name,
+          color: values.color,
+          brand: values.brand,
+          model: values.model,
+          provider: values.provider,
+          categoryId: values.category._id
+        });
+
+        // insert the product size information
+        let productSizeId = ProductSizes.collection.insert({productId: productId, size: values.size});
+        
+        let stores = Stores.find({}).fetch();
+
+        // insert the stocks related to all the stores
+        stores.forEach(function(store: Store){
+          Stocks.insert({
+            quantity: 0,
+            lastCostPrice: +values.cost,
+            priceCash: +values.cashPayment,
+            priceCard: +values.cardPayment,
+            rateCash: (+values.cashPayment/(+values.cost))*100,
+            rateCard: (+values.cardPayment/(+values.cost))*100,
+            storeId: store._id,
+            active: true,
+            productSizeId: productSizeId
+          })
+        })
+      }
+      
+      this.complexForm.reset();
+    }
   }
 
   copy(original: any){

@@ -89,11 +89,11 @@ export function loadData() {
     // 1 sections
     Sections.insert({
       _id: "01", 
-      name: "Mujer"
+      name: "Dama"
     });
     Sections.insert({
       _id: "02",
-      name: "Hmobre"
+      name: "Caballero"
     });
     Sections.insert({
       _id: "03",
@@ -102,17 +102,17 @@ export function loadData() {
 
     // 1 stores
     Stores.insert({
-      _id: "02",
+      _id: "01",
       name: 'Sucursal1',
       address: '25 de mayo 1690'
     });
     Stores.insert({
-      _id: "01",
+      _id: "02",
       name: 'Sucursal2',
       address: 'colon 1460'
     });
     Stores.insert({
-      _id: "01",
+      _id: "03",
       name: 'Sucursal3',
       address: 'colon 160'
     });
@@ -130,32 +130,32 @@ export function loadData() {
     });
     Categories.insert({
       _id: "03",
-      name: 'Jogin',
+      name: 'Panalones Friza',
       sectionId: '02'
     });
     Categories.insert({
       _id: "04",
-      name: 'Calza',
+      name: 'Calzas',
       sectionId: '01'
     });
     Categories.insert({
       _id: "05",
-      name: 'Pollera',
+      name: 'Polleras',
       sectionId: '01'
     });
     Categories.insert({
       _id: "06",
-      name: 'Remera',
+      name: 'Remeras',
       sectionId: '01'
     });
     Categories.insert({
       _id: "10",
-      name: 'Musculosa',
+      name: 'Musculosas',
       sectionId: '01'
     });
     Categories.insert({
       _id: "11",
-      name: 'Buzo',
+      name: 'Buzos',
       sectionId: '02'
     });
   
@@ -231,7 +231,7 @@ export function loadData() {
     Products.insert({
       _id: "03",
       name: "Remere Manga Larga",
-      barCode: "101110101032",
+      barCode: "101210101032",
       color: "Acuarela",
       brand: "Jaspe",
       model: "2017",
