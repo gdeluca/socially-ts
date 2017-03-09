@@ -3,7 +3,7 @@
     <div class="card-group">
 
       <div class="card">
-        <h4 class="card-text text-center">Orden Nº {{orderNumber}}</h4>  
+        <h4 class="card-text text-center">Orden Nº {{saleNumber}}</h4>  
       </div>
       
       <div class="card">    
@@ -61,13 +61,13 @@
         <h4>Total: $ {{total}}</h4>
       </div>        
       <div class="col span2">
-        <a class="btn btn-block btn-info" routerLink="/orders" routerLinkActive="active">Cancelar Orden</a>
+        <a class="btn btn-block btn-info" routerLink="/sales" routerLinkActive="active">Cancelar Orden</a>
       </div>
       <div class="col span2">
-        <button type="button" class="btn btn-block btn-info" (click)="submitOrder()">Confirmar Venta</button>
+        <button type="button" class="btn btn-block btn-info" (click)="submitSale()">Confirmar Venta</button>
       </div> 
       <div class="col span2">
-        <button type="button" class="btn btn-block btn-info" (click)="reserveOrder()">Reservar Pedido</button>
+        <button type="button" class="btn btn-block btn-info" (click)="reserveSale()">Reservar Pedido</button>
       </div>    
     </div>
   </div>

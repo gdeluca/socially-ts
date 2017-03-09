@@ -1,9 +1,10 @@
 import { CollectionObject } from './collection-object.model';
 
 export interface Purchase extends CollectionObject {
-  purchaseNumber: number;
-  price: number;
+  purchaseNumber: string;
   date: string;
-  quantity: number;
-  productId: string;
+  total?:number;
+  provider:string;
+  payment:number;
+  productPurchaseIds?: string[];
 }

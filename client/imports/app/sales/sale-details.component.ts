@@ -1,23 +1,23 @@
 import { Observable } from 'rxjs/Observable';
 import { Component } from "@angular/core";
 
-import template from "./order-details.component.html";
-import style from "./order-details.component.scss";
+import template from "./sale-details.component.html";
+import style from "./sale-details.component.scss";
 
 @Component({
-  selector: "order-details",
+  selector: "sale-details",
   template,
   styles: [ style ]
 })
-export class OrderDetailsComponent {
+export class SaleDetailsComponent {
  
   products: any[];
-  orderNumber: number;
+  saleNumber: number;
   total: number;
 
   constructor() {
     this.total = 0;
-    this.orderNumber = 234233243;
+    this.saleNumber = 234233243;
     this.products = [
       { 'code': '3453423',
         'name': 'Panalon Banbalina',
@@ -62,5 +62,5 @@ export class OrderDetailsComponent {
 
   }
 
-  cancelOrder(){}
+  cancelSale(){}
 }

@@ -195,6 +195,7 @@
                 <ng-container *ngIf="productSize._id == stock.productSizeId ">
                   <ng-container *ngFor="let store of stores | async; let stockIndex=index; ">
                     <ng-container *ngIf="store._id == stock.storeId">
+                    <!-- may lead to error if store 1 is not loaded -->
                       <ng-container *ngIf="stockIndex == 0 ">
                         <td
                           class="text-center">

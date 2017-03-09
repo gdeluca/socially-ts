@@ -1,8 +1,8 @@
 import { CollectionObject } from './collection-object.model';
 
-export interface OrderEntry extends CollectionObject {
+export interface ProductSale extends CollectionObject {
   quantity: number;
   subTotal: number;
-  orderId: string; 
+  saleId: string; 
   productSizeId: string; 
 }

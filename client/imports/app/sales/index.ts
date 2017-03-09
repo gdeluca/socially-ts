@@ -1,8 +1,8 @@
-import { OrderDetailsComponent } from './order-details.component';
-import { OrdersComponent } from './orders.component';
+import { SaleDetailsComponent } from './sale-details.component';
+import { SalesComponent } from './sales.component';
 
  
 export const SALES_DECLARATIONS = [
-  OrdersComponent,
-  OrderDetailsComponent,
+  SalesComponent,
+  SaleDetailsComponent,
 ];

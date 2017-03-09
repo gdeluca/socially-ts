@@ -1,28 +1,34 @@
-import { Sections } from '../../../both/collections/sections.collection';
-import { Stores } from '../../../both/collections/stores.collection';
-import { Categories } from '../../../both/collections/categories.collection';
-import { UserStores } from '../../../both/collections/user-stores.collection';
 import { Balances } from '../../../both/collections/balances.collection';
-import { Products } from '../../../both/collections/products.collection';
-import { Orders } from '../../../both/collections/orders.collection';
-import { Purchases } from '../../../both/collections/purchases.collection';
-import { ProductSizes } from '../../../both/collections/product-sizes.collection';
-import { Stocks } from '../../../both/collections/stocks.collection';
-import { OrderEntries } from '../../../both/collections/order-entries.collection';
+import { Categories } from '../../../both/collections/categories.collection';
 import { Counters } from '../../../both/collections/counters.collection';
+import { UserStores } from '../../../both/collections/user-stores.collection';
+import { ProductPurchases } from '../../../both/collections/product-purchases.collection';
+import { ProductSales } from '../../../both/collections/product-sales.collection';
+import { ProductSizes } from '../../../both/collections/product-sizes.collection';
+import { Products } from '../../../both/collections/products.collection';
+import { Purchases } from '../../../both/collections/purchases.collection';
+import { Sales } from '../../../both/collections/sales.collection';
+import { Sections } from '../../../both/collections/sections.collection';
+import { Stocks } from '../../../both/collections/stocks.collection';
+import { Stores } from '../../../both/collections/stores.collection';
+import { Tags } from '../../../both/collections/tags.collection';
+import { Users } from '../../../both/collections/users.collection';
 
-import { Section } from '../../../both/models/section.model';
-import { Store } from '../../../both/models/store.model';
-import { Category } from '../../../both/models/category.model';
-import { UserStore } from '../../../both/models/user-store.model';
 import { Balance } from '../../../both/models/balance.model';
-import { Product } from '../../../both/models/product.model';
-import { Order } from '../../../both/models/order.model';
-import { Purchase } from '../../../both/models/purchase.model';
-import { ProductSize } from '../../../both/models/product-size.model';
-import { Stock } from '../../../both/models/stock.model';
-import { OrderEntry } from '../../../both/models/order-entry.model';
+import { Category } from '../../../both/models/category.model';
 import { Counter } from '../../../both/models/counter.model';
+import { UserStore } from '../../../both/models/user-store.model';
+import { ProductPurchase } from '../../../both/models/product-purchase.model';
+import { ProductSale } from '../../../both/models/product-sale.model';
+import { ProductSize } from '../../../both/models/product-size.model';
+import { Product } from '../../../both/models/product.model';
+import { Purchase } from '../../../both/models/purchase.model';
+import { Sale } from '../../../both/models/sale.model';
+import { Section } from '../../../both/models/section.model';
+import { Stock } from '../../../both/models/stock.model';
+import { Store } from '../../../both/models/store.model';
+import { Tag } from '../../../both/models/tag.model';
+import { User } from '../../../both/models/user.model';
 
 
 import { Accounts } from 'meteor/accounts-base';
@@ -34,20 +40,63 @@ export function loadData() {
     // counters setup
     Counters.insert({
       _id: "01", 
-      lastCode: 100006,
+      lastCode: "000001",
       type:"balance"
     });
     
     Counters.insert({
       _id: "02", 
-      lastCode: 100003,
+      lastCode: "000001",
       type:"purchase"
     });
 
     Counters.insert({
       _id: "03", 
-      lastCode: 100002,
-      type:"sales"
+      lastCode: "000001",
+      type:"sale"
+    });
+
+    // tags setup
+    Tags.insert({
+      code:"01",
+      type:"name",
+      description:"Bermuda GYM"
+    });
+
+    Tags.insert({
+      code:"01",
+      type:"model",
+      description:"Universal"
+    });
+
+    Tags.insert({
+      code:"01",
+      type:"brand",
+      description:"Animal"
+    });
+
+    Tags.insert({
+      code:"01",
+      type:"color",
+      description:"No definido"
+    });
+
+    Tags.insert({
+      code:"01",
+      type:"category",
+      description:"Pantalon"
+    });
+
+    Tags.insert({
+      code:"01",
+      type:"provider",
+      description:"Andres"
+    });
+
+    Tags.insert({
+      code:"02",
+      type:"provider",
+      description:"Juan"
     });
 
     // 1 users
@@ -177,7 +226,7 @@ export function loadData() {
     // 2 balance open or close
     Balances.insert({
       _id: "01",
-      balanceNumber: 100001,
+      balanceNumber: "000001",
       storeId: "01",
       cashExistence: 500, 
       operation: "close", // open // close // extraction // deposit
@@ -185,7 +234,7 @@ export function loadData() {
     });
     Balances.insert({
       _id: "02",
-      balanceNumber: 100002,
+      balanceNumber: "000002",
       storeId: "01",
       cashExistence: 500,
       operation: "open", // open // close // extraction // deposit
@@ -193,11 +242,11 @@ export function loadData() {
     });
     Balances.insert({
       _id: "03",
-      balanceNumber: 100003,
+      balanceNumber: "000003",
       storeId: "01",
       cashExistence: 1500,
       operation: "open", // open // close // extraction // deposit
-      actionDate: "2017-01-12T9:11:01Z"
+      actionDate: "2017-01-13T9:11:01Z"
     });
 
     // 2: user stores
@@ -220,6 +269,11 @@ export function loadData() {
       _id: "04",
       userId: user_id_2,
       storeId: "02"
+    });
+    UserStores.insert({
+      _id: "05",
+      userId: user_id_2,
+      storeId: "03"
     });
 
     // 3: products
@@ -264,46 +318,23 @@ export function loadData() {
       categoryId: "06"
     });
    
-    // 3: orders
-    // check the balance is in open status on current date before order creations
-    Orders.insert({
+    // 3: sales
+    // check the balance is in open status on current date before sale creations
+    Sales.insert({
       _id: "01",
-      orderNumber: "100001",
+      saleNumber: "000001",
       status: "started",
       lastUpdate: "2017-01-12T9:11:01Z",
       userStoreId: "01", //guille en pumpu
       balanceId: "02" // an open balance
     });
-    Orders.insert({
+    Sales.insert({
       _id: "02",
-      orderNumber: "100002",
+      saleNumber: "000002",
       status: "started",
       lastUpdate: "2017-01-12T9:11:01Z",
-      userStoreId: "02", //marce en molino
-      balanceId: "03" // an open balance
-    });
-
-    // 4: product purchase 
-    Purchases.insert({
-      purchaseNumber: 100001,
-      price: 150,
-      date: "2016-07-12T11:23:01Z",
-      quantity: 50,
-      productId: "01"
-    });
-    Purchases.insert({
-      purchaseNumber: 100002,
-      price: 100,
-      date: "2016-01-11T11:23:01Z",
-      quantity: 300,
-      productId: "02"
-    });
-    Purchases.insert({
-      purchaseNumber: 100003,
-      price: 190,
-      date: "2017-07-12T11:23:01Z",
-      quantity: 50,
-      productId: "02"
+      userStoreId: "02", 
+      balanceId: "03"
     });
 
     // 4: product sizes
@@ -345,7 +376,6 @@ export function loadData() {
       storeId: "01",
       productSizeId: "01"
     });
-
     Stocks.insert({
       _id: "02",
       quantity: 20,
@@ -431,33 +461,78 @@ export function loadData() {
       productSizeId: "04"
     });
 
-    // 5: order entries
-    OrderEntries.insert({
+    // 5: purchase 
+    Purchases.insert({
+       _id: "01",
+      purchaseNumber: "000001",
+      date: "2016-07-10T11:23:01Z",
+      provider:"Juan",
+      payment:0
+    });
+    Purchases.insert({
+       _id: "02",
+      purchaseNumber: "000002",
+      date: "2016-01-11T11:23:01Z",
+      provider:"Andres",
+      payment:0
+    });
+    Purchases.insert({
+       _id: "03",
+      purchaseNumber: "000003",
+      date: "2017-07-12T11:23:01Z",
+      provider:"Jose",
+      payment:0
+    });
+
+    // 5: sales entries
+    ProductSales.insert({
       _id: "01",
       productSizeId: "01", 
-      orderId: "01",
+      saleId: "01",
       quantity: 1,
       subTotal: 300
     });
-    OrderEntries.insert({
+    ProductSales.insert({
       _id: "02",
       productSizeId: "03", 
-      orderId: "01",
+      saleId: "01",
       quantity: 2,
       subTotal: 420
     });
-    OrderEntries.insert({
+    ProductSales.insert({
       _id: "03",
       productSizeId: "05", 
-      orderId: "01",
+      saleId: "01",
       quantity: 1,
       subTotal: 210
     });
 
+    // 6: product purchase
+    ProductPurchases.insert({
+      quantity: 50,
+      cost: 100,
+      subtotal:5000,
+      purchaseId: "01", 
+      productSizeId: "01"
+    });
+    ProductPurchases.insert({
+      quantity: 50,
+      cost: 200,
+      subtotal:10000,
+      purchaseId: "01", 
+      productSizeId: "02"
+    });
+
+    // 6: update purchase information
+    ProductPurchases.update(
+      {_id: "01"},
+      {$set:{total: 15000}}
+    );
+
     // 6: update balance test
     Balances.insert({
       _id: "03",
-      balanceNumber: 100004,
+      balanceNumber: "000004",
       storeId: "01",
       cashExistence: 500,
       cashFlow: -100,
@@ -466,7 +541,7 @@ export function loadData() {
     }); 
     Balances.insert({
       _id: "04",
-      balanceNumber: 100005,
+      balanceNumber: "000005",
       storeId: "01",
       cashExistence: 400,
       cashFlow: 50,
@@ -475,9 +550,9 @@ export function loadData() {
     });
 
     //started submited reserved
-    Orders.update({_id:"01"},{
+    Sales.update({_id:"01"},{
       $set: { 
-        orderEntryIds: ["01", "02", "03"],
+        productSaleIds: ["01", "02", "03"],
         status: "submitted",
         subtotal: 930,
         taxes: 195.3,
@@ -492,7 +567,7 @@ export function loadData() {
     Stocks.update({ storeId: "01", productSizeId: "05" },{$dec: { quantity: 1 }});
 
     //check the balance is open before submit
-    //update the balance to contain submited order information
+    //update the balance to contain submited sale information
     Balances.update(
       {storeId: "01", sort: {actionDate: -1}, limit: 1},
       {$set:{$inc: {cashFlow: 1125.3, cashExistence: 400}}}
@@ -501,7 +576,7 @@ export function loadData() {
     // to the end of day close the balance
     Balances.insert({
       _id: "04",
-      balanceNumber: 100006,
+      balanceNumber: "000006",
       storeId: "01",
       cashExistence: 1125.3,
       operation: "close", // open // close // extraction // deposit

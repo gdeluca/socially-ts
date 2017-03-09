@@ -14,7 +14,7 @@ import { AppComponent } from './app.component';
 import { routes, ROUTES_PROVIDERS } from './app.routes';
 
 
-// project definitions, module inport order mattersç
+// project definitions, module inport order matters
 import { BALANCES_DECLARATIONS } from './balances';
 import { STOCKS_DECLARATIONS } from './stock';
 import { SALES_DECLARATIONS } from './sales';
