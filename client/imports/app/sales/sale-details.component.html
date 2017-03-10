@@ -1,64 +1,193 @@
-<div class="card text-center">
-  <div class="card-header">
-    <div class="card-group">
+<div>
+  
+  <!-- sumario de venta -->
+  <div class="row">
+    <h3 class="col-12 text-center">Detalle de Venta</h3>
+    <div  class="form-inline">
 
-      <div class="card">
-        <h4 class="card-text text-center">Orden Nº {{saleNumber}}</h4>  
+      <div class="ml-4 mt-4">
+        <a>Nº de Venta: {{sale?.saleNumber}}</a>
       </div>
+
+      <div class="ml-4 mt-4">
+        <a>Vendedor: {{getUserName()}}</a>
+      </div>
+
+      <div class="ml-4 mt-4">
+        <a>Estado: {{getSaleStatus(sale?.status)}}</a>
+      </div>
+
+      <ng-container *ngIf="sale?.discount">
+        <div class="ml-4 mt-4">
+          <a>Descontado:$ {{sale?.discount}}</a>
+        </div>
+      </ng-container>
+
+     <!--  <ng-container *ngIf="sale?.taxes">
+        <div class="ml-4 mt-4">
+          <a>Impuestos:$ {{sale?.taxes}}</a>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="sale?.subtotal">
+        <div class="ml-4 mt-4">
+          <a>Subtotal:$ {{sale?.subtotal}}</a>
+        </div>
+      </ng-container> -->
+
+      <div class="ml-4 mt-4">
+        <label class="form-check-label">
+        Forma de pago
+        <select 
+          name="paymentForm" 
+          class="form-control"
+          [disabled] = "sale?.status == 'submitted'"
+          [(ngModel)]="paymentForm"
+          (blur)="doLog();"
+          >
+          <option value="1">Contado</option>
+          <option value="2">Tarjeta</option>
+          <option value="3">Cuenta</option>
+        </select> 
+          </label>
+      </div>
+
       
-      <div class="card">    
-        <form class="input-group">
-          <input type="text" class="form-control" #searchtext placeholder="Codigo de barras">
-          <button type="button" class="btn btn-primary" (click)="addProduct(searchtext.value)">Agregar</button>
-        </form>
-      </div>
+        <div class="ml-4 mt-4">
+          <a>Total:$ {{getTotal()}}</a>
+        </div>
+     
+
+    </div>
   </div>
 
-  <div class="card-block">
-    <h3 class="col-12 text-center">Detalles de venta</h3>
-    <!-- table-responsive table-striped table-bordered table-hover -->
+  <!--  busqueda x codigo -->
+  <div class="row">
+    <div  class="form-inline">
+     
+     <div class="ml-4 mt-4">
+        <input 
+          [disabled] = "sale?.status == 'submitted'"
+          type="text" 
+          name="productAmount" 
+          class="form-control" 
+          [(ngModel)]="productAmount"
+          placeholder="Cantidad">
+      </div>
+
+      <div class=" mt-4">
+        <input
+          [disabled] = "sale?.status == 'submitted'"
+          type="text" 
+          name="barCodeLookup" 
+          class="form-control" 
+          [(ngModel)]="selectedCode"
+          (blur)="search('barCode', selectedCode);"
+          placeholder="Buscar por Codigo">
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
     <table class="table table-bordered table-hover ">
+      <!-- headers -->
       <thead class="thead-default">
         <tr>
-          <th class="text-center">Codigo</th>
-          <th class="text-center">Descripcion</th>
-          <th class="text-center">Talle</th>
-          <th class="text-center">Marca</th>
-          <th class="text-center">Modelo</th>
-          <th class="text-center">Color</th>
-          <th class="text-center">Pecio Unitario</th>
-          <th class="text-center">Disponibles</th> 
-          <th class="text-center"><span class="fa fa-chevron-down" aria-hidden="true"></span></th>
-          <th class="text-center">Cantidad</th>
-          <th class="text-center"><span class="fa fa-chevron-up" aria-hidden="true"></span></th>
-          <th class="text-center">Subtotal</th>
-          <th class="text-center">Quitar</th>
+          <th  class="text-center" *ngFor="let header of headers; let colIndex = index; ">
+            <ng-container *ngIf=" header.key === 'UP' ">
+              <span class="fa fa-chevron-up" aria-hidden="true"></span>
+            </ng-container>
+            <ng-container *ngIf=" header.key === 'DOWN' ">
+              <span class="fa fa-chevron-down" aria-hidden="true"></span>
+            </ng-container>
+            <ng-container *ngIf=" header.key !== 'UP' && header.key !== 'DOWN'">
+            {{header.key}}
+          </th>
+          <th class="text-center">#</th>
         </tr>
       </thead>
+      
       <tbody>
-        <tr *ngFor="let product of products">
-          <td class="text-center">{{product.code}}</td>
-          <td class="text-center">{{product.name}}</td>
-          <td class="text-center">{{product.size}}</td>
-          <td class="text-center">{{product.brand}}</td>
-          <td class="text-center">{{product.model}}</td>
-          <td class="text-center">{{product.color}}</td>
-          <td class="text-center">{{product.price}}</td>
-          <td class="text-center">{{product.available - product.quantity}}</td>
-          <td class="text-center"><button type="button" class="btn btn-default" (click)=decreaseAmount(product)><span class="fa fa-chevron-down" aria-hidden="true"></span></button></td>
-          <td class="text-center" >{{product.quantity}}</td>
-          <td class="text-center"><button type="button" class="btn btn-default" (click)=increaseAmount(product)><span class="fa fa-chevron-up" aria-hidden="true"></span></button></td>
-          <td class="text-center">{{product.price * product.quantity}}</td>
-          <td class="text-center"><button type="button" class="btn btn-default" (click)=remove(product)><span class="fa fa-times" aria-hidden="true"></span></button></td>
-        </tr>
+        <!-- table content -->
+
+        <!-- 'Codigo', 'Descripcion', 'Color', 'Talle', 'Marca', 'Modelo', 'Precio', 'UP',  'Cantidad', 'DOWN',  'SubTotal', '#' -->
+        <ng-container *ngFor="let productSale of productSales | async;">
+          <tr *ngFor="let productSize of productSizes | async; let rowIndex=index; ">
+            <ng-container *ngIf=" productSale.productSizeId == productSize._id">
+              <ng-container *ngFor="let product of products | async;"> 
+                <ng-container *ngIf=" product._id == productSize.productId ">
+                  <ng-container *ngFor="let stock of stocks | async;">
+                    <ng-container *ngIf=" stock.storeId == userStore.storeId && productSize.productId == stock.productSizeId">
+                      <td class="text-center">
+                        <a [routerLink]="['/products', product.code]">{{productSize.barCode}}</a>
+                      </td>
+                      <td class="text-center">
+                        <a>{{product.name}}</a>
+                      </td>
+
+                      <td class="text-center">
+                        <a>{{product.color}}</a>
+                      </td>
+
+                      <td class="text-center">
+                        <a>{{productSize.size}}</a>
+                      </td>
+
+                      <td class="text-center">
+                        <a>{{product.brand}}</a>
+                      </td>
+
+                      <td class="text-center">
+                        <a>{{product.model}}</a>
+                      </td>
+
+                      <td class="text-center">
+                        <a>{{getPrice(stock)}}</a>
+                      </td>
+                      
+                      <td class="text-center">
+                        <button type="button" class="btn btn-default" (click)=decreaseAmount(rowIndex)>
+                          <span class="fa fa-chevron-down" aria-hidden="true"></span>
+                        </button>
+                      </td>
+                      
+                      <td class="text-center">
+                         <a>{{getProductAmount(rowIndex)}}</a>
+                      </td>
+                      
+                      <td class="text-center">
+                        <button type="button" class="btn btn-default" (click)=increaseAmount(rowIndex,stock)>
+                          <span class="fa fa-chevron-up" aria-hidden="true">
+                          </span>
+                        </button>
+                      </td>
+
+                      <td class="text-center">
+                          <a>{{calculateSubTotal(rowIndex,stock)}}</a>
+                      </td>
+
+                      <td class="text-center">
+                        <button type="button" class="btn btn-default" (click)=remove(product)>
+                          <span class="fa fa-times" aria-hidden="true"></span>
+                        </button>
+                      </td>
+
+                    </ng-container>
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>
-  
+
+  <!-- action buttons panel -->
   <div class="card-footer">
     <div class="row">
       <div class="col-2">
-        <h4>Total: $ {{total}}</h4>
+        <h4>Total: $ {{getTotal()}}</h4>
       </div>        
       <div class="col span2">
         <a class="btn btn-block btn-info" routerLink="/sales" routerLinkActive="active">Cancelar Orden</a>
@@ -72,3 +201,5 @@
     </div>
   </div>
 </div>
+</div>
+

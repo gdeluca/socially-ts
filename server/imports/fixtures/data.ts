@@ -324,14 +324,16 @@ export function loadData() {
       _id: "01",
       saleNumber: "000001",
       status: "started",
+      payment: "contado",
       lastUpdate: "2017-01-12T9:11:01Z",
-      userStoreId: "01", //guille en pumpu
-      balanceId: "02" // an open balance
+      userStoreId: "01", 
+      balanceId: "02"
     });
     Sales.insert({
       _id: "02",
       saleNumber: "000002",
       status: "started",
+      payment: "contado",
       lastUpdate: "2017-01-12T9:11:01Z",
       userStoreId: "02", 
       balanceId: "03"
@@ -549,11 +551,11 @@ export function loadData() {
       actionDate: "2017-01-14T10:13:01Z"
     });
 
-    //started submited reserved
+    //started submitted reserved
     Sales.update({_id:"01"},{
       $set: { 
         productSaleIds: ["01", "02", "03"],
-        status: "submitted",
+        status: "started",
         subtotal: 930,
         taxes: 195.3,
         total: 1125.3,
@@ -567,7 +569,7 @@ export function loadData() {
     Stocks.update({ storeId: "01", productSizeId: "05" },{$dec: { quantity: 1 }});
 
     //check the balance is open before submit
-    //update the balance to contain submited sale information
+    //update the balance to contain submitted sale information
     Balances.update(
       {storeId: "01", sort: {actionDate: -1}, limit: 1},
       {$set:{$inc: {cashFlow: 1125.3, cashExistence: 400}}}

@@ -11,6 +11,7 @@ import './imports/publications/parties';
 import './imports/publications/categories'; 
 import './imports/publications/counters'; 
 import './imports/publications/products'; 
+import './imports/publications/sales'; 
 import './imports/publications/sections'; 
 import './imports/publications/stores'; 
 import './imports/publications/stocks'; 

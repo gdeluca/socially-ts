@@ -21,12 +21,12 @@ import { UsersComponent } from './users/users.component';
 
  
 export const routes: Route[] = [
-  { path: '', redirectTo: '/stock', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
+  { path: '', redirectTo: '/sales/000001', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
   { path: 'balances', component: BalanceResumeComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'categories', component: CategoriesComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'login', component: LoginComponent },
   { path: 'sales', component: SalesComponent, canActivate: ['canActivateForLoggedIn'] },
-  { path: 'sales/:saleId', component: SaleDetailsComponent , canActivate: ['canActivateForLoggedIn'] },
+  { path: 'sales/:saleNumber', component: SaleDetailsComponent , canActivate: ['canActivateForLoggedIn'] },
   { path: 'parties', component: PartiesListComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'party/:partyId', component: PartyDetailsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'products', component: ProductsComponent, canActivate: ['canActivateForLoggedIn'] },

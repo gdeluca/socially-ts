@@ -71,23 +71,21 @@ Meteor.publishComposite('stocks', function(options: SearchOptions, filters: any)
       Counts.publish(this, 'numberOfStocks',Stocks.collection.find(stockSelector , options), { noReady: true });
       return Stocks.collection.find(stockSelector, options);
     },
-    children: [
-      {
-        find: function(stock) {
-            return ProductSizes.collection.find({ $and: [{ _id: stock.productSizeId }, productSizeSelector ] });
-        },
+    children: [{
+      find: function(stock) {
+          return ProductSizes.collection.find({ $and: [{ _id: stock.productSizeId }, productSizeSelector ] });
+      },
         children: [{
           find: function(productSize) {
             return Products.collection.find({ $and: [{ _id: productSize.productId }, productSelector ] })
           },
-          children: [{
-          find: function(product) {
-            return Categories.collection.find({ $and: [{ _id: product.categoryId }, categorySelector ] })
-          }
+            children: [{
+              find: function(product) {
+                return Categories.collection.find({ $and: [{ _id: product.categoryId }, categorySelector ] })
+              }
+            }]
         }]
-        }]
-      }
-    ],
+    }]
   }
 });
 
