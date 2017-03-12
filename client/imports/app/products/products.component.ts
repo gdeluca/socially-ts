@@ -96,7 +96,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ){
     this.complexForm = formBuilder.group({
       name: ['', Validators.compose([Validators.required, Validators.minLength(3)])],
-      code: ['', Validators.compose([Validators.required, Validators.minLength(12)])],
+      code: ['', Validators.compose([Validators.required, Validators.minLength(10)])],
       color:[''],
       brand: [''],
       model: [''],

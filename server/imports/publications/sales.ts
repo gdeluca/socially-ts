@@ -16,7 +16,7 @@ import { Sales } from '../../../both/collections/sales.collection';
 import { Stocks } from '../../../both/collections/stocks.collection';
 import { Stores } from '../../../both/collections/stores.collection';
 // import { Tags } from '../../../both/collections/tags.collection';
-// import { Users } from '../../../both/collections/users.collection';
+import { Users } from '../../../both/collections/users.collection';
 
 // // model 
 // import { Balance } from '../../../both/models/balance.model';
@@ -77,6 +77,11 @@ Meteor.publishComposite('sales', function(saleNumber: string, options: SearchOpt
           {
             find: function(userStore) {
               return Stores.collection.find({ _id: userStore.storeId });
+            }
+          },
+          {
+            find: function(userStore) {
+              return  Meteor.users.find({ _id: userStore.userId }, {fields: {username: 1}});
             }
           }
         ]

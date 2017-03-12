@@ -1,0 +1,88 @@
+<table class="table table-bordered table-hover ">
+  <thead class="thead-default"> 
+    <!-- headers -->
+    <tr>
+      <th  class="text-center" *ngFor="let header of headers; let colIndex = index; ">
+        {{header.key}}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <ng-container *ngFor="let header of headers; let colIndex = index; ">
+        <td class="text-center">
+          <input 
+            type="text" 
+            class="col-9" 
+            name=filter-{{header.key}}
+            placeholder={{header.key}}
+            #tmp
+            (blur)="search(header.value, tmp.value)">
+        </td>
+      </ng-container> 
+    </tr>
+    <tr *ngFor="let product of products | async; let rowIndex=index; "
+    (click)="populateProductSizes(product);setClickedRow(rowIndex)"
+    [ngClass]="{'highlight': selectedRow == rowIndex}" >
+
+      <!-- name field -->
+      <td class="text-center">
+        <a>{{product.name}}</a>
+      </td>
+      
+      <!-- code field -->
+      <td class="text-center">
+        <a>{{product.code}}</a>
+      </td>
+
+      <!-- color field -->
+      <td class="text-center">
+        <a>{{product.color}}</a>
+      </td>
+
+      <!-- brand field -->
+      <td class="text-center">
+        <a>{{product.brand}}</a>
+      </td>
+
+      <!-- provider field -->
+      <td class="text-center">
+        <a>{{product.provider}}</a>
+      </td>
+
+      <!-- model field -->
+      <td class="text-center">
+        <a>{{product.model}}</a>
+      </td>
+
+      <!-- categories field-->
+      <ng-container *ngFor=" let category of categories | async"> 
+        <ng-container *ngIf=" product.categoryId == category._id">
+          <td class="text-center">
+            <a>{{category.name}}</a>
+          </td>
+        </ng-container>
+      </ng-container>
+    </tr>
+  </tbody>
+</table>
+
+
+<div class="form-group" [hidden]="hideSizesForm">
+  <legend>Seleccione un talle:</legend>
+  <ng-container *ngFor=" let productSize of productSizes | async; let rowIndex=index; "> 
+    <ng-container *ngIf=" selectedProduct?._id == productSize.productId">
+        <div class="pr-5">
+          {{productSize.size}}
+          <input type="radio" 
+            class="form-check-input radio-info" 
+            name="sizesGroup" 
+            id="sizeIndexId{{rowIndex}}"
+            data-dismiss="modal"
+            (click)="doEmit(productSize.barCode)"
+            [value]="productSize.barCode"
+            >
+        </div>
+    </ng-container>
+  </ng-container>
+</div>

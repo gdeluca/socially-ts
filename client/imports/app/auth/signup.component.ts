@@ -30,7 +30,11 @@ export class SignupComponent implements OnInit, OnDestroy {
   selectedStore: Store;
 
 
-  constructor(private router: Router, private zone: NgZone, private formBuilder: FormBuilder) {}
+  constructor(
+    private router: Router, 
+    private zone: NgZone, 
+    private formBuilder: FormBuilder) 
+  {}
  
   ngOnInit() {
     this.signupForm = this.formBuilder.group({
@@ -44,8 +48,9 @@ export class SignupComponent implements OnInit, OnDestroy {
 
     this.error = '';
 
-    this.storesSub = MeteorObservable.subscribe('stores').subscribe(() => {
-      this.stores = Stores.find({}).zone();
+    this.storesSub = MeteorObservable.subscribe('stores')
+      .subscribe(() => {
+        this.stores = Stores.find({}).zone();
     });
 
   }

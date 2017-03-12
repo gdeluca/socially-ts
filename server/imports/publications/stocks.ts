@@ -89,4 +89,6 @@ Meteor.publishComposite('stocks', function(options: SearchOptions, filters: any)
   }
 });
 
-
+Meteor.publish('allStocks', function(options: SearchOptions) { 
+  return Stocks.find({}, options);
+});

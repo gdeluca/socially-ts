@@ -1,58 +1,60 @@
 
 // angular
-import { Component, OnInit, OnDestroy, Injectable, Inject, NgModule } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+// import { Injectable, Inject, NgModule, Input, Output, EventEmitter  } from '@angular/core';
+// import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+// import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
-import { PaginationService } from 'ng2-pagination';
-
+// import { PaginationService } from 'ng2-pagination';
+ import { Bert } from 'meteor/themeteorchef:bert';
+ 
 // reactiveX
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+// import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/combineLatest';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/publishLast';
+// import 'rxjs/add/operator/combineLatest';
+// import 'rxjs/add/operator/map';
+// import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
 
 // collections
-import { Balances } from '../../../../both/collections/balances.collection';
-import { Categories } from '../../../../both/collections/categories.collection';
-import { Counters } from '../../../../both/collections/counters.collection';
+// import { Balances } from '../../../../both/collections/balances.collection';
+// import { Categories } from '../../../../both/collections/categories.collection';
+// import { Counters } from '../../../../both/collections/counters.collection';
 import { UserStores } from '../../../../both/collections/user-stores.collection';
-import { ProductPurchases } from '../../../../both/collections/product-purchases.collection';
+// import { ProductPurchases } from '../../../../both/collections/product-purchases.collection';
 import { ProductSales } from '../../../../both/collections/product-sales.collection';
 import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
 import { Products } from '../../../../both/collections/products.collection';
-import { Purchases } from '../../../../both/collections/purchases.collection';
-import { Sales } from '../../../../both/collections/sales.collection';
-import { Sections } from '../../../../both/collections/sections.collection';
+// import { Purchases } from '../../../../both/collections/purchases.collection';
+import { Sales, salesStatusMapping, formOfPayment } from '../../../../both/collections/sales.collection';
+// import { Sections } from '../../../../both/collections/sections.collection';
 import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
-import { Tags } from '../../../../both/collections/tags.collection';
+// import { Tags } from '../../../../both/collections/tags.collection';
 import { Users } from '../../../../both/collections/users.collection';
 
 // model 
-import { Balance } from '../../../../both/models/balance.model';
-import { Category } from '../../../../both/models/category.model';
-import { Counter } from '../../../../both/models/counter.model';
+// import { Balance } from '../../../../both/models/balance.model';
+// import { Category } from '../../../../both/models/category.model';
+// import { Counter } from '../../../../both/models/counter.model';
 import { UserStore } from '../../../../both/models/user-store.model';
-import { ProductPurchase } from '../../../../both/models/product-purchase.model';
+// import { ProductPurchase } from '../../../../both/models/product-purchase.model';
 import { ProductSale } from '../../../../both/models/product-sale.model';
 import { ProductSize } from '../../../../both/models/product-size.model';
 import { Product } from '../../../../both/models/product.model';
-import { Purchase } from '../../../../both/models/purchase.model';
+// import { Purchase } from '../../../../both/models/purchase.model';
 import { Sale } from '../../../../both/models/sale.model';
-import { Section } from '../../../../both/models/section.model';
+// import { Section } from '../../../../both/models/section.model';
 import { Stock } from '../../../../both/models/stock.model';
 import { Store } from '../../../../both/models/store.model';
-import { Tag } from '../../../../both/models/tag.model';
+// import { Tag } from '../../../../both/models/tag.model';
 import { User } from '../../../../both/models/user.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
@@ -61,20 +63,17 @@ import { isNumeric } from '../validators/validators';
 import template from "./sale-details.component.html";
 import style from "./sale-details.component.scss";
 
+import { ProductSearchComponent } from './product-search.component';
+
 @Component({
   selector: "sale-details",
   template,
-  styles: [ style ]
+  styles: [ style ] 
 })
 @InjectUser('user')
 export class SaleDetailsComponent implements OnInit, OnDestroy {
  
-  saleStatus = {
-    'started': 'En Proceso', 
-    'submitted': 'Finalizada', 
-    'reserved': 'Mercadera Reservada o Señada', 
-    'canceled': 'Cancelada',
-  };
+  saleStatus = salesStatusMapping; // from Sales;
 
   salePayment = {
     'card': 'Contado', 
@@ -100,15 +99,19 @@ getSaleStatus(value){
   return this.saleStatus[value];
 }
   paymentForm: number = 1;
-  productAmounts: number[] = [];
+  quantityTracker: number[] = [];
   productSubTotals: number[] = [];
   saleNumber: number;
   total: number = 0;
 
+  selectedProductSizeBarCode: string;
+  selectedProductAmount: number = 1;
+
   paramsSub: Subscription;
   saleSub: Subscription;
+  allStockSub: Subscription;
 
-  user: Meteor.User;
+  seller: User;
   sale: Sale;
   productSales: Observable<ProductSale[]>;
   productSizes: Observable<ProductSize[]>;
@@ -116,15 +119,17 @@ getSaleStatus(value){
   userStore: UserStore;
   store: Store;
   stocks: Observable<Stock[]>;
+  allStocks: Observable<Stock[]>;
 
  constructor(
     private router: Router,
     private activeRoute: ActivatedRoute
   ) {
-    
   }
 
   ngOnInit() {
+      Bert.defaults.hideDelay = 5000;
+
     // console.log('init sale details subscribers');
     this.paramsSub = this.activeRoute.params
       .map(params => params['saleNumber'])
@@ -132,12 +137,10 @@ getSaleStatus(value){
         this.saleNumber = saleNumber
         
         if (this.saleSub) {
-          // console.log('unsuscribe sale sub');
           this.saleSub.unsubscribe();
         }
- 
         this.saleSub = MeteorObservable.subscribe('sales', this.saleNumber).subscribe(() => {
-          MeteorObservable.autorun().subscribe(() => {
+          // MeteorObservable.autorun().subscribe(() => {
             // console.log('getting subscriber data');
 
             this.sale = Sales.findOne({saleNumber:this.saleNumber});
@@ -145,10 +148,20 @@ getSaleStatus(value){
             this.productSizes = ProductSizes.find({}).zone();
             this.products = Products.find({}).zone();
             this.userStore = UserStores.findOne();
+            this.seller = Users.find({_id: this.userStore.userId}).fetch()[0];
             this.store = Stores.findOne({});
-            this.stocks = Stocks.find({}).zone();
-          });
+           // this.stocks = Stocks.find({}).zone();
+          // });
         });
+ 
+
+        if (this.allStockSub) { 
+          this.allStockSub.unsubscribe();
+        }
+        this.allStockSub = MeteorObservable.subscribe('allStocks').subscribe(() => {
+          this.stocks = Stocks.find({}).zone();
+        });
+
 
       });
   }
@@ -157,31 +170,109 @@ getSaleStatus(value){
     // console.log('destroy party details subscribers');
     this.paramsSub.unsubscribe();
     this.saleSub.unsubscribe();
+    this.allStockSub.unsubscribe();
   }
+  
+  /** search the product by code and add it to the table  */
+  addProduct() {
 
-  addProduct(code){
-    // search the product by code and add it to the table 
+    let currentBarCode = this.selectedProductSizeBarCode;
+    this.selectedProductSizeBarCode = "";
+    let requestedQuantity = +this.selectedProductAmount;
+    // attach this check to input box 
+    if (!currentBarCode || currentBarCode.length != 12) {
+      return;
+    }
+
+    console.log('entering add product');
+    // get the productsize
+    let productSize = ProductSizes.collection.find({
+      barCode: currentBarCode
+    }).fetch()[0];
+
+    console.log('getting stock for product size:' + productSize._id);
+    // check stock existence for the productSize
+    let stockFetch = Stocks.collection.find({
+      productSizeId: productSize._id, active:true, storeId: this.store._id
+    }).fetch();
+
+    console.log({
+      productSizeId: productSize._id, active:true, storeId: this.store._id
+    });
+    // checkeo de consistencia
+    if (stockFetch.length > 1) {
+      Bert.alert('Entradas duplicadas para el stock activo del producto: ' 
+        + currentBarCode + ' en la sucursal ' + this.store.name, 
+        'warning', 'growl-top-right' ); 
+      return;
+    }
+
+    if (stockFetch.length == 0) {
+       Bert.alert( 'No se encuentra informacion del stock activo para producto: ' 
+        + currentBarCode + ' en la sucursal ' + this.store.name, 
+        'warning', 'growl-top-right' ); 
+       return;
+    }
+
+    let stock = stockFetch[0];
+    console.log('stock object :' + JSON.stringify(stock));
+    if (stock.quantity < requestedQuantity) {
+      Bert.alert(
+        'La cantidad ingresada: ' + requestedQuantity 
+        + 'es mayor a la disponible en stock: ' + stock.quantity 
+        + ' para el producto seleccionado: ' + currentBarCode, 
+        'warning', 'growl-top-right' ); 
+      return;
+
+    } else {
+      let productSale = ProductSales.collection.find(
+        {productSizeId: productSize._id, saleId: this.sale._id}
+      ).fetch()[0];
+
+      console.log('updating stock:' + stock._id);
+      // update the stock, decrement the quantity field
+      Stocks.update(
+       {_id:stock._id},
+       {$set:{quantity:stock.quantity-requestedQuantity}}
+      );
+
+      // if found the update(increase the quantity)
+       console.log('current product sale:' + JSON.stringify(productSale));
+      if (productSale) {
+        console.log('updating current product sale:');
+        ProductSales.update(
+          {_id:productSale._id},
+          {$set:{quantity:productSale.quantity+requestedQuantity}}
+        );
+      } else {
+        // add a new one
+        console.log('updating product sales');
+        // update the produstsale, add the new productsize
+        ProductSales.insert({
+          productSizeId: productSize._id, 
+          saleId: this.sale._id,
+          quantity: requestedQuantity
+        });
+
+        Bert.alert('Producto agregado', 'success', 'growl-top-right'); 
+
+      }
+    }
   }
    
-   getUserName(){
-    return "";// return Meteor.userId().username;
-   }
-  getProductAmount(index) {
-    if (this.productAmounts[index] === undefined){
-      this.productAmounts[index] = 1;
-    }
-    return this.productAmounts[index];
+  setQuantityTracker(index, quantity) {
+    this.quantityTracker[index] = quantity; 
+    return this.quantityTracker[index];
   }
 
   calculateSubTotal(index, stock) {
     this.productSubTotals[index] = 
-      this.getPrice(stock) * this.getProductAmount(index);
+      this.getPrice(stock) * this.quantityTracker[index];
     return this.productSubTotals[index];
   }
 
   getTotal(){
     var total = 0;
-        //console.log(this.productSubTotals);
     if (this.productSubTotals.length > 0) {
       for (let subTotal of this.productSubTotals) {
         total += subTotal;
@@ -197,26 +288,33 @@ getSaleStatus(value){
       return stock.priceCard;
     }
   }
+
+  checkLength(){
+    if (this.selectedProductSizeBarCode.length == 12){
+      this.addProduct();
+    }
+  }
   
   increaseAmount(index, stock) {
-    if (stock.quantity - this.productAmounts[index] > 0) {
-      this.productAmounts[index] +=1;
+    if (stock.quantity - this.quantityTracker[index] > 0) {
+      this.quantityTracker[index] +=1;
     }
   }
 
   decreaseAmount(index) {
-    if (this.productAmounts[index] > 1) {
-      this.productAmounts[index] -=1;
+    if (this.quantityTracker[index] > 1) {
+      this.quantityTracker[index] -=1;
     }
   }
 
-  remove(product){
-
+  removeFormList(product){
+ 
   }
 
   cancelSale(){}
 
-  doLog(){
-    // console.log(this.paymentForm);
+  notifyProductFound(barCode:string) {
+    this.selectedProductSizeBarCode = barCode;
+    this.addProduct();
   }
 }

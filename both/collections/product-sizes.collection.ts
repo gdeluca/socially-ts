@@ -4,7 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { ProductSize } from '../models/product-size.model';
 
 export const ProductSizes = new MongoObservable.Collection<ProductSize>('productSizes');
-const mappingSizes = {'S':'70','M':'71','L':'73','XL':'74','XXL':'75','XXXL':'76'};
+const mappingSizes = {'S':'70','M':'71','L':'73','XL':'74','XXL':'75','XXXL':'76','XXXXL':'76','UNICO':'00'};
 
 export function getMappingSize(size: string){
   if (size) {

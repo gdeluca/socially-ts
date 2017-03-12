@@ -10,7 +10,7 @@
       </div>
 
       <div class="ml-4 mt-4">
-        <a>Vendedor: {{getUserName()}}</a>
+        <a>Vendedor: {{seller?.username}}</a>
       </div>
 
       <div class="ml-4 mt-4">
@@ -43,7 +43,6 @@
           class="form-control"
           [disabled] = "sale?.status == 'submitted'"
           [(ngModel)]="paymentForm"
-          (blur)="doLog();"
           >
           <option value="1">Contado</option>
           <option value="2">Tarjeta</option>
@@ -69,9 +68,9 @@
         <input 
           [disabled] = "sale?.status == 'submitted'"
           type="text" 
-          name="productAmount" 
+          name="selectedProductAmount" 
           class="form-control" 
-          [(ngModel)]="productAmount"
+          [(ngModel)]="selectedProductAmount"
           placeholder="Cantidad">
       </div>
 
@@ -79,12 +78,49 @@
         <input
           [disabled] = "sale?.status == 'submitted'"
           type="text" 
-          name="barCodeLookup" 
+          name="selectedProductSizeBarCode" 
           class="form-control" 
-          [(ngModel)]="selectedCode"
-          (blur)="search('barCode', selectedCode);"
+          [(ngModel)]="selectedProductSizeBarCode"
+          (keyup.enter)="addProduct();"
+          (blur)="addProduct();"
+          (keyup)="checkLength()"
           placeholder="Buscar por Codigo">
       </div>
+
+
+
+      <div class="ml-4 mt-4">
+        <a 
+          [attr.disabled] = "sale?.status == 'submitted'"
+          class="btn btn-block btn-info"
+          data-toggle="modal"
+          href="#myModal"
+          routerLinkActive="active"
+          >
+            Buscar Producto
+        </a>
+      </div>
+
+      <!-- product search modal -->
+      <div class="modal fade" id="myModal">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title">Seleccione un articulo</h4>
+            </div>
+            <div class="modal-body">
+              <product-search 
+                (update)="notifyProductFound($event)"> 
+              </product-search>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
+
     </div>
   </div>
 
@@ -117,7 +153,7 @@
               <ng-container *ngFor="let product of products | async;"> 
                 <ng-container *ngIf=" product._id == productSize.productId ">
                   <ng-container *ngFor="let stock of stocks | async;">
-                    <ng-container *ngIf=" stock.storeId == userStore.storeId && productSize.productId == stock.productSizeId">
+                    <ng-container *ngIf=" stock.storeId == userStore.storeId && productSize._id == stock.productSizeId">
                       <td class="text-center">
                         <a [routerLink]="['/products', product.code]">{{productSize.barCode}}</a>
                       </td>
@@ -152,7 +188,7 @@
                       </td>
                       
                       <td class="text-center">
-                         <a>{{getProductAmount(rowIndex)}}</a>
+                        <a>{{setQuantityTracker(rowIndex, productSale.quantity)}}</a>                      
                       </td>
                       
                       <td class="text-center">
@@ -167,7 +203,7 @@
                       </td>
 
                       <td class="text-center">
-                        <button type="button" class="btn btn-default" (click)=remove(product)>
+                        <button type="button" class="btn btn-default" (click)=removeFormList(product)>
                           <span class="fa fa-times" aria-hidden="true"></span>
                         </button>
                       </td>

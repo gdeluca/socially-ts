@@ -564,7 +564,7 @@ export function loadData() {
     });
 
     // update local stock(before submit)
-    Stocks.update({ storeId: "01", productSizeId: "01" },{$dec: { quantity: 1 }});
+    Stocks.update({ _id: "01" },{$dec: { quantity: 1 }});
     Stocks.update({ storeId: "01", productSizeId: "03" },{$dec: { quantity: 2 }});
     Stocks.update({ storeId: "01", productSizeId: "05" },{$dec: { quantity: 1 }});
 
