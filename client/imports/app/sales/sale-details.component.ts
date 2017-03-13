@@ -33,7 +33,7 @@ import { ProductSales } from '../../../../both/collections/product-sales.collect
 import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
 import { Products } from '../../../../both/collections/products.collection';
 // import { Purchases } from '../../../../both/collections/purchases.collection';
-import { Sales, salesStatusMapping, salePaymentMapping } from '../../../../both/collections/sales.collection';
+import { Sales, salesStatusMapping, salePaymentMapping, workShiftMapping } from '../../../../both/collections/sales.collection';
 // import { Sections } from '../../../../both/collections/sections.collection';
 import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
@@ -74,8 +74,8 @@ import { ProductSearchComponent } from './product-search.component';
 export class SaleDetailsComponent implements OnInit, OnDestroy {
  
   saleStatus = salesStatusMapping; // from Sales;
-
   salePayment = salePaymentMapping;
+  workShift = workShiftMapping;
    
   // name <-> sortfield, touple
   headers: Dictionary[] = [

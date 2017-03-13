@@ -1,5 +1,5 @@
-import { BalanceResumeComponent } from './balance-resume.component';
+import { BalancesComponent } from './balances.component';
 
 export const BALANCES_DECLARATIONS = [
-  BalanceResumeComponent,
+  BalancesComponent,
 ];

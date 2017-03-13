@@ -75,7 +75,7 @@ Meteor.publishComposite('sale-details', function(saleNumber: string, options: Se
   }
 });
 
-const saleFields = ['paymentForm', 'status', 'saleDate'];
+const saleFields = ['paymentForm', 'saleState', 'saleDate'];
 const userFields = ['seller'];
 const storeFields = ['name'];
 

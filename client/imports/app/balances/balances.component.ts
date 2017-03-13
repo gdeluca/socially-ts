@@ -22,16 +22,16 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
 
 // collections
-// import { Balances } from '../../../../both/collections/balances.collection';
+import { Balances, balanceOpsMapping, balanceOps } from '../../../../both/collections/balances.collection';
 // import { Categories } from '../../../../both/collections/categories.collection';
 // import { Counters } from '../../../../both/collections/counters.collection';
 import { UserStores } from '../../../../both/collections/user-stores.collection';
 // import { ProductPurchases } from '../../../../both/collections/product-purchases.collection';
-import { ProductSales } from '../../../../both/collections/product-sales.collection';
+// import { ProductSales } from '../../../../both/collections/product-sales.collection';
 // import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
 // import { Products } from '../../../../both/collections/products.collection';
 // import { Purchases } from '../../../../both/collections/purchases.collection';
-import { Sales, salesStatusMapping, formOfPayment } from '../../../../both/collections/sales.collection';
+import { Sales } from '../../../../both/collections/sales.collection';
 // import { Sections } from '../../../../both/collections/sections.collection';
 // import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
@@ -39,12 +39,12 @@ import { Stores } from '../../../../both/collections/stores.collection';
 import { Users } from '../../../../both/collections/users.collection';
 
 // model 
-// import { Balance } from '../../../../both/models/balance.model';
+import { Balance } from '../../../../both/models/balance.model';
 // import { Category } from '../../../../both/models/category.model';
 // import { Counter } from '../../../../both/models/counter.model';
 import { UserStore } from '../../../../both/models/user-store.model';
 // import { ProductPurchase } from '../../../../both/models/product-purchase.model';
-import { ProductSale } from '../../../../both/models/product-sale.model';
+// import { ProductSale } from '../../../../both/models/product-sale.model';
 // import { ProductSize } from '../../../../both/models/product-size.model';
 // import { Product } from '../../../../both/models/product.model';
 // import { Purchase } from '../../../../both/models/purchase.model';
@@ -59,17 +59,18 @@ import { Dictionary } from '../../../../both/models/dictionary';
 import { isNumeric } from '../validators/validators';
 
 
-import template from "./sales.component.html";
-import style from "./sales.component.scss";
+import template from "./balances.component.html";
+import style from "./balances.component.scss";
 
 @Component({
-  selector: "sales",
+  selector: "balances",
   template,
   styles: [ style ]
 })
 @InjectUser('currentUser')
-export class SalesComponent {
-   // pagination related
+export class BalancesComponent {
+  
+  // pagination related
   pageSize: Subject<number> = new Subject<number>();
   curPage: Subject<number> = new Subject<number>();
   sortDirection: Subject<number> = new Subject<number>();
@@ -81,22 +82,21 @@ export class SalesComponent {
     'year':  '',
     'month': '',
     'day': '',
-    'seller': '',
-    'paymentForm': '',
-    'saleState': ''
+    'store': '',
+    'workShift': ''
   };
 
   // name <-> sortfield, touple
   headers: Dictionary[] = [
-    {'key': 'Nº Venta', 'value':'saleNumber'},
-    {'key': 'Forma de Pago', 'value': 'payment', 'showHeaderFilter': true},
-    {'key': 'Descuento', 'value':'discount', 'showHeaderFilter': false},
-    {'key': 'Estado de Venta', 'value':'status', 'showHeaderFilter': true},
-    {'key': 'Fecha de Venta', 'value':'saleDate', 'showHeaderFilter': true},
-    {'key': 'Ultimo Cambio', 'value':'lastUpdate', 'showHeaderFilter': false},
-    {'key': 'Vendedor', 'value':'seller', 'showHeaderFilter': true},
-    {'key': 'Sucursal', 'value':'name', 'showHeaderFilter': true},
-    {'key': 'Total', 'value':'total', 'showHeaderFilter': false},
+    {'key': 'Nº Balance', 'value':'balanceNumber'},
+    {'key': 'Año', 'value': 'year'},
+    {'key': 'Mes', 'value':'month'},
+    {'key': 'Dia', 'value':'day'},
+    {'key': 'Turno', 'value':'workShift'},
+    {'key': 'Sucursal', 'value':'store'},
+    {'key': 'Existencia', 'value':'existence'},
+    {'key': 'Operacion', 'value':'operation'},
+    {'key': 'Facturacion', 'value':'invoicing'},
   ];
 
   collectionCount: number = 0;
@@ -109,26 +109,30 @@ export class SalesComponent {
   complexForm: FormGroup;
 
   currentUser: Meteor.User;
+
   emptySale = 
     {
-      saleNumber:'', 
-      saleState:'' 
+      balanceNumber:'', 
+      operationState:'' 
     };
-  editedSale: any;
+  editedBalance: any;
   editing: boolean = false;
 
+  balances: Observable<Balance[]>;
   sales: Observable<Sale[]>;
-  productSales: Observable<ProductSale[]>;
   userStores: Observable<UserStore[]>;
   stores: Observable<Store[]>;
   users: Observable<User[]>;
+
+  showOperations: boolean = false;
+  showStores: boolean = false;
 
   constructor(
     private paginationService: PaginationService, 
     private formBuilder: FormBuilder
   ){
     this.complexForm = formBuilder.group({
-      saleState: ['', Validators.required],
+      operation: ['', Validators.required],
     });
   }
 
@@ -151,25 +155,24 @@ export class SalesComponent {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('sales-store', options, filters)
+      this.paginatedSub = MeteorObservable.subscribe('balance-sales', options, filters)
         .subscribe(() => {
+          this.balances = Balances.find({}).zone();
           this.sales = Sales.find({}).zone();
-          this.productSales = ProductSales.find({}).zone();
           this.userStores= UserStores.find({}).zone();
           this.stores = Stores.find({}).zone();
           this.users = Users.find({}).zone();
       });
-
     });
 
     this.pageSize.next(this.PAGESIZE);
     this.curPage.next(1);
-    this.sortField.next('saleNumber');
+    this.sortField.next('balanceNumber');
     this.sortDirection.next(1);
     this.filters.next('');
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
-      this.collectionCount = Counts.get('numberOfSales');
+      this.collectionCount = Counts.get('numberOfBalances');
       this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
     });
 
@@ -187,7 +190,15 @@ export class SalesComponent {
     this.optionsSub.unsubscribe();
     this.autorunSub.unsubscribe();
   }
+
+  doShowOperation(condition:boolean){
+    this.showOperations = condition;
+  }
   
+  doShowStores(condition:boolean){
+    this.showStores = condition;
+  }
+
   changeSortOrder(direction: string, fieldName: string): void {
     this.sortDirection.next(parseInt(direction));
     this.sortField.next(fieldName);
@@ -196,5 +207,7 @@ export class SalesComponent {
   copy(original: any){
     return Object.assign({}, original)
   }
+
+
 
 }

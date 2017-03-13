@@ -78,7 +78,7 @@
         <td></td>
           <ng-container *ngFor="let header of headers; let colIndex=index; ">
             <td class="text-center">
-              <ng-container *ngIf="header.showHeader ">
+              <ng-container *ngIf="header.showHeaderFilter ">
                 <input 
                   type="text" 
                   class="col-12" 
@@ -93,7 +93,7 @@
           </ng-container> 
         </tr> 
 
-        <!-- 'saleNumber', 'payment', 'discount', 'status', 'saleDate', 'lastUpdate', 'seller', 'total' -->
+        <!-- 'saleNumber', 'payment', 'discount', 'saleState', 'saleDate', 'lastUpdate', 'seller', 'total' -->
         <tr *ngFor="let sale of sales | async; let rowIndex=index; ">
       <!--   {{sale.saleNumber}} -->
           <ng-container *ngFor="let userStore of userStores | async; "> 
@@ -150,7 +150,7 @@
 
                           <td 
                             class="text-center">
-                            <a>{{sale.status}}</a>
+                            <a>{{sale.saleState}}</a>
                           </td>
 
                           <td

@@ -5,7 +5,7 @@ import { PartiesListComponent } from './parties/parties-list.component';
 import { PartyDetailsComponent } from './parties/party-details.component';
 
 import { CategoriesComponent } from './categories/categories.component';
-import { BalanceResumeComponent } from './balances/balance-resume.component';
+import { BalancesComponent } from './balances/balances.component';
 import { LoginComponent } from './auth/login.component';
 import { SaleDetailsComponent } from './sales/sale-details.component'; 
 import { SalesComponent } from './sales/sales.component';
@@ -19,10 +19,10 @@ import { StockListComponent } from './stock/stock-list.component';
 import { StoresComponent } from './stores/stores.component';
 import { UsersComponent } from './users/users.component';
 
- 
+  
 export const routes: Route[] = [
   { path: '', redirectTo: '/sales/000001', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
-  { path: 'balances', component: BalanceResumeComponent, canActivate: ['canActivateForLoggedIn'] },
+  { path: 'balances', component: BalancesComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'categories', component: CategoriesComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'login', component: LoginComponent },
   { path: 'sales', component: SalesComponent, canActivate: ['canActivateForLoggedIn'] },

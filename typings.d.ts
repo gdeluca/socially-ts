@@ -6,6 +6,8 @@
 /// <reference types="zone.js" />
 /// <reference types="meteor-typings" />
 /// <reference types="@types/meteor-publish-composite" />
+/// <reference types="@types/meteor-persistent-session" />
+
 
 declare module "*.html" {
   const template: string;

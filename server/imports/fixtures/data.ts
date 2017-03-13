@@ -323,8 +323,9 @@ export function loadData() {
     Sales.insert({
       _id: "01",
       saleNumber: "000001",
-      status: "started",
+      saleState: "started",
       payment: "contado",
+      workShift: "morning",
       saleDate: "2017-01-12T9:09:01Z",
       lastUpdate: "2017-01-12T9:11:01Z",
       userStoreId: "01", 
@@ -333,8 +334,9 @@ export function loadData() {
     Sales.insert({
       _id: "02",
       saleNumber: "000002",
-      status: "started",
+      saleState: "started",
       payment: "contado",
+      workShift: "morning",
       saleDate: "2017-01-12T9:07:01Z",
       lastUpdate: "2017-01-12T9:12:01Z",
       userStoreId: "02", 
@@ -557,7 +559,7 @@ export function loadData() {
     Sales.update({_id:"01"},{
       $set: { 
         productSaleIds: ["01", "02", "03"],
-        status: "started",
+        saleState: "started",
         subtotal: 930,
         taxes: 195.3,
         total: 1125.3,

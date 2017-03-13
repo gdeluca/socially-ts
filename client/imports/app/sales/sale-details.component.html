@@ -14,7 +14,7 @@
       </div>
 
       <div class="ml-4 mt-4">
-        <a>Estado: {{getSaleStatus(sale?.status)}}</a>
+        <a>Estado: {{getSaleStatus(sale?.saleState)}}</a>
       </div>
 
       <ng-container *ngIf="sale?.discount">
@@ -41,7 +41,7 @@
         <select 
           name="paymentForm" 
           class="form-control"
-          [disabled] = "sale?.status == 'submitted'"
+          [disabled] = "sale?.saleState == 'submitted'"
           [(ngModel)]="paymentForm"
           >
           <option value="1">Contado</option>
@@ -66,7 +66,7 @@
      
      <div class="ml-4 mt-4">
         <input 
-          [disabled] = "sale?.status == 'submitted'"
+          [disabled] = "sale?.saleState == 'submitted'"
           type="text" 
           name="selectedProductAmount" 
           class="form-control" 
@@ -76,7 +76,7 @@
 
       <div class=" mt-4">
         <input
-          [disabled] = "sale?.status == 'submitted'"
+          [disabled] = "sale?.saleState == 'submitted'"
           type="text" 
           name="selectedProductSizeBarCode" 
           class="form-control" 
@@ -91,7 +91,7 @@
 
       <div class="ml-4 mt-4">
         <a 
-          [attr.disabled] = "sale?.status == 'submitted'"
+          [attr.disabled] = "sale?.saleState == 'submitted'"
           class="btn btn-block btn-info"
           data-toggle="modal"
           href="#myModal"

@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { Parties } from '../../../both/collections/parties.collection';
 
 import { Party } from '../../../both/models/party.model';
+import { Bert } from 'meteor/themeteorchef:bert';
 
 
 @Component({
@@ -14,5 +15,8 @@ import { Party } from '../../../both/models/party.model';
   styles: [ style ]
 })
 export class AppComponent {
-  
+  constructor(
+  ){
+    Bert.defaults.hideDelay = 7000;
+  }
 }

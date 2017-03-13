@@ -18,7 +18,7 @@ import { Users } from '../../../../both/collections/users.collection';
 import template from './login.component.html';
  
 @Component({
-  selector: 'login',
+  selector: 'login', 
   template
 })
 export class LoginComponent implements OnInit, OnDestroy {
@@ -82,8 +82,8 @@ export class LoginComponent implements OnInit, OnDestroy {
             console.log(err);
             this.error = err;
           } else {
-            Session.set("currentUserEmail", this.loginForm.value.email);
-            Session.set("currentStoreName", this.selectedStore.name);
+            Session.setPersistent("currentUserEmail", this.loginForm.value.email);
+            Session.setPersistent("currentStoreName", this.selectedStore.name);
             this.router.navigate(['/']);
           }
         });

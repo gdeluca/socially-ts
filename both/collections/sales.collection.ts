@@ -20,6 +20,11 @@ export const salePaymentMapping = {
     'account': 'Cuenta', 
   };
 
+export const workShiftMapping = {
+    'morning': 'Mañana', 
+    'afternoon': 'Tarde', 
+  };
+
 function loggedIn() {
   return !!Meteor.user();
 }

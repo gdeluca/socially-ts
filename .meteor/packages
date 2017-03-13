@@ -29,8 +29,10 @@ reywood:publish-composite
 momentjs:moment
 dburles:collection-helpers
 fortawesome:fontawesome
-session@1.1.7
 msavin:mongol
 themeteorchef:bert
 aldeed:collection2
 konecty:mongo-counter
+u2622:persistent-session
+msavin:jetsetter
+session
