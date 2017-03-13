@@ -1,43 +1,190 @@
 <div>
-  <h2 class="text-center">Ventas</h2>
+  <div class="row">
+    <h2 class="text-center">Ventas</h2>
 
-  <div class="form-inline">
-    <button type="button" class="form-control btn btn-primary ml-2" (click)="addSale()"  [disabled]="saleCreated">
-    Nueva orden de venta
-    </button>
-    <button type="button" class="form-control btn btn-primary ml-2" (click)="deleteSale()"  [hidden]="!saleCreated">
-    Cancelar orden
-    </button>
+    <div class="form-inline">
+      <div class=" ml-4 mt-4">
+        <button 
+          type="button" 
+          class="form-control btn btn-primary ml-2" 
+          (click)="addSale()"  
+          [disabled]="saleCreated"
+        >
+          Nueva Venta
+        </button>
+      </div>
+      <!-- <div class=" ml-4 mt-4">
+        <button 
+          type="button" 
+          class="form-control btn btn-primary ml-2" 
+          (click)="deleteSale()"  
+          [hidden]="!saleCreated"
+        >
+          Cancelar Venta
+        </button> 
+      </div> -->
+    </div>
   </div>
 
-  <div [hidden]="!saleCreated">
-<!--     <sale-details></sale-details>
- -->  </div>
+  <div class="row">
+    <div class="col-12 text-center">
+      <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+    </div>
+  </div>
 
   <div><hr></div>
 
-  <div class="row" [hidden]="saleCreated">
-    <h3 class="col-12 text-center">Ordenes de Venta</h3>
-    <!-- table-responsive table-striped table-bordered table-hover -->
-    <table class="table table-bordered table-hover ">
+  <div class="row">
+    <!-- sales content -->
+    <table class="table table-bordered table-hover">
       <thead class="thead-default">
         <tr>
-          <th>Nº Venta</th>
-          <th>Total</th>
-          <th>Descuento</th>
-          <th>Estado</th>
-          <th>Vendedor</th>
-          <th>Ultimo Cambio</th>
-        </tr>
+          <!-- headers for sorting -->
+          <th class="text-center">#</th>
+          <th  
+            class="text-center " 
+            style="vertical-align:middle;" 
+            *ngFor="let header of headers; let colIndex = index; ">
+            <div class="input-group">
+              {{header.key}}
+              <button 
+                [hidden]="idx !== colIndex || direction !== 'up'" 
+                type="button" 
+                class="btn btn-default" 
+                (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+                <span class="fa fa-chevron-up" aria-hidden="true"></span>
+              </button>
+              <button 
+                  [hidden]="idx !== colIndex || direction !== 'down'" 
+                  type="button" 
+                  class="btn btn-default"  
+                  (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
+                  <span class="fa fa-chevron-down" aria-hidden="true"></span>
+              </button>
+              <button 
+                [hidden]="direction && idx === colIndex " 
+                type="button" 
+                class="btn btn-default"   
+                (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+                <span class="fa fa-sort" aria-hidden="true"></span>
+              </button>
+            </div>
+          </th> 
       </thead>
       <tbody>
-        <tr *ngFor="let sale of sales">
-        <td><a [routerLink]="['sales/', sale.orderNumber]">{{sale.orderNumber}}</a></td>
-          <td>{{sale.total}}</td>
-          <td>{{sale.discount}}</td>
-          <td>{{sale.status}}</td>
-          <td>{{sale.sellerName}}</td>
-          <td>{{sale.lastUpdate}}</td>
+
+        <!-- filter fields on table header -->
+        <tr>
+        <td></td>
+          <ng-container *ngFor="let header of headers; let colIndex=index; ">
+            <td class="text-center">
+              <ng-container *ngIf="header.showHeader ">
+                <input 
+                  type="text" 
+                  class="col-12" 
+                  name=filter-{{header.key}}
+                  placeholder={{header.key}}
+                  #tmp
+                  (blur)="search(header.value, tmp.value)"
+                  (keyup.enter)="search(header.value, tmp.value);"
+                  >
+              </ng-container>
+            </td>
+          </ng-container> 
+        </tr> 
+
+        <!-- 'saleNumber', 'payment', 'discount', 'status', 'saleDate', 'lastUpdate', 'seller', 'total' -->
+        <tr *ngFor="let sale of sales | async; let rowIndex=index; ">
+      <!--   {{sale.saleNumber}} -->
+          <ng-container *ngFor="let userStore of userStores | async; "> 
+            <ng-container *ngIf="userStore._id == sale.userStoreId ">
+              <!--   userstore {{userStore._id}} -->
+              <ng-container *ngFor="let store of stores | async;  "> 
+                <ng-container *ngIf="store._id == userStore.storeId ">
+                 <!--   store  {{store._id}} -->
+                  <ng-container *ngFor="let user of users | async;  "> 
+                    <ng-container *ngIf="user._id == userStore.userId ">
+               <!--         user  {{user.username}} -->
+                     <!--  <ng-container *ngFor="let productSale of productSales | async; "> 
+                        <ng-container *ngIf="sale._id == productSale.saleId ">
+                          productsale{{productSale._id}} -->
+                          <!-- action buttons for to edit stock fields -->
+                          <td>
+                            <button 
+                              [hidden]="currentIndex === rowIndex && editing"
+                              type="button" 
+                              class="btn btn-default" 
+                              (click)="currentIndex=rowIndex; editing=true;editedStock = copy(emptySale)">
+                              <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
+                            </button>
+                            <button 
+                              [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+                              type="button" 
+                              class="btn btn-default" 
+                              (click)="currentIndex=rowIndex; editing=false; update(editedSale)">
+                              <span class="fa fa-check-square-o" aria-hidden="true"></span>
+                            </button>
+                            <button 
+                              [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)" 
+                              type="button" 
+                              class="btn btn-default" 
+                              (click)="currentIndex=rowIndex; editing=false; ">
+                              <span class="fa fa-ban" aria-hidden="true"></span>
+                            </button>
+                          </td>
+
+                          <td 
+                            class="text-center">
+                            <a [routerLink]="['/sales', sale.saleNumber]">{{sale.saleNumber}}</a>
+                          </td>
+
+                          <td 
+                            class="text-center">
+                            <a>{{sale.payment}}</a>
+                          </td>
+
+                          <td
+                            class="text-center">
+                            <a>{{sale.discount}}</a>
+                          </td>
+
+                          <td 
+                            class="text-center">
+                            <a>{{sale.status}}</a>
+                          </td>
+
+                          <td
+                            class="text-center">
+                            <a>{{sale.saleDate}}</a>
+                          </td>
+
+                          <td
+                            class="text-center">
+                            <a>{{sale.lastUpdate}}</a>
+                          </td>
+
+                          <td
+                            class="text-center">
+                            <a>{{user.username}}</a>
+                          </td>
+
+                          <td
+                            class="text-center">
+                            <a>{{store.name}}</a>
+                          </td>
+
+                          <td
+                            class="text-center">
+                            <a>total</a>
+                          </td>
+                       <!--  </ng-container>
+                      </ng-container> -->
+                    </ng-container>
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </ng-container>
         </tr>
       </tbody>
     </table>

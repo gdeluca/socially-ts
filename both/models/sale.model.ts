@@ -5,6 +5,7 @@ export interface Sale extends CollectionObject {
   status: string; //started submitted reserved canceled
   payment: string; // cash, card, cuenta
   lastUpdate: string;
+  saleDate: string;
   userStoreId: string;
   balanceId: string;
   discount?: number;

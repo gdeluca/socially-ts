@@ -325,6 +325,7 @@ export function loadData() {
       saleNumber: "000001",
       status: "started",
       payment: "contado",
+      saleDate: "2017-01-12T9:09:01Z",
       lastUpdate: "2017-01-12T9:11:01Z",
       userStoreId: "01", 
       balanceId: "02"
@@ -334,7 +335,8 @@ export function loadData() {
       saleNumber: "000002",
       status: "started",
       payment: "contado",
-      lastUpdate: "2017-01-12T9:11:01Z",
+      saleDate: "2017-01-12T9:07:01Z",
+      lastUpdate: "2017-01-12T9:12:01Z",
       userStoreId: "02", 
       balanceId: "03"
     });

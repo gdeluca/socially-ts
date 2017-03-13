@@ -33,7 +33,7 @@ import { ProductSales } from '../../../../both/collections/product-sales.collect
 import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
 import { Products } from '../../../../both/collections/products.collection';
 // import { Purchases } from '../../../../both/collections/purchases.collection';
-import { Sales, salesStatusMapping, formOfPayment } from '../../../../both/collections/sales.collection';
+import { Sales, salesStatusMapping, salePaymentMapping } from '../../../../both/collections/sales.collection';
 // import { Sections } from '../../../../both/collections/sections.collection';
 import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
@@ -75,11 +75,8 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
  
   saleStatus = salesStatusMapping; // from Sales;
 
-  salePayment = {
-    'card': 'Contado', 
-    'cash': 'Tarjeta', 
-    'account': 'Cuenta', 
-  };
+  salePayment = salePaymentMapping;
+   
   // name <-> sortfield, touple
   headers: Dictionary[] = [
     {'key': 'Codigo', 'value':'code'},
@@ -95,9 +92,6 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
     {'key': 'SubTotal', 'value':'subTotal'},
   ];
 
-getSaleStatus(value){
-  return this.saleStatus[value];
-}
   paymentForm: number = 1;
   quantityTracker: number[] = [];
   productSubTotals: number[] = [];
@@ -124,8 +118,7 @@ getSaleStatus(value){
  constructor(
     private router: Router,
     private activeRoute: ActivatedRoute
-  ) {
-  }
+  ) { }
 
   ngOnInit() {
       Bert.defaults.hideDelay = 5000;
@@ -139,7 +132,7 @@ getSaleStatus(value){
         if (this.saleSub) {
           this.saleSub.unsubscribe();
         }
-        this.saleSub = MeteorObservable.subscribe('sales', this.saleNumber).subscribe(() => {
+        this.saleSub = MeteorObservable.subscribe('sale-details', this.saleNumber).subscribe(() => {
           // MeteorObservable.autorun().subscribe(() => {
             // console.log('getting subscriber data');
 
@@ -173,6 +166,10 @@ getSaleStatus(value){
     this.allStockSub.unsubscribe();
   }
   
+  getSaleStatus(value){
+    return this.saleStatus[value];
+  }
+
   /** search the product by code and add it to the table  */
   addProduct() {
 

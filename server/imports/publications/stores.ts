@@ -23,11 +23,13 @@ Meteor.publishComposite('stores.users', function(user_id: string) {
     find: function() {
         return UserStores.collection.find({ userId: user_id })
     }, 
-    children: [{
-        find: function(userStore) {
-            return Stores.collection.find({_id: userStore.storeId});
-        }
-    }]
+    children: [
+      {
+          find: function(userStore) {
+              return Stores.collection.find({_id: userStore.storeId});
+          }
+      }
+    ]
   }
 });
 
@@ -36,16 +38,20 @@ Meteor.publishComposite('stores.useremail', function(email: string) {
     find: function() { 
       return Users.collection.find({'emails.address': email});
     },
-    children: [{
-      find: function(user) {
-          return UserStores.collection.find({ userId: user._id})
-      },
-      children: [{
-        find: function(userStore) {
-            return Stores.collection.find({_id: userStore.storeId});
-        }
-      }]
-    }]
+    children: [
+      {
+        find: function(user) {
+            return UserStores.collection.find({ userId: user._id})
+        },
+        children: [
+          {
+            find: function(userStore) {
+                return Stores.collection.find({_id: userStore.storeId});
+            }
+          }
+        ]
+      }
+    ]
   }
 });
 

@@ -1,6 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 import { Counts } from 'meteor/tmeasday:publish-counts';
 
+import { getSelectorFilter } from './commons';
+import { SearchOptions } from '../../../both/search/search-options';
+
 // collections
 // import { Balances } from '../../../both/collections/balances.collection';
 // import { Categories } from '../../../both/collections/categories.collection';
@@ -18,26 +21,8 @@ import { Stores } from '../../../both/collections/stores.collection';
 // import { Tags } from '../../../both/collections/tags.collection';
 import { Users } from '../../../both/collections/users.collection';
 
-// // model 
-// import { Balance } from '../../../both/models/balance.model';
-// import { Category } from '../../../both/models/category.model';
-// import { Counter } from '../../../both/models/counter.model';
-// import { UserStore } from '../../../both/models/user-store.model';
-// import { ProductPurchase } from '../../../both/models/product-purchase.model';
-// import { ProductSale } from '../../../both/models/product-sale.model';
-// import { ProductSize } from '../../../both/models/product-size.model';
-// import { Product } from '../../../both/models/product.model';
-// import { Purchase } from '../../../both/models/purchase.model';
-// import { Sale } from '../../../both/models/sale.model';
-// import { Section } from '../../../both/models/section.model';
-// import { Stock } from '../../../both/models/stock.model';
-// import { Store } from '../../../both/models/store.model';
-// import { Tag } from '../../../both/models/tag.model';
-// import { User } from '../../../both/models/user.model';
 
-import { SearchOptions } from '../../../both/search/search-options';
-
-Meteor.publishComposite('sales', function(saleNumber: string, options: SearchOptions) {
+Meteor.publishComposite('sale-details', function(saleNumber: string, options: SearchOptions) {
   return {
     find: function() {
       return Sales.collection.find({ saleNumber: saleNumber }, options);
@@ -90,5 +75,52 @@ Meteor.publishComposite('sales', function(saleNumber: string, options: SearchOpt
   }
 });
 
+const saleFields = ['paymentForm', 'status', 'saleDate'];
+const userFields = ['seller'];
+const storeFields = ['name'];
+
+
+Meteor.publishComposite('sales-store', function(options: SearchOptions, filters: any) {
+  
+  let salesSelector = getSelectorFilter(saleFields, filters);
+  let usersSelector = getSelectorFilter(userFields, filters);
+  let storesSelector = getSelectorFilter(storeFields, filters);
+
+  return {
+    find: function() {
+      Counts.publish(this, 'numberOfSales',Sales.collection.find(salesSelector , options), { noReady: true });
+      return Sales.collection.find(salesSelector, options);
+    },
+    children: [
+      {
+        find: function(sale) {
+          return UserStores.collection.find({ _id: sale.userStoreId });
+        },
+        children: [
+          {
+            find: function(userStore) {
+              return Stores.collection.find(
+                { $and: [{ _id: userStore.storeId }, storesSelector ] }
+              );
+            }
+          },
+          {
+            find: function(userStore) {
+              return  Meteor.users.find(
+                { $and: [{ _id: userStore.userId }, usersSelector ] }, 
+                {fields: {username: 1}}
+              );
+            }
+          }
+        ]
+      },
+      {
+        find: function(sale) {
+          return ProductSales.collection.find({ saleId: sale._id });
+        }
+      }
+    ]
+  }
+});
 
 

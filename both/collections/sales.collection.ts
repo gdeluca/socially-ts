@@ -14,6 +14,12 @@ export const salesStatusMapping = {
     'canceled': 'Cancelada'
   };
 
+export const salePaymentMapping = {
+    'card': 'Contado', 
+    'cash': 'Tarjeta', 
+    'account': 'Cuenta', 
+  };
+
 function loggedIn() {
   return !!Meteor.user();
 }
