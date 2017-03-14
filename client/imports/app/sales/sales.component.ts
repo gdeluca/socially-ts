@@ -7,6 +7,9 @@ import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
+
+import { Bert } from 'meteor/themeteorchef:bert';
+
  
 // reactiveX
 import { Observable } from 'rxjs/Observable';

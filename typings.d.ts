@@ -7,6 +7,7 @@
 /// <reference types="meteor-typings" />
 /// <reference types="@types/meteor-publish-composite" />
 /// <reference types="@types/meteor-persistent-session" />
+/// <reference types="moment/moment.d.ts" />
 
 
 declare module "*.html" {

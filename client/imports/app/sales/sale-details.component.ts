@@ -121,7 +121,6 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-      Bert.defaults.hideDelay = 5000;
 
     // console.log('init sale details subscribers');
     this.paramsSub = this.activeRoute.params

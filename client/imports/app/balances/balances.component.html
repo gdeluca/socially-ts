@@ -3,7 +3,15 @@
 
 <div  class="form-inline">
   
-  <fieldset class="form-group">
+  <!-- <multi-dropdown 
+    [options]="myOptions" 
+    [texts]="myTexts" 
+    [settings]="mySettings" 
+    [(ngModel)]="optionsModel">
+  </multi-dropdown>
+
+ -->
+  <!-- <fieldset class="form-group"> 
       <legend>Agrupar por:</legend>
       <div class="form-check">
         <label class="form-check-label">
@@ -17,15 +25,92 @@
           Operaciones
         </label>
       </div>
-  </fieldset>
+  </fieldset> -->
+
 
   <div class=" ml-4 mt-4">
     <div class="form-check">
       <label class="form-check-label">
-        <input type="checkbox" class="form-check-input" (click)="doShowStores(!showStores)" >
-        Filtrar por sucursal
+        <input type="checkbox" class="form-check-input" (click)="filterBy('year')" >
+        Año
       </label>
     </div>
+  </div>
+  <div class=" ml-4 mt-4">
+    <multi-dropdown 
+      [options]= "[{ id: 1, name: '2017' },{ id: 2, name: '2018' }]"
+      [texts]="commonTexts" 
+      [settings]="singleSettings" 
+      [(ngModel)]="yearSelected">
+    </multi-dropdown>
+  </div>
+
+  <div class=" ml-4 mt-4">
+    <div class="form-check">
+      <label class="form-check-label">
+        <input type="checkbox" class="form-check-input" (click)="filterBy('month')" >
+        Mes
+      </label>
+    </div>
+  </div>
+  <div class=" ml-4 mt-4">
+    <multi-dropdown 
+      [options]= "monthsData"
+      [texts]="commonTexts" 
+      [settings]="singleSettings" 
+      [(ngModel)]="monthSelected">
+    </multi-dropdown>
+  </div>
+
+  <div class=" ml-4 mt-4">
+    <div class="form-check">
+      <label class="form-check-label">
+        <input type="checkbox" class="form-check-input" (click)="filterBy('day')" >
+        Dia
+      </label>
+    </div>
+  </div>
+  <div class=" ml-4 mt-4">
+    <multi-dropdown 
+      [options]= "daysData"
+      [texts]="commonTexts" 
+      [settings]="multiSettings" 
+      [(ngModel)]="daysSelected">
+    </multi-dropdown>
+  </div>
+
+  <div class=" ml-4 mt-4">
+    <div class="form-check">
+      <label class="form-check-label">
+        <input type="checkbox" checked class="form-check-input" (click)="filterBy('workshift')" >
+        Turno
+      </label>
+    </div>
+  </div>
+  <div class=" ml-4 mt-4">
+    <multi-dropdown 
+      [options]= "[{ id: 1, name: 'mañana' },{ id: 2, name: 'tarde' }]"
+      [texts]="commonTexts" 
+      [settings]="multiSettings" 
+      [(ngModel)]="workShiftSelected">
+    </multi-dropdown>
+  </div>
+
+  <div class=" ml-4 mt-4">
+    <div class="form-check">
+      <label class="form-check-label">
+        <input type="checkbox" checked class="form-check-input" (click)="filterBy('store')" >
+        Sucursal
+      </label>
+    </div>
+  </div>
+  <div class=" ml-4 mt-4">
+    <multi-dropdown 
+      [options]="storesData"
+      [texts]="commonTexts" 
+      [settings]="multiSettings" 
+      [(ngModel)]="storesSelected">
+    </multi-dropdown>
   </div>
 
 </div>
@@ -33,32 +118,6 @@
 
   <div><hr></div>
 
-  <div class="row" >
-    <h3 class="col-12 text-center">Resumen</h3>
-    <!-- table-responsive table-striped table-bordered table-hover -->
-    <table class="table table-bordered table-hover ">
-      <thead class="thead-default">
-        <tr>
-          <th>Nº Balance</th>
-          <th>Fecha</th>
-           <!-- mostrar si se usa el filtro mostrar facturacion -->
-          <th [hidden]="showOperations">Facturacion</th> 
-          <!-- mostrar si no se usa el filtro mostrar las operaciones -->
-          <th [hidden]="!showOperations">Operacion</th>    
-          <!-- mostrar si no se usa el filtro por sucursal -->
-          <th [hidden]="!showStores">Sucursal</th>   
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let balance of balances">
-        <td><a [routerLink]="['balance/', balance.balanceNumber]">{{balance.balanceNumber}}</a></td>
-          <td>{{balance.actionDate}}</td>
-          <td [hidden]="showOperations">{{balance.facturation}}</td>
-          <td [hidden]="!showOperations">{{balance.operation}}</td>
-          <td [hidden]="!showStores">{{balance.storeId}}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+ 
 
 </div>

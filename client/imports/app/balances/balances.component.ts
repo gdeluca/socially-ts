@@ -8,6 +8,8 @@ import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
  
+import { Bert } from 'meteor/themeteorchef:bert';
+
 // reactiveX
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -58,10 +60,13 @@ import { User } from '../../../../both/models/user.model';
 import { Dictionary } from '../../../../both/models/dictionary';
 import { isNumeric } from '../validators/validators';
 
+import { IMultiSelectOption, IMultiSelectTexts, IMultiSelectSettings } from '../../modules/multiselect';
+import * as moment from 'moment';
+import 'moment/locale/es';
 
 import template from "./balances.component.html";
 import style from "./balances.component.scss";
-
+ 
 @Component({
   selector: "balances",
   template,
@@ -105,6 +110,8 @@ export class BalancesComponent {
   paginatedSub: Subscription;
   optionsSub: Subscription;
   autorunSub: Subscription;
+  storesSub: Subscription;
+
 
   complexForm: FormGroup;
 
@@ -123,19 +130,84 @@ export class BalancesComponent {
   userStores: Observable<UserStore[]>;
   stores: Observable<Store[]>;
   users: Observable<User[]>;
+  allStores: Observable<Store[]>;
 
   showOperations: boolean = false;
   showStores: boolean = false;
+
+  commonTexts: IMultiSelectTexts = {
+      checkAll: 'Todos',
+      uncheckAll: 'Ninguno',
+      checked: 'Selecionado',
+      checkedPlural: 'Seleccionados',
+      searchPlaceholder: 'Buscar...',
+      defaultTitle: 'Sin seleccion',
+      allSelected: 'Todos Selecionados',
+  };
+
+  singleSettings: IMultiSelectSettings = {
+      pullRight: false,
+      enableSearch: false,
+      checkedStyle: 'fontawesome',
+      buttonClasses: 'btn btn-default btn-secondary',
+      selectionLimit: 1,
+      autoUnselect: true,
+      closeOnSelect: false,
+      showCheckAll: false,
+      showUncheckAll: false,
+      dynamicTitleMaxItems: 1,
+      maxHeight: '300px',
+  };
+
+  multiSettings: IMultiSelectSettings = {
+      pullRight: false,
+      enableSearch: false,
+      checkedStyle: 'fontawesome',
+      buttonClasses: 'btn btn-default btn-secondary',
+      selectionLimit: 0,
+      autoUnselect: false,
+      closeOnSelect: false,
+      showCheckAll: true,
+      showUncheckAll: true,
+      dynamicTitleMaxItems: 10,
+      maxHeight: '300px',
+  };
+  
+  yearSelected: number[] = [moment().year() - 2016]; // Default selection
+  monthSelected: number[] = [moment().month()];
+  daysSelected: number[] = [+moment().format('D')];
+  workShiftSelected: number[];
+  yearsData: IMultiSelectOption[] = [
+      { id: 1, name: '2017' },
+      { id: 2, name: '2018' },
+      { id: 3, name: '2019' },
+  ];
+
+  monthsData = this.getMonthsData();
+
+  daysData = this.daysInMonth(moment().format('MM'), moment().year());
+
+  storesData = this.getStoreData();
+  // /* Labels */
+  // myOptions: IMultiSelectOption[] = [
+  //     { id: 1, name: 'Car brands', isLabel: true },
+  //     { id: 2, name: 'Volvo', parentId: 1 },
+  //     { id: 3, name: 'Colors', isLabel: true },
+  //     { id: 4, name: 'Blue', parentId: 3 }
+  // ];
+
 
   constructor(
     private paginationService: PaginationService, 
     private formBuilder: FormBuilder
   ){
+    moment.locale("es");
+
     this.complexForm = formBuilder.group({
       operation: ['', Validators.required],
     });
   }
-
+ 
   ngOnInit() {
     this.optionsSub = Observable.combineLatest(
       this.pageSize,
@@ -163,6 +235,14 @@ export class BalancesComponent {
           this.stores = Stores.find({}).zone();
           this.users = Users.find({}).zone();
       });
+
+      if (this.storesSub) { 
+        this.storesSub.unsubscribe();
+      }
+      this.storesSub = MeteorObservable.subscribe('stores').subscribe(() => {
+        this.allStores = Stores.find({}).zone();
+      });
+
     });
 
     this.pageSize.next(this.PAGESIZE);
@@ -189,6 +269,7 @@ export class BalancesComponent {
     this.paginatedSub.unsubscribe();
     this.optionsSub.unsubscribe();
     this.autorunSub.unsubscribe();
+    this.storesSub.unsubscribe();
   }
 
   doShowOperation(condition:boolean){
@@ -208,6 +289,36 @@ export class BalancesComponent {
     return Object.assign({}, original)
   }
 
+  filterBy(filter) { 
+    console.log(filter);
+  }
 
+  daysInMonth(month, year) {
+       console.log(moment());
 
+    let count = +moment( year + '-' + month, "YYYY-MM").daysInMonth();
+    let result: any[] = [];
+    for (var i = 1; i <= count; ++i) {
+      result.push({id: i, name: ""+i });
+    }  
+    return result;
+  } 
+
+  getMonthsData() {
+    let result: any[] = [];
+    moment.months().map((month: string) => {
+      result.push({id: result.length, name: month });
+    });
+    return result;
+  }
+
+  getStoreData(): IMultiSelectOption[] {
+    let result = [];
+    this.allStores.subscribe((stores) => {
+      for (var index = 1; index <= stores.length; index++) {
+        result.push({id: index, name: stores[index].name });
+      }
+    })
+    return result; 
+  }
 }
