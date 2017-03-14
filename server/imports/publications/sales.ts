@@ -80,7 +80,7 @@ const userFields = ['seller'];
 const storeFields = ['name'];
 
 
-Meteor.publishComposite('sales-store', function(options: SearchOptions, filters: any) {
+Meteor.publishComposite('sales-store', function(options: SearchOptions, filters: any, balanceId?: string) {
   
   let salesSelector = getSelectorFilter(saleFields, filters);
   let usersSelector = getSelectorFilter(userFields, filters);
@@ -88,6 +88,11 @@ Meteor.publishComposite('sales-store', function(options: SearchOptions, filters:
 
   return {
     find: function() {
+      // filter by balance
+      if (balanceId) {
+        salesSelector = { $and: [{ balanceId: balanceId }, salesSelector ] };
+      }
+
       Counts.publish(this, 'numberOfSales',Sales.collection.find(salesSelector , options), { noReady: true });
       return Sales.collection.find(salesSelector, options);
     },

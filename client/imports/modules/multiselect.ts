@@ -90,8 +90,10 @@ export class MultiSelectSearchFilter implements PipeTransform {
     <div class="dropdown">
       <button type="button" class="dropdown-toggle" [ngClass]="settings.buttonClasses"
               (click)="toggleDropdown()">{{ title }}&nbsp;<span class="caret"></span></button>
+      
       <ul *ngIf="isVisible" class="dropdown-menu" [class.pull-right]="settings.pullRight" [class.dropdown-menu-right]="settings.pullRight"
           [style.max-height]="settings.maxHeight" style="display: block; height: auto; overflow-y: auto;">
+        
         <li class="dropdown-item" *ngIf="settings.enableSearch">
           <div class="input-group input-group-sm">
             <span class="input-group-addon" id="sizing-addon3"><i class="fa fa-search"></i></span>
@@ -102,32 +104,54 @@ export class MultiSelectSearchFilter implements PipeTransform {
         </span>
           </div>
         </li>
+        
         <li class="dropdown-divider divider" *ngIf="settings.enableSearch"></li>
+        
         <li class="dropdown-item" *ngIf="settings.showCheckAll">
           <a href="javascript:;" role="menuitem" tabindex="-1" (click)="checkAll()">
             <span style="width: 16px;" class="glyphicon glyphicon-ok"></span>
             {{ texts.checkAll }}
           </a>
         </li>
+        
         <li class="dropdown-item" *ngIf="settings.showUncheckAll">
           <a href="javascript:;" role="menuitem" tabindex="-1" (click)="uncheckAll()">
             <span style="width: 16px;" class="glyphicon glyphicon-remove"></span>
             {{ texts.uncheckAll }}
           </a>
         </li>
+        
         <li *ngIf="settings.showCheckAll || settings.showUncheckAll" class="dropdown-divider divider"></li>
-        <li class="dropdown-item" [style]="!option.isLabel && cursorpointer" *ngFor="let option of options | searchFilter:searchFilterText"
-            (click)="!option.isLabel && setSelected($event, option)" [class.dropdown-header]="option.isLabel">
+        
+        <li class="dropdown-item" 
+          [style]="!option.isLabel && cursorpointer" 
+          *ngFor="let option of options | searchFilter:searchFilterText"
+          (click)="!option.isLabel && setSelected($event, option)" 
+          [class.dropdown-header]="option.isLabel"
+        >
           <template [ngIf]="option.isLabel">
             {{ option.name }}
           </template>
+
           <a *ngIf="!option.isLabel" href="javascript:;" role="menuitem" tabindex="-1">
-            <input *ngIf="settings.checkedStyle === 'checkboxes'" type="checkbox" [checked]="isSelected(option)" (click)="preventCheckboxCheck($event, option)"/>
-            <span *ngIf="settings.checkedStyle === 'glyphicon'" style="width: 16px;"
-                  class="glyphicon" [class.glyphicon-ok]="isSelected(option)"></span>
-            <span *ngIf="settings.checkedStyle === 'fontawesome'" style="width: 16px;display: inline-block;">
-              <i *ngIf="isSelected(option)" class="fa fa-check" aria-hidden="true"></i>
+            
+            <input *ngIf="settings.checkedStyle === 'checkboxes'" 
+              type="checkbox" [checked]="isSelected(option)" 
+              (click)="preventCheckboxCheck($event, option)"/>
+
+            <span *ngIf="settings.checkedStyle === 'glyphicon'" 
+              style="width: 16px;" 
+              class="glyphicon" 
+              [class.glyphicon-ok]="isSelected(option)">
             </span>
+
+            <span *ngIf="settings.checkedStyle === 'fontawesome'" 
+              style="width: 16px;display: inline-block;">
+              <i *ngIf="isSelected(option)" 
+              class="fa fa-check" 
+              aria-hidden="true"></i>
+            </span>
+
             {{ option.name }}
           </a>
         </li>
@@ -156,8 +180,11 @@ export class MultiselectDropdown implements OnInit, DoCheck, ControlValueAccesso
     if (!parentFound) {
       this.isVisible = false;
       this.dropdownClosed.emit();
+    } else {
+      // console.log(this.element.nativeElement);
     }
   }
+
 
   model: number[];
   title: string;
@@ -203,8 +230,12 @@ export class MultiselectDropdown implements OnInit, DoCheck, ControlValueAccesso
   }
 
   onModelChange: Function = (_: any) => {
+        console.log('change events');
+
   };
   onModelTouched: Function = () => {
+        console.log('touch events');
+
   };
 
   writeValue(value: any): void {

@@ -1,123 +1,233 @@
 <div>
-  <h2 class="text-center">Balances</h2>
 
-<div  class="form-inline">
-  
-  <!-- <multi-dropdown 
-    [options]="myOptions" 
-    [texts]="myTexts" 
-    [settings]="mySettings" 
-    [(ngModel)]="optionsModel">
-  </multi-dropdown>
+  <!-- filters header -->
+  <div class="row">
+    <h2 class="col-12 text-center">Balances</h2>
 
- -->
-  <!-- <fieldset class="form-group"> 
-      <legend>Agrupar por:</legend>
-      <div class="form-check">
-        <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios1" value="option1" checked (click)="doShowOperation(false)">
-          Facturacion
-        </label>
+    <div  class="form-inline">
+      
+      <!-- <multi-dropdown 
+        [options]="myOptions" 
+        [texts]="myTexts" 
+        [settings]="mySettings" 
+        [(ngModel)]="optionsModel">
+      </multi-dropdown>
+      <!-- <fieldset class="form-group"> 
+          <legend>Agrupar por:</legend>
+          <div class="form-check">
+            <label class="form-check-label">
+              <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios1" value="option1" checked (click)="doShowOperation(false)">
+              Facturacion
+            </label>
+          </div>
+          <div class="form-check">
+          <label class="form-check-label">
+              <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" (click)="doShowOperation(true)">
+              Operaciones
+            </label>
+          </div>
+      </fieldset> -->
+
+      <!-- year -->
+      <div class=" ml-4 mt-4">
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" 
+              class="form-check-input" 
+              (click)="filterBy('year')" >
+            Año
+          </label>
+        </div>
       </div>
-      <div class="form-check">
-      <label class="form-check-label">
-          <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" (click)="doShowOperation(true)">
-          Operaciones
-        </label>
+      <div class=" ml-4 mt-4">
+        <multi-dropdown 
+          [options]="yearsData"
+          [texts]="commonTexts" 
+          [settings]="singleSettings" 
+          [(ngModel)]="yearSelected">
+        </multi-dropdown>
       </div>
-  </fieldset> -->
-
-
-  <div class=" ml-4 mt-4">
-    <div class="form-check">
-      <label class="form-check-label">
-        <input type="checkbox" class="form-check-input" (click)="filterBy('year')" >
-        Año
-      </label>
+      <!-- month -->
+      <div class=" ml-4 mt-4">
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" 
+              class="form-check-input" 
+              (click)="filterBy('month')" >
+            Mes
+          </label>
+        </div>
+      </div>
+      <div class=" ml-4 mt-4">
+        <multi-dropdown 
+          [options]= "monthsData"
+          [texts]="commonTexts" 
+          [settings]="singleSettings" 
+          [(ngModel)]="monthSelected"
+          (ngModelChange)="populateDays(monthSelected,yearSelected)"
+          >
+        </multi-dropdown>
+      </div>
+      <!-- day -->
+      <div class=" ml-4 mt-4">
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" 
+              class="form-check-input" 
+              (click)="filterBy('day')" >
+            Dia
+          </label>
+        </div>
+      </div>
+      <div class=" ml-4 mt-4">
+        <multi-dropdown 
+          [options]="daysData"
+          [texts]="commonTexts" 
+          [settings]="multiSettingsWithChecks" 
+          [(ngModel)]="daysSelected"
+          >
+        </multi-dropdown>
+      </div>
+      <!-- workshift -->
+      <div class=" ml-4 mt-4">
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" 
+              checked class="form-check-input" 
+              (click)="filterBy('workshift')" >
+            Turno
+          </label>
+        </div>
+      </div>
+      <div class=" ml-4 mt-4">
+        <multi-dropdown 
+          [options]= "workShiftData"
+          [texts]="commonTexts" 
+          [settings]="multiSettingsWithoutChecks" 
+          [(ngModel)]="workShiftsSelected">
+        </multi-dropdown>
+      </div>
+      <!-- store -->
+      <div class=" ml-4 mt-4">
+        <div class="form-check">
+          <label class="form-check-label">
+            <input type="checkbox" checked class="form-check-input" (click)="filterBy('store')" >
+            Sucursal
+          </label>
+        </div>
+      </div>
+      <div class=" ml-4 mt-4">
+        <multi-dropdown 
+          [options]="storesData"
+          [texts]="commonTexts" 
+          [settings]="multiSettingsWithoutChecks" 
+          [(ngModel)]="storesSelected">
+        </multi-dropdown>
+      </div>
     </div>
   </div>
-  <div class=" ml-4 mt-4">
-    <multi-dropdown 
-      [options]= "[{ id: 1, name: '2017' },{ id: 2, name: '2018' }]"
-      [texts]="commonTexts" 
-      [settings]="singleSettings" 
-      [(ngModel)]="yearSelected">
-    </multi-dropdown>
-  </div>
 
-  <div class=" ml-4 mt-4">
-    <div class="form-check">
-      <label class="form-check-label">
-        <input type="checkbox" class="form-check-input" (click)="filterBy('month')" >
-        Mes
-      </label>
+  <div class="row">
+    <div class="col-12 text-center">
+      <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
     </div>
   </div>
-  <div class=" ml-4 mt-4">
-    <multi-dropdown 
-      [options]= "monthsData"
-      [texts]="commonTexts" 
-      [settings]="singleSettings" 
-      [(ngModel)]="monthSelected">
-    </multi-dropdown>
-  </div>
 
-  <div class=" ml-4 mt-4">
-    <div class="form-check">
-      <label class="form-check-label">
-        <input type="checkbox" class="form-check-input" (click)="filterBy('day')" >
-        Dia
-      </label>
-    </div>
-  </div>
-  <div class=" ml-4 mt-4">
-    <multi-dropdown 
-      [options]= "daysData"
-      [texts]="commonTexts" 
-      [settings]="multiSettings" 
-      [(ngModel)]="daysSelected">
-    </multi-dropdown>
-  </div>
+  <div class="row">
+    <!-- sales content -->
+    <table class="table table-bordered table-hover">
+      <thead class="thead-default">
+        <tr>
+          <!-- headers for sorting -->
+          <th  
+            class="text-center " 
+            style="vertical-align:middle;" 
+            *ngFor="let header of headers; let colIndex = index; ">
+            <div class="input-group">
+              {{header.key}}
+              <button 
+                [hidden]="idx !== colIndex || direction !== 'up'" 
+                type="button" 
+                class="btn btn-default" 
+                (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+                <span class="fa fa-chevron-up" aria-hidden="true"></span>
+              </button>
+              <button 
+                  [hidden]="idx !== colIndex || direction !== 'down'" 
+                  type="button" 
+                  class="btn btn-default"  
+                  (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
+                  <span class="fa fa-chevron-down" aria-hidden="true"></span>
+              </button>
+              <button 
+                [hidden]="direction && idx === colIndex " 
+                type="button" 
+                class="btn btn-default"   
+                (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+                <span class="fa fa-sort" aria-hidden="true"></span>
+              </button>
+            </div>
+          </th> 
+      </thead>
+      <tbody>
+        <!-- 'balanceNumber', 'year', 'month', 'day', 'workShift', 'store', 'existence', 'operation', 'invoicing'  -->
+        <tr *ngFor="let balance of balances | async; let rowIndex=index; ">
+          <ng-container *ngFor="let sale of sales | async; "> 
+            <!-- balance {{balance.balanceNumber}} -->
+            <ng-container *ngIf="balance._id == sale.balanceId ">
+              <!-- sale {{sale.saleNumber}} -->
+              <ng-container *ngFor="let userStore of userStores | async; "> 
+                <ng-container *ngIf="userStore._id == sale.userStoreId ">
+                    <!-- userstore {{userStore._id}} -->
+                  <ng-container *ngFor="let store of stores | async;  "> 
+                    <ng-container *ngIf="store._id == userStore.storeId ">
+                      <ng-container *ngIf="balance.storeId == store._id ">
+                       <!-- store  {{store._id}} -->                
+                        <td class="text-center">
+                          <a [routerLink]="['/balances', balance.balanceNumber]">{{balance.balanceNumber}}</a>
+                        </td>
 
-  <div class=" ml-4 mt-4">
-    <div class="form-check">
-      <label class="form-check-label">
-        <input type="checkbox" checked class="form-check-input" (click)="filterBy('workshift')" >
-        Turno
-      </label>
-    </div>
+                        <td class="text-center">
+                          <a>{{getFromModel('year',yearSelected)}}</a>
+                        </td>
+
+                        <td class="text-center">
+                          <a>{{getFromModel('month',monthSelected)}}</a>
+                        </td>
+
+                        <td class="text-center">
+                          <a>{{getFromModel('days',daysSelected)}}</a>
+                        </td>
+
+                        <td class="text-center">
+                          <a>{{getFromModel('workShift',workShiftsSelected)}}</a>
+                        </td>
+
+                        <td class="text-center">
+                          <a>{{store.name}}</a>
+                        </td>
+
+                        <td class="text-center">
+                          <a>{{balance.cashExistence}}</a>
+                        </td>
+
+                        <td class="text-center">
+                          <a>{{balance.operation}}</a>
+                        </td>
+
+                        <td class="text-center">
+                          <a>{{calculateInvoicing()}}</a>
+                        </td>
+                      </ng-container>
+                    </ng-container>
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <div class=" ml-4 mt-4">
-    <multi-dropdown 
-      [options]= "[{ id: 1, name: 'mañana' },{ id: 2, name: 'tarde' }]"
-      [texts]="commonTexts" 
-      [settings]="multiSettings" 
-      [(ngModel)]="workShiftSelected">
-    </multi-dropdown>
-  </div>
-
-  <div class=" ml-4 mt-4">
-    <div class="form-check">
-      <label class="form-check-label">
-        <input type="checkbox" checked class="form-check-input" (click)="filterBy('store')" >
-        Sucursal
-      </label>
-    </div>
-  </div>
-  <div class=" ml-4 mt-4">
-    <multi-dropdown 
-      [options]="storesData"
-      [texts]="commonTexts" 
-      [settings]="multiSettings" 
-      [(ngModel)]="storesSelected">
-    </multi-dropdown>
-  </div>
-
-</div>
-
-
-  <div><hr></div>
-
- 
 
 </div>

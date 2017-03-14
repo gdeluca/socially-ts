@@ -5,7 +5,7 @@
     "start": "meteor run",
     "start:prod": "meteor run --production",
     "build": "meteor build ./build/",
-    "clear": "meteor reset",
+    "clear": "meteor reset;",
     "meteor:update": "meteor update --all-packages",
     "test": "meteor test --driver-package practicalmeteor:mocha",
     "test:ci": "meteor test --once --driver-package dispatch:mocha-phantomjs"

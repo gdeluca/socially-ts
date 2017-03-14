@@ -24,7 +24,7 @@ import { Stores } from '../../../both/collections/stores.collection';
 const saleFields = ['saleDate', 'paymentForm', 'saleState'];
 const userFields = ['seller'];
 
-Meteor.publishComposite('balance-sales', function(options: SearchOptions, filters: any) {
+Meteor.publishComposite('balances-sales', function(options: SearchOptions, filters: any) {
   
   let salesSelector = getSelectorFilter(saleFields, filters);
   let usersSelector = getSelectorFilter(userFields, filters);
@@ -42,21 +42,15 @@ Meteor.publishComposite('balance-sales', function(options: SearchOptions, filter
         children: [
           {
             find: function(sale) {
-               return UserStores.collection.find({ _id: sale.userStoreId });
-            }
-          },
-          {
-            find: function(userStore) {
-              return  Meteor.users.find(
-                { $and: [{ _id: userStore.userId }, usersSelector ]}, 
-                { fields: {username: 1} }
-              );
-            }
-          },
-          {
-            find: function(userStore) {
-              return Stores.collection.find({ _id: userStore.storeId });
-            }
+              return UserStores.collection.find({ _id: sale.userStoreId });
+            },
+            children: [
+              {
+                find: function(userStore, balance) {
+                  return Stores.collection.find({ _id: userStore.storeId });
+                }
+              }
+            ]
           }
         ]
       }

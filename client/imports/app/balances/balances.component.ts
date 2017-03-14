@@ -19,6 +19,8 @@ import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/map';
 // import 'rxjs/add/operator/publishLast';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/operator/do';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
@@ -129,7 +131,6 @@ export class BalancesComponent {
   sales: Observable<Sale[]>;
   userStores: Observable<UserStore[]>;
   stores: Observable<Store[]>;
-  users: Observable<User[]>;
   allStores: Observable<Store[]>;
 
   showOperations: boolean = false;
@@ -159,7 +160,7 @@ export class BalancesComponent {
       maxHeight: '300px',
   };
 
-  multiSettings: IMultiSelectSettings = {
+  multiSettingsWithChecks: IMultiSelectSettings = {
       pullRight: false,
       enableSearch: false,
       checkedStyle: 'fontawesome',
@@ -172,22 +173,21 @@ export class BalancesComponent {
       dynamicTitleMaxItems: 10,
       maxHeight: '300px',
   };
+
+  multiSettingsWithoutChecks: IMultiSelectSettings = {
+      pullRight: false,
+      enableSearch: false,
+      checkedStyle: 'fontawesome',
+      buttonClasses: 'btn btn-default btn-secondary',
+      selectionLimit: 0,
+      autoUnselect: false,
+      closeOnSelect: false,
+      showCheckAll: false,
+      showUncheckAll: false,
+      dynamicTitleMaxItems: 10,
+      maxHeight: '300px',
+  };
   
-  yearSelected: number[] = [moment().year() - 2016]; // Default selection
-  monthSelected: number[] = [moment().month()];
-  daysSelected: number[] = [+moment().format('D')];
-  workShiftSelected: number[];
-  yearsData: IMultiSelectOption[] = [
-      { id: 1, name: '2017' },
-      { id: 2, name: '2018' },
-      { id: 3, name: '2019' },
-  ];
-
-  monthsData = this.getMonthsData();
-
-  daysData = this.daysInMonth(moment().format('MM'), moment().year());
-
-  storesData = this.getStoreData();
   // /* Labels */
   // myOptions: IMultiSelectOption[] = [
   //     { id: 1, name: 'Car brands', isLabel: true },
@@ -196,7 +196,23 @@ export class BalancesComponent {
   //     { id: 4, name: 'Blue', parentId: 3 }
   // ];
 
-
+  yearSelected: number[] = [moment().year() - 2016]; // Default selection
+  monthSelected: number[] = [moment().month()];
+  daysSelected: number[] = [+moment().format('D')];
+  workShiftsSelected: number[] = [1, 2];
+  yearsData: IMultiSelectOption[] = [
+      { id: 1, name: '2017' },
+      { id: 2, name: '2018' },
+      { id: 3, name: '2019' },
+  ];
+  monthsData = [];
+  daysData = [];
+  workShiftData = [
+    { id: 1, name: 'MAÑANA' },
+    { id: 2, name: 'TARDE' }
+  ]
+  storesData = [];
+  
   constructor(
     private paginationService: PaginationService, 
     private formBuilder: FormBuilder
@@ -227,13 +243,12 @@ export class BalancesComponent {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('balance-sales', options, filters)
+      this.paginatedSub = MeteorObservable.subscribe('balances-sales', options, filters)
         .subscribe(() => {
           this.balances = Balances.find({}).zone();
           this.sales = Sales.find({}).zone();
           this.userStores= UserStores.find({}).zone();
           this.stores = Stores.find({}).zone();
-          this.users = Users.find({}).zone();
       });
 
       if (this.storesSub) { 
@@ -241,7 +256,11 @@ export class BalancesComponent {
       }
       this.storesSub = MeteorObservable.subscribe('stores').subscribe(() => {
         this.allStores = Stores.find({}).zone();
+
+        this.populateStoreData();
       });
+
+      this.populateMonthsData(moment.months(), this.yearSelected);
 
     });
 
@@ -281,8 +300,9 @@ export class BalancesComponent {
   }
 
   changeSortOrder(direction: string, fieldName: string): void {
-    this.sortDirection.next(parseInt(direction));
-    this.sortField.next(fieldName);
+    console.log('direction:' + direction + ' fieldname' + fieldName);
+    // this.sortDirection.next(parseInt(direction));
+    // this.sortField.next(fieldName);
   }
 
   copy(original: any){
@@ -294,31 +314,89 @@ export class BalancesComponent {
   }
 
   daysInMonth(month, year) {
-       console.log(moment());
-
-    let count = +moment( year + '-' + month, "YYYY-MM").daysInMonth();
+    let count = this.daysInMonthCount(month, year);    
     let result: any[] = [];
     for (var i = 1; i <= count; ++i) {
       result.push({id: i, name: ""+i });
     }  
     return result;
   } 
+ 
+  populateDays(month, year){
+    this.daysData = this.daysInMonth(month, year);
+    this.daysSelected = [+moment().format('D')];
+    this.daysSelected = Array.from(
+        new Array(this.daysInMonthCount(month, year)),(val,index)=>index+1);
 
-  getMonthsData() {
+
+
+  }
+
+  populateMonthsData(month, year) {
     let result: any[] = [];
-    moment.months().map((month: string) => {
+    month.map((month: string) => {
       result.push({id: result.length, name: month });
     });
-    return result;
+    this.monthsData = result;
+
+    this.populateDays(month, year);
+
   }
 
-  getStoreData(): IMultiSelectOption[] {
-    let result = [];
-    this.allStores.subscribe((stores) => {
-      for (var index = 1; index <= stores.length; index++) {
-        result.push({id: index, name: stores[index].name });
-      }
-    })
-    return result; 
+  daysInMonthCount(month, year) {
+    return +moment( year + '-' + [month[0]+1], "YYYY-MM").daysInMonth();
   }
+
+  populateStoreData(){
+    let result = [];
+    let index = 0;
+    this.allStores
+      .flatMap(function(stores) { return stores })
+      .distinct()
+      .subscribe((store) => {
+        result.push({id: ++index, name: store['name'] });
+      });
+      
+    this.storesData = result;
+  }
+
+  filterFieldById(model, index: number){
+    return model.filter((element) => {
+      return element.id == index
+    })[0].name;
+  }
+
+  filterJoinFieldByIds(model, indexes: number[]) {
+    return indexes.map((index) => {
+      return this.filterFieldById(model, index);
+    }).join(", ");
+  }
+
+  getFromModel(field: string, index: any) {
+    switch(field) { 
+      case 'year': { 
+        return this.filterFieldById(this.yearsData, index);
+      } 
+      case 'month': { 
+        return this.filterFieldById(this.monthsData, index);
+      } 
+      case 'days': { 
+        let val = this.filterJoinFieldByIds(this.daysData, index);
+        return (val.length > 15) ? val.substring(0, 15) + " ..." : val;
+      }
+      case 'workShift': { 
+        return this.filterJoinFieldByIds(this.workShiftData, index);
+      } 
+      default: { 
+        return 'none';
+      } 
+    } 
+  }
+
+  calculateInvoicing() {
+  // operate over date or workshift
+  // formula: close + extraction - deposit - open 
+    return 1000;
+  }
+
 }
