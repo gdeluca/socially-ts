@@ -260,109 +260,129 @@ export class StockListComponent implements OnInit, OnDestroy {
       let size = values.size.toUpperCase();
       let barCode = productCode + getMappingSize(values.size);
 
-      console.log('product code', productCode);
+      console.log('looking for product with code: ', productCode);
       // find a product
       let product = Products.findOne({code: productCode});
-      console.log('found product', product);
       if (product) {
           // if exists update the product information
-         Products.update(product._id, {
-          $set: { 
-            name: values.name,
-            color: values.color,
-            provider: values.provider,
-            categoryId: values.category._id
-          }
-        })
+        Products.update(product._id, {
+            $set: { 
+              name: values.name,
+              color: values.color,
+              provider: values.provider,
+              categoryId: values.category._id
+            }
+        });
+        console.log('product updated', JSON.stringify(product))
 
-        // update or insert the product size information
-        let productSizeId = '';
-
-        console.log('looking for productSize with ', {productId: product._id, size: size});
+        // find or insert the product size information
+        console.log('looking for productSize with: ', {productId: product._id, size: size});
         let productSize = ProductSizes.findOne(
           {productId: product._id, size: size, barCode: barCode}
         );
+        let productSizeId = '';
         if (productSize) {
-          console.log('productSize found', productSize);
+          console.log('productSize found', JSON.stringify(productSize));
           productSizeId = productSize._id;
         } else {
           productSizeId = ProductSizes.collection.insert(
             {productId: product._id, size: size, barCode: barCode}
           );
-          console.log('productSize created', productSize);
+          console.log('productSize created, new id is:', productSizeId)
         }
 
         let stores = Stores.find({}).fetch();
 
-      //   // update or insert the stocks related to all the stores
-      //   stores.forEach(function(store: Store){
-      //     let stock = Stocks.findOne(
-      //       {productSizeId: productSizeId, storeId: store._id, active: true}
-      //     ); 
-      //     if (stock) { 
-      //       console.log('stock found', stock);
-      //       Stocks.update(stock._id, {
-      //         $set: { 
-      //           lastCostPrice: +values.cost,
-      //           priceCash: +values.cashPayment,
-      //           priceCard: +values.cardPayment,
-      //           rateCash: (+values.cashPayment/(+values.cost))*100,
-      //           rateCard: (+values.cardPayment/(+values.cost))*100,
-      //         }
-      //      })
-      //     } else {
-      //       console.log('stock inserting ');
-      //       Stocks.insert({
-      //         quantity: 0,
-      //         lastCostPrice: +values.cost,
-      //         priceCash: +values.cashPayment,
-      //         priceCard: +values.cardPayment,
-      //         rateCash: (+values.cashPayment/(+values.cost))*100,
-      //         rateCard: (+values.cardPayment/(+values.cost))*100,
-      //         storeId: store._id,
-      //         active: true,
-      //         productSizeId: productSizeId
-      //       })
-      //     }
-      //   }) 
+        stores.forEach(function(store: Store){
+          
+          // update or insert the stocks for each stores
+          let stock = Stocks.findOne(
+            {productSizeId: productSizeId, storeId: store._id, active: true}
+          ); 
+          if (stock) { 
+            console.log('stock found, nothing to do', JSON.stringify(stock));
+          } else {
+            Stocks.insert({
+              quantity: 0,
+              storeId: store._id,
+              active: true,
+              productSizeId: productSizeId
+            })
+            console.log('stock created', JSON.stringify(stock));
+          }
 
-      // // if the product is missed create a new one
-      // } else {
-      //   console.log('inseting product');
-      //   let productId = Products.collection.insert({
-      //     code: productCode,
-      //     name: values.name,
-      //     color: values.color,
-      //     brand: values.brand,
-      //     model: values.model,
-      //     provider: values.provider,
-      //     categoryId: values.category._id
-      //   });
+          // update or insert the productprices for each stores 
+          let productPrice = ProductPrices.findOne(
+            {productId: product._id, storeId: store._id}
+          );
+          if (productPrice) { 
+            ProductPrices.update(stock._id, {
+              $set: { 
+                lastCostPrice: +values.cost,
+                priceCash: +values.cashPayment,
+                priceCard: +values.cardPayment,
+                rateCash: (+values.cashPayment/(+values.cost))*100,
+                rateCard: (+values.cardPayment/(+values.cost))*100,
+              }
+            })
+            console.log('productPrice updated: ', JSON.stringify(productPrice));
+          } else {
+            let productPriceId = ProductPrices.insert({
+              lastCostPrice: +values.cost,
+              priceCash: +values.cashPayment,
+              priceCard: +values.cardPayment,
+              rateCash: (+values.cashPayment/(+values.cost))*100,
+              rateCard: (+values.cardPayment/(+values.cost))*100,
+              storeId: store._id,
+              productId: product._id
+            })
+            console.log('productPrice created: ', productPriceId);
+          }
+        });
 
-      //   console.log('inseting product size');
-      //   // insert the product size information
-      //   let productSizeId = ProductSizes.collection.insert(
-      //       {productId: productId, size: size, barCode: barCode}
-      //   );
+      } else {
+        // the product is missed, create a new one
+        let productId = Products.collection.insert({
+          code: productCode,
+          name: values.name,
+          color: values.color,
+          brand: values.brand,
+          model: values.model,
+          provider: values.provider,
+          categoryId: values.category._id
+        });
+        console.log('product created with id: ', productId)
+
+        // insert the product size information
+        let productSizeId = ProductSizes.collection.insert(
+            {productId: productId, size: size, barCode: barCode}
+        );
         
-      //   let stores = Stores.find({}).fetch();
+        let stores = Stores.find({}).fetch();
 
-      //   // insert the stocks related to all the stores
-      //   stores.forEach(function(store: Store){
-      //     console.log('inseting stock for store: ',store);
+        // insert the stocks related to all the stores
+        stores.forEach(function(store: Store){
+          console.log('inseting stock for store: ',store);
 
-      //     Stocks.insert({
-      //       quantity: 0,
-      //       lastCostPrice: +values.cost,
-      //       priceCash: +values.cashPayment,
-      //       priceCard: +values.cardPayment,
-      //       rateCash: (+values.cashPayment/(+values.cost))*100,
-      //       rateCard: (+values.cardPayment/(+values.cost))*100,
-      //       storeId: store._id,
-      //       active: true,
-      //       productSizeId: productSizeId
-      //     })
-      //   })
+          Stocks.insert({
+            quantity: 0,
+            storeId: store._id,
+            active: true,
+            productSizeId: productSizeId
+          });
+          console.log('stock created');
+
+          ProductPrices.insert({
+            lastCostPrice: +values.cost,
+            priceCash: +values.cashPayment,
+            priceCard: +values.cardPayment,
+            rateCash: (+values.cashPayment/(+values.cost))*100,
+            rateCard: (+values.cardPayment/(+values.cost))*100,
+            storeId: store._id,
+            productId: productId
+          })
+          console.log('productPrice created');
+        })
       }
       
       this.complexForm.reset();

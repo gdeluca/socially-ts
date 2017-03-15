@@ -46,7 +46,7 @@ Meteor.publishComposite('productsSize-stock', function(options: SearchOptions, f
     children: [
       {
         find: function(productSize) {
-          return Stocks.collection.find({ _id: productSize.stockId });
+          return Stocks.collection.find({ productSizeId: productSize._id });
         }
       }, 
       {
