@@ -1,6 +1,6 @@
 // angular
 import { Component, OnInit, OnDestroy, Injectable, Inject, NgModule } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
+// import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
@@ -16,9 +16,9 @@ import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/publishLast';
 
-
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
+import { Bert } from 'meteor/themeteorchef:bert';
 
 // collections
 import { ProductSizes, getMappingSize } from '../../../../both/collections/product-sizes.collection';
@@ -85,7 +85,7 @@ export class StockListComponent implements OnInit, OnDestroy {
   ];
 
   collectionCount: number = 0;
-  PAGESIZE: number = 15;  
+  PAGESIZE: number = 3;  
   
   paginatedSub: Subscription;
   optionsSub: Subscription;
@@ -120,25 +120,9 @@ export class StockListComponent implements OnInit, OnDestroy {
   allSections: Observable<Section[]>;
   allStores: Observable<Store[]>;
 
-
-  complexForm : FormGroup;
-
   constructor(
     private paginationService: PaginationService, 
-    private formBuilder: FormBuilder
-  ){
-    this.complexForm = formBuilder.group({
-      barCode:     ['', Validators.compose([Validators.required, Validators.minLength(12)])],
-      name:        ['', Validators.compose([Validators.required, Validators.minLength(3)])],
-      color:       ['', Validators.required],
-      size:        ['', Validators.required],
-      provider:    ['', Validators.required],
-      cost:        ['', Validators.compose([Validators.required, isNumeric])],
-      cashPayment: ['', Validators.compose([Validators.required, isNumeric])],
-      cardPayment: ['', Validators.compose([Validators.required, isNumeric])],
-      category:    ['', Validators.required],
-      section:     ['', Validators.required],
-    });
+  ){ 
   }
  
    ngOnInit() {
@@ -150,7 +134,7 @@ export class StockListComponent implements OnInit, OnDestroy {
       this.filters
     ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
       const options: SearchOptions = {
-        limit: pageSize as number,
+        limit: (pageSize as number),
         skip: ((curPage as number) - 1) * (pageSize as number),
         sort: { [sortField as string] : sortDirection as number }
       };
@@ -167,6 +151,7 @@ export class StockListComponent implements OnInit, OnDestroy {
           this.stores = Stores.find({}).zone();
           this.products = Products.find({}).zone();
           this.productPrices = ProductPrices.find({}).zone();
+          console.log('into');
       });
 
     });
@@ -245,25 +230,6 @@ export class StockListComponent implements OnInit, OnDestroy {
 
     // clean after insert
     editedStock = this.copy(this.emptyStock);
-  }
-
-  save(form: FormGroup){
-    if (!Meteor.userId()) {
-      alert('Ingrese al sistema para poder guardar');
-      return;
-    } 
-    if (form.valid) {
-      let values = form.value;
-
-      MeteorObservable.call('saveStock', values)
-        .subscribe(() => {
-          alert('Stock successfully saved.');
-        }, (error) => {
-          alert(`Failed to save to ${error}`);
-      });
-        
-      this.complexForm.reset();
-    }
   }
 
   copy(original: any){

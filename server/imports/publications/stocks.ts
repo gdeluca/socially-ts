@@ -34,14 +34,14 @@ Meteor.publish('allStocks', function(options: SearchOptions) {
 });
 
 Meteor.publishComposite('productsSize-stock', function(options: SearchOptions, filters: any) {
-  
+
   let productPriceSelector = getSelectorFilter(productPriceFields, filters);
   let productSelector = getSelectorFilter(productFields, filters);
   let productSizeSelector = getSelectorFilter(productSizeFields, filters);
   
   return {
-    find: function() {
-      Counts.publish(this, 'numberOfProductSizes',ProductSizes.collection.find({} , options), { noReady: true });
+    find: function() { 
+      Counts.publish(this, 'numberOfProductSizes', ProductSizes.collection.find(productSizeSelector , options), { noReady: true });
       return ProductSizes.collection.find(productSizeSelector, options);
     },
     children: [

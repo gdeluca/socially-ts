@@ -49,23 +49,21 @@ return {
   }
 });
 
-Meteor.publishComposite('products.categories', function(options: SearchOptions, filterField?: string, filterValue?: string) {
-  let query = {}
-  
-  if (filterField && filterValue) {
-    const searchRegEx = { '$regex': '.*' + ([filterValue] || '') + '.*', '$options': 'i' };
-    query = { [filterField]: searchRegEx }
-  } 
+Meteor.publishComposite('products-with-categories', function(options: SearchOptions, filters: any) {
+  let productSelector = getSelectorFilter(productFields, filters);
+
   return {
     find: function() {
-    Counts.publish(this, 'numberOfProducts',Products.collection.find(query , options), { noReady: true });
-    return Products.collection.find(query, options);
+      Counts.publish(this, 'numberOfProducts',Products.collection.find(productSelector , options), { noReady: true });
+      return Products.collection.find(productSelector, options);
     },
-    children: [{
-      find: function(product) {
-        return Categories.collection.find({_id: product.categoryId});
+    children: [
+      {
+        find: function(product) {
+          return Categories.collection.find( { _id: product.categoryId } );
+        }
       }
-    }]
+    ]
   }
 });
 
