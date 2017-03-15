@@ -1,4 +1,6 @@
 import { Meteor } from 'meteor/meteor';
+import { } from 'meteor-publish-composite';
+
 import { Stores } from '../../../both/collections/stores.collection';
 import { Store } from '../../../both/models/store.model';
 import { UserStore } from '../../../both/models/user-store.model';

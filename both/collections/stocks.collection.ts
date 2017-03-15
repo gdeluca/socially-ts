@@ -1,6 +1,5 @@
 import { MongoObservable } from 'meteor-rxjs';
 import { Meteor } from 'meteor/meteor';
-
 import { Stock } from '../models/stock.model';
 
 export const Stocks = new MongoObservable.Collection<Stock>('stocks');
@@ -15,3 +14,8 @@ Stocks.allow({
   remove: loggedIn
 });
 
+Stocks.collection["helpers"]({
+  oneStock() {
+    return Stocks.findOne();
+  }
+});

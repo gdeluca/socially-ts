@@ -1,18 +1,17 @@
 import { Observable } from 'rxjs/Observable';
 import { Component } from "@angular/core";
 
-import template from "./stock-load.component.html";
-import style from "./stock-load.component.scss";
+import template from "./stock-form.component.html";
+import style from "./stock-form.component.scss";
 
 @Component({
-  selector: "stock-load",
+  selector: "stock-form",
   template,
   styles: [ style ]
 })
-export class StockLoadComponent {
+export class StockFormComponent {
   
   constructor() {
-   
   }
 
 }
