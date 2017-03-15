@@ -10,6 +10,7 @@ import { SearchOptions } from '../../../both/search/search-options';
 // import { Counters } from '../../../both/collections/counters.collection';
 import { UserStores } from '../../../both/collections/user-stores.collection';
 // import { ProductPurchases } from '../../../both/collections/product-purchases.collection';
+import { ProductPrices } from '../../../both/collections/product-prices.collection';
 import { ProductSales } from '../../../both/collections/product-sales.collection';
 import { ProductSizes } from '../../../both/collections/product-sizes.collection';
 import { Products } from '../../../both/collections/products.collection';
@@ -44,11 +45,16 @@ Meteor.publishComposite('sale-details', function(saleNumber: string, options: Se
                 },
                 children: [
                   { 
-                    find: function(productSize) {
-                      return Stocks.collection.find({ productSizeId: productSize._id});
+                    find: function(product) {
+                      return ProductPrices.collection.find({ productId: product._id});
                     }
                   }
                 ]
+              },
+              { 
+                find: function(productSize) {
+                  return Stocks.collection.find({ productSizeId: productSize._id});
+                }
               }
             ]
           }

@@ -3,6 +3,7 @@ import { Categories } from '../../../both/collections/categories.collection';
 import { Counters } from '../../../both/collections/counters.collection';
 import { UserStores } from '../../../both/collections/user-stores.collection';
 import { ProductPurchases } from '../../../both/collections/product-purchases.collection';
+import { ProductPrices } from '../../../both/collections/product-prices.collection';
 import { ProductSales } from '../../../both/collections/product-sales.collection';
 import { ProductSizes } from '../../../both/collections/product-sizes.collection';
 import { Products } from '../../../both/collections/products.collection';
@@ -19,6 +20,7 @@ import { Category } from '../../../both/models/category.model';
 import { Counter } from '../../../both/models/counter.model';
 import { UserStore } from '../../../both/models/user-store.model';
 import { ProductPurchase } from '../../../both/models/product-purchase.model';
+import { ProductPrice } from '../../../both/models/product-price.model';
 import { ProductSale } from '../../../both/models/product-sale.model';
 import { ProductSize } from '../../../both/models/product-size.model';
 import { Product } from '../../../both/models/product.model';
@@ -78,7 +80,7 @@ export function loadData() {
     Tags.insert({
       code:"01",
       type:"color",
-      description:"No definido"
+      description:"Azul"
     });
 
     Tags.insert({
@@ -144,8 +146,9 @@ export function loadData() {
     var user_id_1 = Accounts.createUser(users[1]);
     Meteor.users.update(user_id_1, {
         $set: { "emails.0.verified": true}
-    });  
-     var user_id_2 = Accounts.createUser(users[2]);
+    });
+
+    var user_id_2 = Accounts.createUser(users[2]);
     Meteor.users.update(user_id_2, {
         $set: { "emails.0.verified": true}
     });  
@@ -181,6 +184,29 @@ export function loadData() {
       address: 'colon 160'
     });
 
+    // 1: purchases
+    Purchases.insert({
+       _id: "01",
+      purchaseNumber: "000001",
+      date: "2016-07-10T11:23:01Z",
+      provider:"Juan",
+      payment:0
+    });
+    Purchases.insert({
+       _id: "02",
+      purchaseNumber: "000002",
+      date: "2016-01-11T11:23:01Z",
+      provider:"Andres",
+      payment:1000
+    });
+    Purchases.insert({
+       _id: "03",
+      purchaseNumber: "000003",
+      date: "2017-07-12T11:23:01Z",
+      provider:"Jose",
+      payment:0
+    });
+
     // 2 categories
     Categories.insert({
       _id: "01",
@@ -189,7 +215,7 @@ export function loadData() {
     });
     Categories.insert({
       _id: "02",
-      name: 'Jean',
+      name: 'Jeans',
       sectionId: '01'
     });
     Categories.insert({
@@ -199,27 +225,27 @@ export function loadData() {
     });
     Categories.insert({
       _id: "04",
-      name: 'Calzas',
+      name: 'Calza',
       sectionId: '01'
     });
     Categories.insert({
       _id: "05",
-      name: 'Polleras',
+      name: 'Pollera',
       sectionId: '01'
     });
     Categories.insert({
       _id: "06",
-      name: 'Remeras',
+      name: 'Remera',
       sectionId: '01'
     });
     Categories.insert({
       _id: "10",
-      name: 'Musculosas',
+      name: 'Musculosa',
       sectionId: '01'
     });
     Categories.insert({
       _id: "11",
-      name: 'Buzos',
+      name: 'Buzo',
       sectionId: '02'
     });
   
@@ -284,7 +310,7 @@ export function loadData() {
       color: "Negro",
       brand: "Levis",
       model: "2016",
-      provider: "richard",
+      provider: "Andres",
       categoryId: "02"
     });
     Products.insert({
@@ -294,32 +320,33 @@ export function loadData() {
       color: "Azul",
       brand: "Cuerda",
       model: "2017",
-      provider: "Jhonny",
+      provider: "Juan",
       categoryId: "02"
     });
     Products.insert({
-      _id: "04",
+      _id: "03",
       name: "Chomba Dama",
       code: "1010111011",
       color: "Negro",
       brand: "Evase",
       model: "2017",
-      provider: "Jhonny",
+      provider: "Juan",
       categoryId: "02"
     });
     Products.insert({
-      _id: "03",
+      _id: "04",
       name: "Remere Manga Larga",
       code: "1013111011",
       color: "Acuarela",
       brand: "Jaspe",
       model: "2017",
-      provider: "Jhonny",
+      provider: "Andres",
       categoryId: "06"
     });
    
     // 3: sales
-    // check the balance is in open status on current date before sale creations
+    // check the balance is in open status 
+    // on current date before sale creations
     Sales.insert({
       _id: "01",
       saleNumber: "000001",
@@ -343,41 +370,78 @@ export function loadData() {
       balanceId: "03"
     });
 
-    // 4: product sizes
+    // 4: setting product sizes
     ProductSizes.insert({
       _id: "01",
-       productId: "01",
-       barCode: "101010101033",
-       size: "33"
+      productId: "01",
+      barCode: "101010101033",
+      size: "33"
     });
     ProductSizes.insert({
       _id: "02",
-       productId: "02",
-       barCode: "122213301070",
-       size: "S"
+      productId: "02",
+      barCode: "122213301070",
+      size: "S"
     });
     ProductSizes.insert({
       _id: "03",
-       productId: "02",
-       barCode: "122213301073",       
-       size: "L"
+      productId: "02",
+      barCode: "122213301073",       
+      size: "L"
     });
     ProductSizes.insert({
       _id: "04",
-       productId: "02",
-       barCode: "122213301074", 
-       size: "XL"
+      productId: "02",
+      barCode: "122213301074", 
+      size: "XL"
+    });
+    ProductSizes.insert({
+      _id: "03",
+      productId: "03",
+      barCode: "122213301073",       
+      size: "UNICO"
+    });
+
+    // 4: settings product prices
+    ProductPrices.insert({
+      _id: "01",
+      lastCostPrice: 150,
+      priceCash: 300,
+      priceCard: 210,
+      rateCash: 100,
+      rateCard: 110,
+      productId: "01",
+      storeId: "01"
+    });
+    ProductPrices.insert({
+      _id: "02",
+      lastCostPrice: 100,
+      priceCash: 250,
+      priceCard: 220,
+      productId: "03",
+      storeId: "01"
+    });
+    ProductPrices.insert({
+      _id: "03",
+      lastCostPrice: 22,
+      priceCash: 300,
+      priceCard: 210,
+      productId: "02",
+      storeId: "01"
+    });
+    ProductPrices.insert({
+      _id: "04",
+      lastCostPrice: 50,
+      priceCash: 100,
+      priceCard: 150,
+      productId: "02",
+      storeId: "02"
     });
 
     //5: stocks 
     Stocks.insert({
       _id: "01",
       quantity: 10,
-      lastCostPrice: 22,
-      priceCash: 300,
-      priceCard: 210,
-      rateCash: 100,
-      rateCard: 110,
       active: true,
       storeId: "01",
       productSizeId: "01"
@@ -385,11 +449,6 @@ export function loadData() {
     Stocks.insert({
       _id: "02",
       quantity: 20,
-      lastCostPrice: 22,
-      priceCash: 300,
-      priceCard: 210,
-      rateCash: 100,
-      rateCard: 110,
       active: true,
       storeId: "02",
       productSizeId: "01"
@@ -397,11 +456,6 @@ export function loadData() {
     Stocks.insert({
       _id: "03",
       quantity: 30,
-      lastCostPrice: 22,
-      priceCash: 200,
-      priceCard: 210,
-      rateCash: 100,
-      rateCard: 110,
       active: true,
       storeId: "01",
       productSizeId: "02"
@@ -409,11 +463,6 @@ export function loadData() {
     Stocks.insert({
       _id: "04",
       quantity: 40,
-      lastCostPrice: 22,
-      priceCash: 200,
-      priceCard: 210,
-      rateCash: 100,
-      rateCard: 110,
       active: true,
       storeId: "02",
       productSizeId: "02"
@@ -421,11 +470,6 @@ export function loadData() {
     Stocks.insert({
       _id: "05",
       quantity: 50,
-      lastCostPrice: 22,
-      priceCash: 200,
-      priceCard: 210,
-      rateCash: 100,
-      rateCard: 110,
       active: true,
       storeId: "01",
       productSizeId: "03"
@@ -433,11 +477,6 @@ export function loadData() {
     Stocks.insert({
       _id: "06",
       quantity: 60,
-      lastCostPrice: 22,
-      priceCash: 200,
-      priceCard: 210,
-      rateCash: 100,
-      rateCard: 110,
       active: true,
       storeId: "02",
       productSizeId: "03"
@@ -445,11 +484,6 @@ export function loadData() {
     Stocks.insert({
       _id: "07",
       quantity: 70,
-      lastCostPrice: 22,
-      priceCash: 200,
-      priceCard: 210,
-      rateCash: 100,
-      rateCard: 110,
       active: true,
       storeId: "01",
       productSizeId: "04"
@@ -457,37 +491,9 @@ export function loadData() {
     Stocks.insert({
       _id: "08",
       quantity: 80,
-      lastCostPrice: 22,
-      priceCash: 200,
-      priceCard: 210,
-      rateCash: 100,
-      rateCard: 110,
       active: true,
       storeId: "02",
       productSizeId: "04"
-    });
-
-    // 5: purchase 
-    Purchases.insert({
-       _id: "01",
-      purchaseNumber: "000001",
-      date: "2016-07-10T11:23:01Z",
-      provider:"Juan",
-      payment:0
-    });
-    Purchases.insert({
-       _id: "02",
-      purchaseNumber: "000002",
-      date: "2016-01-11T11:23:01Z",
-      provider:"Andres",
-      payment:0
-    });
-    Purchases.insert({
-       _id: "03",
-      purchaseNumber: "000003",
-      date: "2017-07-12T11:23:01Z",
-      provider:"Jose",
-      payment:0
     });
 
     // 5: sales entries

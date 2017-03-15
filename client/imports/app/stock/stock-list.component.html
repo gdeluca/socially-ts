@@ -21,7 +21,7 @@
           (ngModelChange)="search('categoryId', selectedCategory)"
           >
           <option value="" selected >Filtrar por Categoria</option>
-          <option *ngFor="let category of categories | async" 
+          <option *ngFor="let category of allCategories | async" 
           [ngValue]="category._id"
          >{{category.name}}</option>
         </select> 
@@ -116,7 +116,6 @@
             </button>-->
           </th> 
         </tr>
-
       </thead>
       <tbody>
 
@@ -141,115 +140,101 @@
 
         <!-- 'barCode', 'name', 'color', 'size', 'quantity', 'provider', 'cost', 'cashPayment', 'cardPayment' -->
         <tr *ngFor="let productSize of productSizes | async; let rowIndex=index; ">
+          <!-- size{{productSize._id}} -->
           <ng-container *ngFor="let product of products | async; "> 
             <ng-container *ngIf="product._id == productSize.productId ">
-
-              <!-- action buttons for to edit stock fields -->
-              <td>
-                <button 
-                  [hidden]="currentIndex === rowIndex && editing"
-                  type="button" 
-                  class="btn btn-default" 
-                  (click)="currentIndex=rowIndex; editing=true;editedStock = copy(emptyStock)">
-                  <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
-                </button>
-                <button 
-                  [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
-                  type="button" 
-                  class="btn btn-default" 
-                  (click)="currentIndex=rowIndex; editing=false; update(editedStock)">
-                  <span class="fa fa-check-square-o" aria-hidden="true"></span>
-                </button>
-                <button 
-                  [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)" 
-                  type="button" 
-                  class="btn btn-default" 
-                  (click)="currentIndex=rowIndex; editing=false;">
-                  <span class="fa fa-ban" aria-hidden="true"></span>
-                </button>
-              </td>
-
-              <td 
-                class="text-center">
-                <a [routerLink]="['/products', product.code]">{{productSize.barCode}}</a>
-              </td>
-              <td 
-                class="text-center">
-                <a>{{product.name}}</a>
-              </td>
-
-              <td
-                class="text-center">
-                <a>{{product.color}}</a>
-              </td>
-
-              <td 
-                class="text-center">
-                <a>{{productSize.size}}</a>
-              </td>
-
-              <td
-                class="text-center">
-                <a>{{product.provider}}</a>
-              </td>
-
-              <ng-container *ngFor="let stock of stocks | async;  "> 
-                <ng-container *ngIf="productSize._id == stock.productSizeId ">
-                  <ng-container *ngFor="let store of stores | async; let stockIndex=index; ">
-                    <ng-container *ngIf="store._id == stock.storeId">
-                    <!-- may lead to error if store 1 is not loaded -->
-                      <ng-container *ngIf="stockIndex == 0 ">
-                        <td
-                          class="text-center">
-                          <a>{{stock.lastCostPrice}}</a>
-                        </td>
-
-                        <td
-                          class="text-center">
-                          <a>{{stock.priceCash}}</a>
-                        </td>
-
-                        <td 
-                          class="text-center">
-                          <a>{{stock.priceCard}}</a>
-                        </td>      
-                      </ng-container>
-                    </ng-container> 
-                  </ng-container>
-                </ng-container>
-              </ng-container>
-
-
-              <!-- workaround: required to assume that all product have he same price -->
-              <ng-container *ngFor="let stock of stocks | async;  "> 
-                <ng-container *ngIf="productSize._id == stock.productSizeId ">
-                  <ng-container *ngFor="let store of stores | async; let storeIndex=index; ">
-                    <ng-container *ngIf=" store._id == stock.storeId">
-                      
-                     <!-- display mode-->
-                      <td 
-                        class="text-center"
-                        [hidden]="currentIndex === rowIndex && editing">
-                         <a>{{stock.quantity}}</a>
-                      </td>
-                      <!-- editing mode-->
-                      <td 
+             <!-- prod{{product._id}} -->
+              <ng-container *ngFor="let productPrice of productPrices | async; let priceIndex=index;  "> 
+                <ng-container *ngIf="product._id == productPrice.productId ">
+                  <!-- price{{productPrice._id}} -->
+                  <ng-container *ngIf="priceIndex == 0 ">
+                    <!-- action buttons for to edit stock fields -->
+                    <td>
+                      <button 
+                        [hidden]="currentIndex === rowIndex && editing"
+                        type="button" 
+                        class="btn btn-default" 
+                        (click)="currentIndex=rowIndex; editing=true;editedStock = copy(emptyStock)">
+                        <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
+                      </button>
+                      <button 
                         [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
-                        class="text-center">
-                        <input 
-                          type="text" 
-                          name="quantity-{{stockIndex}}-{{storeIndex}}" 
-                          class="form-control" 
-                          [value]="stock.quantity" 
-                          (input)="updateEditedStock(editedStock,stock,store._id, $event.target.value)">
-                      </td>
-                          
-                    </ng-container> 
+                        type="button" 
+                        class="btn btn-default" 
+                        (click)="currentIndex=rowIndex; editing=false; update(editedStock)">
+                        <span class="fa fa-check-square-o" aria-hidden="true"></span>
+                      </button>
+                      <button 
+                        [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)" 
+                        type="button" 
+                        class="btn btn-default" 
+                        (click)="currentIndex=rowIndex; editing=false; ">
+                        <span class="fa fa-ban" aria-hidden="true"></span>
+                      </button>
+                    </td>
+
+                    <td class="text-center">
+                      <a [routerLink]="['/products', product.code]">{{productSize.barCode}}</a>
+                    </td>
+
+                    <td class="text-center">
+                      <a>{{product.name}}</a>
+                    </td>
+
+                    <td class="text-center">
+                      <a>{{product.color}}</a>
+                    </td>
+
+                    <td class="text-center">
+                      <a>{{productSize.size}}</a>
+                    </td>
+
+                    <td class="text-center">
+                      <a>{{product.provider}}</a>
+                    </td>
+
+                    <td class="text-center">
+                      <a>{{productPrice.lastCostPrice}}</a>
+                    </td>
+
+                    <td class="text-center">
+                      <a>{{productPrice.priceCash}}</a>
+                    </td>
+
+                    <td class="text-center">
+                      <a>{{productPrice.priceCard}}</a>
+                    </td>   
+                  </ng-container> 
+
+                  <ng-container *ngFor="let store of stores | async; let stockIndex=index; ">
+                    <!-- <ng-container *ngIf="store._id == productPrice.storeId"> -->
+                      <!-- store{{store._id}} -->
+                      <ng-container *ngFor="let stock of stocks | async;  "> 
+                        <ng-container *ngIf="  stock.storeId  ==  store._id">
+                      <!-- stock{{stock._id}} -->
+                          <!-- display mode-->
+                          <td 
+                            class="text-center"
+                            [hidden]="currentIndex === rowIndex && editing">
+                             <a>{{stock.quantity}}</a>
+                          </td>
+                          <!-- editing mode-->
+                          <td 
+                            [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+                            class="text-center">
+                            <input 
+                              type="text" 
+                              name="quantity-{{stockIndex}}-{{storeIndex}}" 
+                              class="form-control" 
+                              [value]="stock.quantity" 
+                              (input)="updateEditedStock(editedStock,stock._id,$event.target.value)">
+                          </td>
+                        </ng-container> 
+<!--                       </ng-container>
+ -->                    </ng-container>
                   </ng-container>
                 </ng-container>
               </ng-container>
-
-
             </ng-container>
           </ng-container>
         </tr>

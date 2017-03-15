@@ -22,6 +22,7 @@ import { SearchOptions } from '../../../../both/search/search-options';
 
 // collections
 import { ProductSizes, getMappingSize } from '../../../../both/collections/product-sizes.collection';
+import { ProductPrices } from '../../../../both/collections/product-prices.collection';
 import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Products } from '../../../../both/collections/products.collection';
 import { Categories } from '../../../../both/collections/categories.collection';
@@ -30,6 +31,7 @@ import { Stores } from '../../../../both/collections/stores.collection';
 
 // model 
 import { ProductSize } from '../../../../both/models/product-size.model';
+import { ProductPrice } from '../../../../both/models/product-price.model';
 import { Stock } from '../../../../both/models/stock.model';
 import { Product } from '../../../../both/models/product.model';
 import { Category } from '../../../../both/models/category.model';
@@ -107,14 +109,16 @@ export class StockListComponent implements OnInit, OnDestroy {
   editing: boolean = false;
   selectedCategory: Category;
 
-  stocks: Observable<Stock[]>;
   productSizes: Observable<ProductSize[]>;
-  products: Observable<Product[]>;
-  categories: Observable<Category[]>;
+  stocks: Observable<Stock[]>;
   stores: Observable<Store[]>;
+  products: Observable<Product[]>;
+  productPrices: Observable<ProductPrice[]>;
+  categories: Observable<Category[]>; 
 
   allCategories: Observable<Category[]>;
   allSections: Observable<Section[]>;
+  allStores: Observable<Store[]>;
 
 
   complexForm : FormGroup;
@@ -156,13 +160,13 @@ export class StockListComponent implements OnInit, OnDestroy {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('stocks', options, filters)
+      this.paginatedSub = MeteorObservable.subscribe('productsSize-stock', options, filters)
         .subscribe(() => {
-          this.stocks = Stocks.find({}).zone();
           this.productSizes = ProductSizes.find({}).zone();
+          this.stocks = Stocks.find({}).zone();
+          this.stores = Stores.find({}).zone();
           this.products = Products.find({}).zone();
-          this.categories = Categories.find({}).zone();
-
+          this.productPrices = ProductPrices.find({}).zone();
       });
 
     });
@@ -180,7 +184,7 @@ export class StockListComponent implements OnInit, OnDestroy {
     } 
     this.storesSub = MeteorObservable.subscribe('stores')
       .subscribe(() => {
-        this.stores = Stores.find({}).zone();
+        this.allStores = Stores.find({}).zone();
     });
 
     if (this.categoriesSub) {
@@ -191,6 +195,7 @@ export class StockListComponent implements OnInit, OnDestroy {
         this.allCategories = Categories.find({}).zone();
     });
 
+
     this.pageSize.next(this.PAGESIZE);
     this.curPage.next(1);
     this.sortField.next('barCode');
@@ -198,7 +203,7 @@ export class StockListComponent implements OnInit, OnDestroy {
     this.filters.next('');
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
-      this.collectionCount = Counts.get('numberOfStocks');
+      this.collectionCount = Counts.get('numberOfProductSizes');
       this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
     });
 
@@ -231,16 +236,11 @@ export class StockListComponent implements OnInit, OnDestroy {
       if (stock.quantity && stock.stockId) {
         Stocks.update(stock.stockId, {
           $set: { 
-            storeId: stock.storeId, 
             quantity: stock.quantity,
-            priceCash: stock.priceCash,
-            priceCard: stock.priceCard,
-            rateCash: stock.rateCash,
-            rateCard: stock.rateCard,
-            lastCostPrice: stock.lastCostPrice
           }
         });
       }
+      // do something
     }
 
     // clean after insert
@@ -294,75 +294,75 @@ export class StockListComponent implements OnInit, OnDestroy {
 
         let stores = Stores.find({}).fetch();
 
-        // update or insert the stocks related to all the stores
-        stores.forEach(function(store: Store){
-          let stock = Stocks.findOne(
-            {productSizeId: productSizeId, storeId: store._id, active: true}
-          ); 
-          if (stock) { 
-            console.log('stock found', stock);
-            Stocks.update(stock._id, {
-              $set: { 
-                lastCostPrice: +values.cost,
-                priceCash: +values.cashPayment,
-                priceCard: +values.cardPayment,
-                rateCash: (+values.cashPayment/(+values.cost))*100,
-                rateCard: (+values.cardPayment/(+values.cost))*100,
-              }
-           })
-          } else {
-            console.log('stock inserting ');
-            Stocks.insert({
-              quantity: 0,
-              lastCostPrice: +values.cost,
-              priceCash: +values.cashPayment,
-              priceCard: +values.cardPayment,
-              rateCash: (+values.cashPayment/(+values.cost))*100,
-              rateCard: (+values.cardPayment/(+values.cost))*100,
-              storeId: store._id,
-              active: true,
-              productSizeId: productSizeId
-            })
-          }
-        }) 
+      //   // update or insert the stocks related to all the stores
+      //   stores.forEach(function(store: Store){
+      //     let stock = Stocks.findOne(
+      //       {productSizeId: productSizeId, storeId: store._id, active: true}
+      //     ); 
+      //     if (stock) { 
+      //       console.log('stock found', stock);
+      //       Stocks.update(stock._id, {
+      //         $set: { 
+      //           lastCostPrice: +values.cost,
+      //           priceCash: +values.cashPayment,
+      //           priceCard: +values.cardPayment,
+      //           rateCash: (+values.cashPayment/(+values.cost))*100,
+      //           rateCard: (+values.cardPayment/(+values.cost))*100,
+      //         }
+      //      })
+      //     } else {
+      //       console.log('stock inserting ');
+      //       Stocks.insert({
+      //         quantity: 0,
+      //         lastCostPrice: +values.cost,
+      //         priceCash: +values.cashPayment,
+      //         priceCard: +values.cardPayment,
+      //         rateCash: (+values.cashPayment/(+values.cost))*100,
+      //         rateCard: (+values.cardPayment/(+values.cost))*100,
+      //         storeId: store._id,
+      //         active: true,
+      //         productSizeId: productSizeId
+      //       })
+      //     }
+      //   }) 
 
-      // if the product is missed create a new one
-      } else {
-        console.log('inseting product');
-        let productId = Products.collection.insert({
-          code: productCode,
-          name: values.name,
-          color: values.color,
-          brand: values.brand,
-          model: values.model,
-          provider: values.provider,
-          categoryId: values.category._id
-        });
+      // // if the product is missed create a new one
+      // } else {
+      //   console.log('inseting product');
+      //   let productId = Products.collection.insert({
+      //     code: productCode,
+      //     name: values.name,
+      //     color: values.color,
+      //     brand: values.brand,
+      //     model: values.model,
+      //     provider: values.provider,
+      //     categoryId: values.category._id
+      //   });
 
-        console.log('inseting product size');
-        // insert the product size information
-        let productSizeId = ProductSizes.collection.insert(
-            {productId: productId, size: size, barCode: barCode}
-        );
+      //   console.log('inseting product size');
+      //   // insert the product size information
+      //   let productSizeId = ProductSizes.collection.insert(
+      //       {productId: productId, size: size, barCode: barCode}
+      //   );
         
-        let stores = Stores.find({}).fetch();
+      //   let stores = Stores.find({}).fetch();
 
-        // insert the stocks related to all the stores
-        stores.forEach(function(store: Store){
-          console.log('inseting stock for store: ',store);
+      //   // insert the stocks related to all the stores
+      //   stores.forEach(function(store: Store){
+      //     console.log('inseting stock for store: ',store);
 
-          Stocks.insert({
-            quantity: 0,
-            lastCostPrice: +values.cost,
-            priceCash: +values.cashPayment,
-            priceCard: +values.cardPayment,
-            rateCash: (+values.cashPayment/(+values.cost))*100,
-            rateCard: (+values.cardPayment/(+values.cost))*100,
-            storeId: store._id,
-            active: true,
-            productSizeId: productSizeId
-          })
-        })
+      //     Stocks.insert({
+      //       quantity: 0,
+      //       lastCostPrice: +values.cost,
+      //       priceCash: +values.cashPayment,
+      //       priceCard: +values.cardPayment,
+      //       rateCash: (+values.cashPayment/(+values.cost))*100,
+      //       rateCard: (+values.cardPayment/(+values.cost))*100,
+      //       storeId: store._id,
+      //       active: true,
+      //       productSizeId: productSizeId
+      //     })
+      //   })
       }
       
       this.complexForm.reset();
@@ -373,23 +373,15 @@ export class StockListComponent implements OnInit, OnDestroy {
     return Object.assign({}, original)
   }
 
-  /* update edited stock model */
-  updateEditedStock(editedStock: any, stock:Stock, storeId:string, quantity:number){
+  updateEditedStock(editedStock: any, id: string, quantity: number) {
     if (quantity) {
       editedStock.quantity.push(
         {
-          stockId: stock._id, 
-          storeId: storeId, 
+          stockId: id, 
           quantity: quantity,
-          priceCash: stock.priceCash,
-          priceCard: stock.priceCard,
-          rateCash: stock.rateCash,
-          rateCard: stock.rateCard,
-          lastCostPrice: stock.lastCostPrice
         }
       );
     }
-    // console.log(editedStock);
   }
 
   

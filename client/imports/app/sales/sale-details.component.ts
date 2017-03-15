@@ -31,6 +31,7 @@ import { UserStores } from '../../../../both/collections/user-stores.collection'
 // import { ProductPurchases } from '../../../../both/collections/product-purchases.collection';
 import { ProductSales } from '../../../../both/collections/product-sales.collection';
 import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
+import { ProductPrices } from '../../../../both/collections/product-prices.collection';
 import { Products } from '../../../../both/collections/products.collection';
 // import { Purchases } from '../../../../both/collections/purchases.collection';
 import { Sales, salesStatusMapping, salePaymentMapping, workShiftMapping } from '../../../../both/collections/sales.collection';
@@ -48,6 +49,7 @@ import { UserStore } from '../../../../both/models/user-store.model';
 // import { ProductPurchase } from '../../../../both/models/product-purchase.model';
 import { ProductSale } from '../../../../both/models/product-sale.model';
 import { ProductSize } from '../../../../both/models/product-size.model';
+import { ProductPrice } from '../../../../both/models/product-price.model';
 import { Product } from '../../../../both/models/product.model';
 // import { Purchase } from '../../../../both/models/purchase.model';
 import { Sale } from '../../../../both/models/sale.model';
@@ -109,6 +111,8 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
   sale: Sale;
   productSales: Observable<ProductSale[]>;
   productSizes: Observable<ProductSize[]>;
+  productPrices: Observable<ProductPrice[]>;
+
   products: Observable<Product[]>;
   userStore: UserStore;
   store: Store;
@@ -138,6 +142,7 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
             this.sale = Sales.findOne({saleNumber:this.saleNumber});
             this.productSales = ProductSales.find({}).zone();
             this.productSizes = ProductSizes.find({}).zone();
+            this.productPrices = ProductPrices.find({}).zone();
             this.products = Products.find({}).zone();
             this.userStore = UserStores.findOne();
             this.seller = Users.find({_id: this.userStore.userId}).fetch()[0];
@@ -261,9 +266,9 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
     return this.quantityTracker[index];
   }
 
-  calculateSubTotal(index, stock) {
+  calculateSubTotal(index, productPrice) {
     this.productSubTotals[index] = 
-      this.getPrice(stock) * this.quantityTracker[index];
+      this.getPrice(productPrice) * this.quantityTracker[index];
     return this.productSubTotals[index];
   }
 
@@ -277,11 +282,11 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
     return total;
   }
 
-  getPrice(stock){
+  getPrice(productPrice){
     if (this.paymentForm == 1) {
-      return stock.priceCash;
+      return productPrice.priceCash;
     } else {
-      return stock.priceCard;
+      return productPrice.priceCard;
     }
   }
 
@@ -307,7 +312,9 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
  
   }
 
-  cancelSale(){}
+  cancelSale(){
+    
+  }
 
   notifyProductFound(barCode:string) {
     this.selectedProductSizeBarCode = barCode;
