@@ -21,7 +21,7 @@ Meteor.methods({
     check(product.provider, String);
     check(product.categoryId, String);
 
-    return Products.insert(product);
+    return Products.collection.insert(product);
   },
 
   updateProduct: function (selector: string, product: Product) {
@@ -34,9 +34,29 @@ Meteor.methods({
     check(product.provider, String);
     check(product.categoryId, String);
 
-    return Products.update(product);
-  }
+    return Products.update(selector, product);
+  },
 
+  saveProductSizes: function (productId: string, productCode: string, sizes: number[]) {
+    // console.log(productId);
+    // console.log(productCode);
+    // console.log(sizes);
+    check(productId, String);
+    check(productCode, String);
+    check(sizes, [Number]) 
+    let ids = [];
+    for (let size in sizes) {
+      var pz = { 
+        productId: productId, 
+        barCode: productCode+''+size, 
+        size: size 
+      }
+      // console.log(pz);
+      ids.push( 
+        ProductSizes.insert(pz));
+    }
+    return ids;
+  }
 
  
 });

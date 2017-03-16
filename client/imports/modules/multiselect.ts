@@ -89,7 +89,7 @@ export class MultiSelectSearchFilter implements PipeTransform {
   template: `
     <div class="dropdown">
       <button type="button" class="dropdown-toggle" [ngClass]="settings.buttonClasses"
-              (click)="toggleDropdown()">{{ title }}&nbsp;<span class="caret"></span></button>
+              (click)="toggleDropdown()" [disabled]="disabled">{{ title }}&nbsp;<span class="caret"></span></button>
       
       <ul *ngIf="isVisible" class="dropdown-menu" [class.pull-right]="settings.pullRight" [class.dropdown-menu-right]="settings.pullRight"
           [style.max-height]="settings.maxHeight" style="display: block; height: auto; overflow-y: auto;">
@@ -163,6 +163,7 @@ export class MultiselectDropdown implements OnInit, DoCheck, ControlValueAccesso
   @Input() options: Array<IMultiSelectOption>;
   @Input() settings: IMultiSelectSettings;
   @Input() texts: IMultiSelectTexts;
+  @Input() disabled: boolean = false;
   @Output() selectionLimitReached = new EventEmitter();
   @Output() dropdownClosed = new EventEmitter();
   @Output() onAdded = new EventEmitter();
@@ -336,7 +337,7 @@ export class MultiselectDropdown implements OnInit, DoCheck, ControlValueAccesso
     } else if (this.settings.displayAllSelectedText && this.model.length === this.options.length) {
       this.title = this.texts.allSelected || '';
     } else {
-      this.title = this.numSelected
+      this.title = this.numSelected-1
         + ' '
         + (this.numSelected === 1 ? this.texts.checked : this.texts.checkedPlural);
     }

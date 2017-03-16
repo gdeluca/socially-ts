@@ -1,7 +1,8 @@
 <form [formGroup]="complexForm" (ngSubmit)="submitForm(complexForm.value)">
   <table class="table table-hover">
-    <tbody>
-      <tr ng-form="myForm">
+    <tbody ng-form="myForm">
+      <tr>
+
         <!-- action buttons for submision form -->
         <td>
           <button 
@@ -20,7 +21,7 @@
           </button>
           <button 
             [hidden]="!adding" 
-            [disabled]="!complexForm.valid" 
+            [disabled]="!complexForm.valid"
             type="button" 
             class="btn btn-default" 
             (click)="adding=false; save(complexForm)">
@@ -117,7 +118,7 @@
           <select 
             [hidden]="!adding" 
             name="sectionOptions" 
-            class="form-control" 
+            class="form-control"  
              [formControl]="complexForm.controls['category']">
               <option value="" disabled currentIndex hidden>
                 Categoria
@@ -127,6 +128,130 @@
               </option>
           </select> 
         </td>
+      </tr>
+
+      <tr> 
+      <td class="text-center">
+        <div [hidden]="!adding" >
+          <h4 [hidden]="!adding"> Talles:</h4>
+          <!-- sizes selector--> 
+          <div class=" ml-4 mt-4">
+            <multi-dropdown 
+              [options]= "selectorSizesData"
+              [texts]="commonTexts" 
+              [settings]="multiSettingsWithoutChecks" 
+              [(ngModel)]="sizesSelector"
+              formControlName="sizesSelector"
+              class="form-control">
+            </multi-dropdown>
+          </div>
+        </div>
+      </td>
+      <!-- sizes Numerico --> 
+      <td class="text-center">
+        <div [hidden]="!adding" >
+          <div class="form-check">
+            <label class="form-check-label">
+              <input type="radio" 
+                class="form-check-input form-control" 
+                value="numeric" 
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="sizesType" 
+                (ngModelChange)="adding && setSizes('numeric',numericStartSelected,numericEndSelected)"
+                >
+              Numerico
+            </label>
+          </div>
+
+          <div class=" ml-4 mt-4">
+          Desde
+            <multi-dropdown 
+              [options]="numericSizesData"
+              [texts]="commonTexts" 
+              [settings]="singleSettings" 
+              [(ngModel)]="numericStartSelected"
+              [ngModelOptions]="{standalone: true}"
+              [disabled]="sizesType == 'letters' || sizesType == 'unique'"
+              (ngModelChange)="adding && setSizes('numeric',numericStartSelected,numericEndSelected)"
+              >
+            </multi-dropdown>
+          </div>
+          <div class=" ml-4 mt-4">
+          Hasta
+            <multi-dropdown 
+              [options]="numericSizesData"
+              [texts]="commonTexts" 
+              [settings]="singleSettings" 
+              [(ngModel)]="numericEndSelected"
+              [ngModelOptions]="{standalone: true}"
+              [disabled]="sizesType == 'letters' || sizesType == 'unique'"
+              (ngModelChange)="adding && setSizes('numeric',numericStartSelected,numericEndSelected)"
+              >
+            </multi-dropdown>
+          </div>
+        </div>
+      </td>
+      <!-- sizes letras --> 
+      <td class="text-center">
+        <div [hidden]="!adding" >
+          <div class="form-check">
+            <label class="form-check-label">
+              <input type="radio" 
+                class="form-check-input form-control"
+                value="letters"
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="sizesType"
+                (ngModelChange)="adding && setSizes('letters',lettersStartSelected,lettersEndSelected)"
+                >
+              Letras
+            </label>
+          </div>
+
+          <div class=" ml-4 mt-4">
+            Desde
+            <multi-dropdown 
+              [options]="lettersSizesData"
+              [texts]="commonTexts" 
+              [settings]="singleSettings" 
+              [(ngModel)]="lettersStartSelected"
+              [ngModelOptions]="{standalone: true}"
+              [disabled]="sizesType == 'numeric' || sizesType == 'unique'"
+              (ngModelChange)="adding && setSizes('letters',lettersStartSelected,lettersEndSelected)"
+              >
+            </multi-dropdown>
+          </div>
+          <div class=" ml-4 mt-4">
+            Hasta
+            <multi-dropdown 
+              [options]="lettersSizesData"
+              [texts]="commonTexts" 
+              [settings]="singleSettings" 
+              [(ngModel)]="lettersEndSelected"
+              [ngModelOptions]="{standalone: true}"
+              [disabled]="sizesType == 'numeric' || sizesType == 'unique'"
+              (ngModelChange)="adding && setSizes('letters',lettersStartSelected,lettersEndSelected)"
+              >
+            </multi-dropdown>
+          </div>
+        </div>
+      </td>
+      <!-- sizes Numerico --> 
+      <td  class="text-center">
+        <div [hidden]="!adding" >
+          <div class="form-check">
+            <label class="form-check-label">
+              <input type="radio" 
+                class="form-check-input form-control" 
+                value="unique"
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="sizesType"
+                (ngModelChange)="adding && setSizes('unique','','')"
+                >
+              Unico
+            </label>
+          </div>
+        </div> 
+      </td>
       </tr>
     </tbody>
   </table>
