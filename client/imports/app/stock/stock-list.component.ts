@@ -85,7 +85,7 @@ export class StockListComponent implements OnInit, OnDestroy {
   ];
 
   collectionCount: number = 0;
-  PAGESIZE: number = 3;  
+  PAGESIZE: number = 9;  
   
   paginatedSub: Subscription;
   optionsSub: Subscription;

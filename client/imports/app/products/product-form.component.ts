@@ -17,7 +17,7 @@ import { IMultiSelectOption, IMultiSelectTexts, IMultiSelectSettings } from '../
 import { Categories } from '../../../../both/collections/categories.collection';
 import { Products } from '../../../../both/collections/products.collection';
 import { lettersSizes, uniqueSize } from '../../../../both/collections/product-sizes.collection';
-
+  
 import { Category } from '../../../../both/models/category.model';
 
 import template from './product-form.component.html';
@@ -67,7 +67,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     closeOnSelect: true,
     showCheckAll: false,
     showUncheckAll: false,
-    dynamicTitleMaxItems: 1,
+    dynamicTitleMaxItems: 1, 
     maxHeight: '300px' 
   };
 
@@ -198,17 +198,19 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  saveProduct(product, values){
+
+
+  saveProduct(product, values) {
     MeteorObservable.call('saveProduct', product).subscribe(
-      (response) => {
-        this.saveProductSizes(response, product.code, values.sizesSelector);
+      (productId) => {
+        this.saveProductSizes(productId, product.code, values.sizesSelector);
         Bert.alert('Se agrego el producto: ' + product.code , 'success', 'growl-top-right' ); 
       }, (error) => {
         Bert.alert('Error al guardar:  ${error} ', 'danger', 'growl-top-right' ); 
     });
   }
  
-  saveProductSizes(id, code, sizes){
+  saveProductSizes(id, code, sizes) {
     MeteorObservable.call('saveProductSizes', id, code, sizes).subscribe(() => {
       Bert.alert('Se agregaron los talles: ' + JSON.stringify(sizes), 'success', 'growl-top-right' ); 
     }, (error) => {
