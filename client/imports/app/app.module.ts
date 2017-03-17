@@ -5,11 +5,13 @@ import { DemoDataService } from "./demo/demo-data.service";
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { HttpModule } from '@angular/http';
 
 import { AccountsModule } from 'angular2-meteor-accounts-ui';
 import { MomentModule } from 'angular2-moment';
 import { Ng2PaginationModule } from 'ng2-pagination';
 import { MultiselectDropdownModule } from '../modules/multiselect';
+import { Ng2AutoCompleteModule } from 'ng2-auto-complete';
 
 
 import { AppComponent } from './app.component';
@@ -77,6 +79,7 @@ import { FocusDirective } from '../directives/focus.directive';
     RouterModule.forRoot(routes),
     AccountsModule,
     Ng2PaginationModule,
+    Ng2AutoCompleteModule,
     MomentModule,
     MultiselectDropdownModule,
   ],

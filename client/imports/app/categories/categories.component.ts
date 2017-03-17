@@ -47,7 +47,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
 
 
   collectionCount: number = 0;
-  PAGESIZE: number = 6; 
+  PAGESIZE: number = 6   ; 
   
   sectionsSub: Subscription;
   paginatedSub: Subscription;

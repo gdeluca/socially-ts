@@ -10,6 +10,22 @@ import { Store } from '../models/store.model';
 
 Meteor.methods({
 
+  saveStocksForStores: function (productSizeIds: string[], storeIds: string[], quantity: number) {
+    check(productSizeIds, [String]);
+    check(storeIds, [String]);
+    check(quantity, Number);
+    return productSizeIds.map((productSizeId) => {
+      return storeIds.map((storeId) => {
+        return Stocks.collection.insert({
+          quantity: quantity,
+          storeId: storeId,
+          active: true,
+          productSizeId: productSizeId
+        });
+      })
+    });
+  },
+
   saveStock: function (values:any) {
     check(values.size, String);
     check(values.barCode, String);

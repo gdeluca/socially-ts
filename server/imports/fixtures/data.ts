@@ -60,41 +60,75 @@ export function loadData() {
 
     // tags setup
     Tags.insert({
+      code:"00",
+      type:"name",
+      description:"active"
+    });
+    Tags.insert({
       code:"01",
       type:"name",
       description:"Bermuda GYM"
     });
-
+    Tags.insert({
+      code:"00",
+      type:"model",
+      description:"active"
+    });
     Tags.insert({
       code:"01",
       type:"model",
       description:"Universal"
     });
-
+    Tags.insert({
+      code:"00",
+      type:"brand",
+      description:"active"
+    });
     Tags.insert({
       code:"01",
       type:"brand",
       description:"Animal"
     });
-
+    Tags.insert({
+      code:"00",
+      type:"color",
+      description:"active"
+    });
     Tags.insert({
       code:"01",
       type:"color",
       description:"Azul"
     });
-
+    Tags.insert({
+      code:"00",
+      type:"section",
+      description:"active"
+    });
     Tags.insert({
       code:"01",
-      type:"category",
-      description:"Pantalon"
+      type:"section",
+      description:"Dama"
     });
-
+    Tags.insert({
+      code:"01",
+      type:"section",
+      description:"Caballero"
+    });
+    Tags.insert({
+      code:"01",
+      type:"section",
+      description:"Niño"
+    });
+    Tags.insert({
+      code:"00",
+      type:"provider",
+      description:"active"
+    });
     Tags.insert({
       code:"01",
       type:"provider",
       description:"Andres"
     });
-
     Tags.insert({
       code:"02",
       type:"provider",

@@ -19,7 +19,7 @@ Meteor.methods({
     check(product.brand, String);
     check(product.model, String);
     check(product.provider, String);
-    check(product.categoryId, String);
+    check(product.categoryId, String); 
 
     return Products.collection.insert(product);
   },
@@ -37,19 +37,20 @@ Meteor.methods({
     return Products.update(selector, product);
   },
 
-  saveProductSizes: function (productId: string, productCode: string, sizes: number[]) {
+  saveProductSizes: function (productId: string, productCode: string, sizes: string[]) {
     check(productId, String);
     check(productCode, String);
-    check(sizes, [Number]) 
+    check(sizes, [String]) 
     let ids = [];
-    for (let size in sizes) {
-      var pz = { 
+
+    for (var i=0; i<sizes.length;i++) {
+      var productSize = { 
         productId: productId, 
-        barCode: productCode + getMappingSize(size), 
-        size: size 
+        size: sizes[i], 
+        barCode: productCode + getMappingSize(sizes[i]) 
       }
       ids.push( 
-        ProductSizes.insert(pz));
+        ProductSizes.collection.insert(productSize));
     }
     return ids;
   }
