@@ -12,6 +12,7 @@ import './imports/publications/balances';
 import './imports/publications/categories'; 
 import './imports/publications/counters'; 
 import './imports/publications/products'; 
+import './imports/publications/purchases'; 
 import './imports/publications/sales'; 
 import './imports/publications/sections'; 
 import './imports/publications/stores'; 

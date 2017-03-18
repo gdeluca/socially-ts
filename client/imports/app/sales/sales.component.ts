@@ -10,7 +10,6 @@ import { PaginationService } from 'ng2-pagination';
 
 import { Bert } from 'meteor/themeteorchef:bert';
 
- 
 // reactiveX
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -25,7 +24,7 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
 
 // collections
-// import { Balances } from '../../../../both/collections/balances.collection';
+// import { Balances, balanceOpsMapping, balanceOps } from '../../../../both/collections/balances.collection';
 // import { Categories } from '../../../../both/collections/categories.collection';
 // import { Counters } from '../../../../both/collections/counters.collection';
 import { UserStores } from '../../../../both/collections/user-stores.collection';

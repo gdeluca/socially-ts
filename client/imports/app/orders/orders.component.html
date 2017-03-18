@@ -1,1 +1,157 @@
-<div></div>
+<div>
+  <div class="row">
+    <h2 class="col-12 text-center">Compras</h2>
+
+  <div class="form-inline">
+      <div class=" ml-4 mt-4">
+        <button 
+          type="button" 
+          class="form-control btn btn-primary ml-2" 
+          (click)="addOrder()"
+          >
+          Nuevo Pedido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 text-center">
+      <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- purchase content -->
+    <table class="table table-bordered table-hover">
+      <thead class="thead-default">
+        <tr>
+          <!-- headers for sorting -->
+          <th class="text-center">#</th>
+          <th class="text-center" 
+            style="vertical-align:middle;" 
+            *ngFor="let header of headers; let colIndex = index; ">
+            <div class="form-horizontal" >
+              {{header.key}}
+              <button 
+                [hidden]="idx !== colIndex || direction !== 'up'" 
+                type="button" 
+                class="btn btn-default" 
+                (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+                <span class="fa fa-chevron-up" aria-hidden="true"></span>
+              </button>
+              <button 
+                  [hidden]="idx !== colIndex || direction !== 'down'" 
+                  type="button" 
+                  class="btn btn-default"  
+                  (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
+                  <span class="fa fa-chevron-down" aria-hidden="true"></span>
+              </button>
+              <button 
+                [hidden]="direction && idx === colIndex " 
+                type="button" 
+                class="btn btn-default"   
+                (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+                <span class="fa fa-sort" aria-hidden="true"></span>
+              </button>
+            </div>
+          </th> 
+      </thead>
+      <tbody>
+
+        <!-- filter fields on table header -->
+        <tr>
+        <td></td>
+          <ng-container *ngFor="let header of headers; let colIndex=index; ">
+            <td class="text-center">
+              <ng-container *ngIf="header.showHeaderFilter ">
+                <input 
+                  type="text" 
+                  class="col-12" 
+                  name=filter-{{header.key}}
+                  placeholder={{header.key}}
+                  #tmp
+                  (blur)="search(header.value, tmp.value)"
+                  (keyup.enter)="search(header.value, tmp.value);"
+                  >
+              </ng-container>
+            </td>
+          </ng-container> 
+        </tr> 
+
+        <!-- purchaseNumber, purchaseState, purchaseDate, lastUpdate, total, provider, paymentAmount -->
+        <tr *ngFor="let purchase of purchases | async; let rowIndex=index; ">
+     
+          <!-- action buttons for to edit stock fields -->
+          <td>
+            <button 
+              [hidden]="currentIndex === rowIndex && editing"
+              type="button" 
+              class="btn btn-default" 
+              (click)="currentIndex=rowIndex; editing=true;editedPurchase = copy(purchase)">
+              <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+              type="button" 
+              class="btn btn-default" 
+              (click)="currentIndex=rowIndex; editing=false; update(editedPurchase, purchase)">
+              <span class="fa fa-check-square-o" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="currentIndex=rowIndex; editing=false; ">
+              <span class="fa fa-ban" aria-hidden="true"></span>
+            </button>
+          </td>
+          <td class="text-center">
+            <a [routerLink]="['/orders', purchase.purchaseNumber]">{{purchase.purchaseNumber}}
+            </a>
+          </td>
+
+          <!-- display mode -->
+          <td 
+            [hidden]="currentIndex === rowIndex && editing"
+            class="text-center">
+            <a>{{purchase.purchaseState | mapvalues:valuesMapping}}</a>
+          </td>
+          <!-- editing mode -->
+          <td 
+              [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)">
+            <select 
+              name="selectstate-{{rowIndex}}" class="form-control" required  
+              [ngModel]="purchase.purchaseState"
+              (ngModelChange)="editedPurchase.purchaseState = $event"
+              >
+              <option *ngFor="let touple of valuesMapping | mapToIterable"
+              [ngValue]="touple.key">{{touple.val}}</option>
+            </select> 
+          </td>
+
+          <td class="text-center">
+            <a>{{purchase.purchaseDate | amDateFormat:'LL hh:mmA'}}</a>
+          </td>
+
+          <td class="text-center">
+            <a>{{purchase.lastUpdate | amDateFormat:'LL hh:mmA'}}</a>
+          </td>
+
+          <td class="text-center">
+            <a>{{purchase?.total || 0 }}</a>
+          </td>
+
+          <td class="text-center">
+            <a>{{purchase.provider}}</a>
+          </td>
+
+          <td class="text-center">
+            <a>{{purchase.paymentAmount | currency:'ARS':true:'1.2-2'}}</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

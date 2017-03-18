@@ -13,5 +13,4 @@ export interface Sale extends CollectionObject {
   taxes?:number;
   subtotal?:number;
   total?: number;
-  productSaleIds?: string[];
 }

@@ -8,6 +8,7 @@ import { CategoriesComponent } from './categories/categories.component';
 import { BalancesComponent } from './balances/balances.component';
 import { LoginComponent } from './auth/login.component';
 import { OrdersComponent } from './orders/orders.component';
+import { OrderDetailsComponent } from './orders/order-details.component'; 
 // import { ProductListComponent } from './products/product-list.component';
 import { ProductsComponent } from './products/products.component';
 // import { ProductDetailsComponent } from './products/product-details.component';
@@ -27,6 +28,7 @@ export const routes: Route[] = [
   { path: 'categories', component: CategoriesComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'login', component: LoginComponent },
   { path: 'orders', component: OrdersComponent, canActivate: ['canActivateForLoggedIn'] },
+  { path: 'orders/:purchaseNumber', component: OrderDetailsComponent , canActivate: ['canActivateForLoggedIn'] },
   { path: 'parties', component: PartiesListComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'party/:partyId', component: PartyDetailsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'products', component: ProductsComponent, canActivate: ['canActivateForLoggedIn'] },

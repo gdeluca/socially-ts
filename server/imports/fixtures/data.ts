@@ -222,23 +222,29 @@ export function loadData() {
     Purchases.insert({
        _id: "01",
       purchaseNumber: "000001",
-      date: "2016-07-10T11:23:01Z",
+      purchaseState: "loaded",
+      purchaseDate: "2016-07-10T11:23:01Z",
+      lastUpdate: "2016-07-10T11:23:01Z",
       provider:"Juan",
-      payment:0
+      paymentAmount:0
     });
     Purchases.insert({
        _id: "02",
       purchaseNumber: "000002",
-      date: "2016-01-11T11:23:01Z",
+      purchaseState: "received",
+      purchaseDate: "2016-01-11T11:23:01Z",
+      lastUpdate: "2016-07-10T11:23:01Z",
       provider:"Andres",
-      payment:1000
+      paymentAmount:1000
     });
     Purchases.insert({
        _id: "03",
       purchaseNumber: "000003",
-      date: "2017-07-12T11:23:01Z",
+      purchaseState: "requested",
+      purchaseDate: "2017-07-12T11:23:01Z",
+      lastUpdate: "2016-07-10T11:23:01Z",
       provider:"Jose",
-      payment:0
+      paymentAmount:100
     });
 
     // 2 categories
@@ -598,7 +604,6 @@ export function loadData() {
     //started submitted reserved
     Sales.update({_id:"01"},{
       $set: { 
-        productSaleIds: ["01", "02", "03"],
         saleState: "started",
         subtotal: 930,
         taxes: 195.3,

@@ -4,6 +4,14 @@ import { Meteor } from 'meteor/meteor';
 import { Purchase } from '../models/purchase.model';
 
 export const Purchases = new MongoObservable.Collection<Purchase>('purchases');
+export const purchaseStatus = ['loaded','requested','received','canceled', 'deleted'];
+
+export const purchasesStatusMapping = {
+    'loaded': 'Redactada', 
+    'requested': 'Pedido relizado', 
+    'received': 'Pedido recibido', 
+    'canceled': 'Cancelada' // only can be canceled a loaded order.
+  };
 
 function loggedIn() {
   return !!Meteor.user();
