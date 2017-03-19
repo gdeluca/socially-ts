@@ -1,8 +1,8 @@
 <h3 class="col-12 text-center">Tabla de Articulos</h3>
 <div class="row">
   <table class="table table-bordered table-hover table-striped ">
+    <!-- headers for sorting -->
     <thead class="thead-default"> 
-      <!-- headers for sorting -->
       <tr>
         <th class="text-center">Modificar</th>
         <th  class="text-center" *ngFor="let header of headers; let colIndex = index; ">
@@ -195,7 +195,7 @@
               <select 
                 name="selectCategory-{{rowIndex}}" class="form-control" required  
                 [(ngModel)]="editedProduct.categoryId">
-                <option value="" disabled currentIndex hidden>Nombre de Categoria</option>
+                <option value=undefined disabled currentIndex hidden>Categoria</option>
                 <option *ngFor="let category of categories | async" 
                 [ngValue]="category._id">{{category.name}}</option>
               </select> 
@@ -211,6 +211,7 @@
   <!-- submission form -->
   <product-form></product-form>
 </div>
+
 <div class="card align-items-center">
   <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
 </div>

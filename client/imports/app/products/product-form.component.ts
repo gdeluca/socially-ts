@@ -26,7 +26,7 @@ import { Category } from '../../../../both/models/category.model';
 import { Store } from '../../../../both/models/store.model';
 import { Tag } from '../../../../both/models/tag.model';
 
-import { isNumeric } from '../validators/validators'; 
+import { isNumeric } from '../../validators/validators'; 
 
 import template from './product-form.component.html';
 import style from './product-form.component.scss';

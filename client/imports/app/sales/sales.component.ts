@@ -58,7 +58,7 @@ import { Store } from '../../../../both/models/store.model';
 import { User } from '../../../../both/models/user.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
-import { isNumeric } from '../validators/validators';
+import { isNumeric } from '../../validators/validators';
 
 
 import template from "./sales.component.html";
@@ -93,7 +93,7 @@ export class SalesComponent {
     {'key': 'Nº Venta', 'value':'saleNumber'},
     {'key': 'Forma de Pago', 'value': 'payment', 'showHeaderFilter': true},
     {'key': 'Descuento', 'value':'discount', 'showHeaderFilter': false},
-    {'key': 'Estado de Venta', 'value':'status', 'showHeaderFilter': true},
+    {'key': 'Estado', 'value':'status', 'showHeaderFilter': true},
     {'key': 'Fecha de Venta', 'value':'saleDate', 'showHeaderFilter': true},
     {'key': 'Ultimo Cambio', 'value':'lastUpdate', 'showHeaderFilter': false},
     {'key': 'Vendedor', 'value':'seller', 'showHeaderFilter': true},

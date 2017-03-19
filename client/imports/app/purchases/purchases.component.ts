@@ -58,7 +58,7 @@ import { Store } from '../../../../both/models/store.model';
 // import { User } from '../../../../both/models/user.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
-import { isNumeric } from '../validators/validators';
+import { isNumeric } from '../../validators/validators';
 import * as moment from 'moment';
 import 'moment/locale/es';
 
@@ -217,8 +217,10 @@ export class PurchasesComponent {
   update(editedPurchase, purchase) {
     if (editedPurchase.purchaseState != purchase.purchaseState) {
       MeteorObservable.call(
-        'updatePurchaseOrderStatus', purchase._id, editedPurchase.purchaseState)
-      .subscribe(
+        'updatePurchaseOrderStatus', 
+        purchase._id, 
+        editedPurchase.purchaseState
+      ).subscribe(
         (response) => {
          Bert.alert('Se actualizo el pedidio al nuevo estado: ' 
            + editedPurchase.purchaseState, 'success', 'growl-top-right' ); 
@@ -244,7 +246,7 @@ export class PurchasesComponent {
       number, 'loaded', 
       moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
       moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-      "undefined", 0,0).subscribe(
+      "", 0,0).subscribe(
       (response) => {
 
       }, (error) => {

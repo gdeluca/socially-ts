@@ -60,7 +60,7 @@ import { Store } from '../../../../both/models/store.model';
 import { User } from '../../../../both/models/user.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
-import { isNumeric } from '../validators/validators';
+import { isNumeric } from '../../validators/validators';
 
 import template from "./sale-order.component.html";
 import style from "./sale-order.component.scss";

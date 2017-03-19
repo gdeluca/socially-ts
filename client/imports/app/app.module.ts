@@ -1,7 +1,6 @@
 import { NgModule } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
-import { DemoComponent } from "./demo/demo.component";
-import { DemoDataService } from "./demo/demo-data.service";
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -27,7 +26,7 @@ import { PURCHASES_DECLARATIONS } from './purchases';
 import { PRODUCTS_DECLARATIONS } from './products';
 import { SALES_DECLARATIONS } from './sales';
 import { SECTIONS_DECLARATIONS } from './sections';
-import { SHARED_DECLARATIONS } from './shared';
+import { PIPES_DECLARATIONS } from '../pipes';
 import { STOCKS_DECLARATIONS } from './stock';
 import { STORES_DECLARATIONS } from './stores';
 import { USERS_DECLARATIONS } from './users';
@@ -39,7 +38,6 @@ import { FocusDirective } from '../directives/focus.directive';
   // Components, Pipes, Directive
   declarations: [
     AppComponent,
-    DemoComponent,
     FocusDirective,
 
     ...BALANCES_DECLARATIONS,
@@ -51,7 +49,7 @@ import { FocusDirective } from '../directives/focus.directive';
     ...SECTIONS_DECLARATIONS,
     ...STORES_DECLARATIONS,
     ...USERS_DECLARATIONS,
-    ...SHARED_DECLARATIONS,
+    ...PIPES_DECLARATIONS,
     ...NAVBAR_DECLARATIONS,
     ...AUTH_DECLARATIONS,    
     
@@ -64,7 +62,6 @@ import { FocusDirective } from '../directives/focus.directive';
   
   // Providers
   providers: [
-    DemoDataService,
     ...ROUTES_PROVIDERS,
   ],
   

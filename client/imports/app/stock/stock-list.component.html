@@ -20,7 +20,7 @@
           [(ngModel)]="selectedCategory"
           (ngModelChange)="search('categoryId', selectedCategory)"
           >
-          <option value="" selected >Filtrar por Categoria</option>
+          <option value=undefined selected >Categoria</option>
           <option *ngFor="let category of allCategories | async" 
           [ngValue]="category._id"
          >{{category.name}}</option>
@@ -34,7 +34,7 @@
           [(ngModel)]="selectedSection"
           (ngModelChange)="search('sectionId', selectedSection)"
           >
-          <option value="" selected>Filtrar por Seccion</option>
+          <option value=undefined selected>Seccion</option>
           <option *ngFor="let section of allSections | async" 
           [ngValue]="section._id"
           >{{section.name}}</option>

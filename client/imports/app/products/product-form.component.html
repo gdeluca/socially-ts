@@ -138,7 +138,7 @@
             name="sectionOptions" 
             class="form-control"  
              [formControl]="complexForm.controls['category']">
-              <option value="" disabled currentIndex hidden>
+              <option value='' disabled currentIndex hidden>
                 Categoria
               </option>
               <option *ngFor="let category of allCategories | async" [ngValue]="category">

@@ -3,7 +3,6 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 
 import { SearchOptions } from '../../../both/search/search-options';
  
-import { Parties } from '../../../both/collections/parties.collection';
 import { Users } from '../../../both/collections/users.collection';
 import { UserStores } from '../../../both/collections/user-stores.collection';
 import { Stores } from '../../../both/collections/stores.collection';
@@ -13,28 +12,28 @@ import { Store } from '../../../both/models/store.model';
 import { User } from '../../../both/models/user.model';
  
 
-Meteor.publishComposite('user.byEmail', function(email: string) {
-  return {
-    find: function() {
-      return Users.collection.find({"emails" : { $elemMatch: { "address" : email}}});
-    }
-  }
-});
+// Meteor.publishComposite('user.byEmail', function(email: string) {
+//   return {
+//     find: function() {
+//       return Users.collection.find({"emails" : { $elemMatch: { "address" : email}}});
+//     }
+//   }
+// });
  
-Meteor.publish('uninvited', function (partyId: string) {
-  const party = Parties.findOne(partyId);
+// Meteor.publish('uninvited', function (partyId: string) {
+//   const party = Parties.findOne(partyId);
  
-  if (!party) {
-    throw new Meteor.Error('404', 'No such party!');
-  }
+//   if (!party) {
+//     throw new Meteor.Error('404', 'No such party!');
+//   }
   
-  return Meteor.users.find({
-    _id: {
-      $nin: party.invited || [],
-      $ne: this.userId
-    }
-  }); 
-});
+//   return Meteor.users.find({
+//     _id: {
+//       $nin: party.invited || [],
+//       $ne: this.userId
+//     }
+//   }); 
+// });
  
 Meteor.publishComposite('users.stores', function(options: SearchOptions, filterField?: string, filterValue?: string) {
   let query = {}

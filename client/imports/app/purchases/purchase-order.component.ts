@@ -50,7 +50,10 @@ import { Tag } from '../../../../both/models/tag.model';
 import { User } from '../../../../both/models/user.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
-import { isNumeric } from '../validators/validators';
+import { isNumeric } from '../../validators/validators';
+
+import * as moment from 'moment';
+import 'moment/locale/es';
 
 import template from "./purchase-order.component.html";
 import style from "./purchase-order.component.scss";
@@ -121,33 +124,21 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   providerProducts: Observable<Product[]>;
   providerProductPrices: Observable<ProductPrice[]>;
 
-  selectedProvider: Tag;
+  selectedProvider: string ;
   lockProvider: boolean =false;
+
   constructor(
     private router: Router,
     private activeRoute: ActivatedRoute
-    ) 
-  {}
+    )  {}
 
   ngOnInit() {
     this.paramsSub = this.activeRoute.params
       .map(params => params['orderNumber'])
       .subscribe(orderNumber => {
         this.orderNumber = orderNumber
-        
-        if (this.purchaseSub) {
-          this.purchaseSub.unsubscribe();
-        } 
-        this.purchaseSub = MeteorObservable.subscribe('purchase-orders', this.orderNumber).subscribe(() => {
-          this.purchase = Purchases.findOne({purchaseNumber: this.orderNumber});
-          this.productPurchases = ProductPurchases.find().zone();
-          this.productSizes = ProductSizes.find().zone();
-          this.stocks = Stocks.find({}).zone();
-          this.products = Products.find({}).zone();
-          this.productPrices = ProductPrices.find({}).zone();
-        }); 
- 
-      this.registerProductProvider();
+
+      this.registerPurchaseOrderProducts();
 
       if (this.storesSub) { 
         this.storesSub.unsubscribe();
@@ -176,23 +167,90 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     }
   }
 
-  registerProductProvider() {
+  findProductSizes(productPurchasesObs: Observable<ProductPurchase[]>): Observable<ProductSize[]> {
+    let ids: string[] = [];
+    productPurchasesObs.mergeMap(productPurchases => {
+      return productPurchases.map(productPurchase => {
+        return productPurchase.productSizeId})})
+      .subscribe(res => {
+        ids.push(res); 
+        console.log(res)
+      });
+      console.log("productSize ids:" ,ids);
+       
+      // ProductSizes.find(
+      //   {_id: { $in: ids }}
+      // ).subscribe((es)=>{
+      //   console.log(JSON.stringify(es))
+      // });
+    return ProductSizes.find({_id: { $in: ids }});
+  }
+
+  findProducts(productSizesObs: Observable<ProductSize[]>): Observable<Product[]> {
+    let ids: string[] = [];
+
+    productSizesObs.mergeMap(productSizes => {
+      return productSizes.map(productSize => {
+        return productSize.productId})})
+      .subscribe(res => {
+        ids.push(res); 
+        console.log("product ids:" ,ids);
+      });
+
+      // Products.find(
+      //   {_id: { $in: ids }}
+      // ).subscribe((es)=>{
+      //   console.log(JSON.stringify(es))
+      // });
+    return Products.find({_id: { $in: ids }});
+  } 
+
+  registerPurchaseOrderProducts() {
+    if (this.purchaseSub) {
+      this.purchaseSub.unsubscribe();
+    } 
+    this.lockProvider=false;
+
+    this.purchaseSub = MeteorObservable.subscribe('purchase-orders', this.orderNumber).subscribe(() => {
+      this.purchase = Purchases.findOne({purchaseNumber: this.orderNumber});
+      this.productPurchases = ProductPurchases.find({ purchaseId: this.purchase._id }).zone();
+      this.productSizes = this.findProductSizes(this.productPurchases);
+      this.products = this.findProducts(this.productSizes).zone();
+      this.stocks = Stocks.find({}).zone();
+      this.productPrices = ProductPrices.find({}).zone();
+
+      // console.log('purchase number', this.orderNumber);
+      // console.log('purchase provider', this.purchase.provider);
+      // console.log(this.selectedProvider);
+      if (this.purchase.provider && this.purchase.provider != 'none') {
+        this.selectedProvider = this.purchase.provider;
+        this.registerProviderProducts(this.selectedProvider);
+      }
+    });  
+  }
+
+  registerProviderProducts(provider) {
     if (this.productsProviderSub) {
         this.productsProviderSub.unsubscribe();
-        this.lockProvider=false;
     } 
-
-    if (this.selectedProvider) {
+    
+    if (provider && provider != 'none') {
       this.lockProvider=true;
-      this.productsProviderSub = MeteorObservable.subscribe('products-stock')
-        .subscribe(() => {
-          this.providerProducts = Products.find(
-            {provider: this.selectedProvider.description}).zone();
-          this.providerProductsSizes = ProductSizes.find({}).zone();
-          this.providerProductPrices = ProductPrices.find({}).zone();
-      }); 
+      this.selectedProvider = provider;
+    } else {
+      this.lockProvider=false;
+      this.selectedProvider = null;
     }
-  }
+
+    this.productsProviderSub = MeteorObservable.subscribe('products-stock')
+      .subscribe(() => {
+        this.providerProducts = Products.find(
+          {provider: this.selectedProvider}).zone();
+        this.providerProductsSizes = ProductSizes.find({}).zone();
+        this.providerProductPrices = ProductPrices.find({}).zone();
+    }); 
+
+  } 
   
   getOrderStatus(value){
     return this.orderStatus[value];
@@ -203,9 +261,9 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
      return (productPrice)?productPrice.lastCostPrice:0;
   }
 
-  getSizes(product) {
-    let productSize = ProductSizes.find({productId:product._id}, {fields: {size: 1}});
-    return (productSize)?productSize.fetch().map(x => {return x.size}):'';
+  getProductSizeIds(product) {
+    let productSize = ProductSizes.find({productId:product._id}, {fields: {}});
+    return (productSize)?productSize.fetch().map(x => {return x._id}):'';
   }
 
   getTotalStock(product: Product) {
@@ -219,180 +277,97 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
       return 0;
     }
   }
+
+  matchingProduct(productObs: Observable<Product[]>, source: Product): Product {
+    let result:Product;
+
+    productObs.subscribe((products)=>{
+      console.log('looking into : ' + JSON.stringify(products));
+      let match =  products.filter((product: Product) => product._id == source._id);
+      console.log('match found: ' + JSON.stringify(match));
+      if (match.length > 0){
+       result = match[0];
+      }
+    }) 
+    return result;
+  }
    
   isProductSelected(providerProduct: Product): boolean {
-    let product = Products.collection.find({_id: providerProduct._id});
-    return (product)?product.count() > 0 : false;
+    // console.log('check selected for: ' + JSON.stringify(providerProduct));
+   
+      this.products.subscribe((es)=>{
+         console.log(JSON.stringify(es))
+       });
+    let selected = this.matchingProduct(this.products, providerProduct);
+    console.log('selected = ' + JSON.stringify(selected));
+    return (selected != undefined);
   }
 
   getProductPurchaseTotal(product){ 
     // console.log(JSON.stringify(product));
   }
 
+  updatePurchaseProvider(provider){
+    console.log('purchase updated with provider', provider);
+    MeteorObservable.call('updatePurchaseOrder', 
+      this.purchase._id,
+      'loaded',
+      null,
+      moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+      provider,
+      null,
+      null,
+    ).subscribe(
+      () => {
+      Bert.alert('Se actualizo el producto', 'success', 'growl-top-right' ); 
+    }, (error) => {
+      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+    });
+
+    this.registerProviderProducts(provider);
+  }
   updateProductPurchase(product, value){
     // console.log(JSON.stringify(product));
     // console.log(JSON.stringify(value));
-  }
+  } 
 
   addToPurchaseList(product){
-    MeteorObservable.call('saveProductPurchase', 
+    // console.log(this.purchase._id, product._id, this.getSizes(product), this.getCost(product));
+    MeteorObservable.call('saveProductSizesPurchase', 
       this.purchase._id, 
       product._id,
-      this.getSizes(product),
+      this.getProductSizeIds(product),
       this.getCost(product),
       0
     ).subscribe(
       () => {
       Bert.alert('Se agrego el producto a la lista', 'success', 'growl-top-right' ); 
+    
+      // TODO: investigate why changes are not propagate automatically 
+      this.productSizes = this.findProductSizes(this.productPurchases).zone();
+      this.products = this.findProducts(this.productSizes).zone();
+    
     }, (error) => {
       Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
     });
   }
 
-  /** search the product by code and add it to the table  */
-  addProduct() {
-
-    // let currentBarCode = this.selectedProductSizeBarCode;
-    // this.selectedProductSizeBarCode = "";
-    // let requestedQuantity = +this.selectedProductAmount;
-    // // attach this check to input box 
-    // if (!currentBarCode || currentBarCode.length != 12) {
-    //   return;
-    // }
-
-    // console.log('entering add product');
-    // // get the productsize
-    // let productSize = ProductSizes.collection.find({
-    //   barCode: currentBarCode
-    // }).fetch()[0];
-
-    // console.log('getting stock for product size:' + productSize._id);
-    // // check stock existence for the productSize
-    // let stockFetch = Stocks.collection.find({
-    //   productSizeId: productSize._id, active:true, storeId: this.store._id
-    // }).fetch();
-
-    // console.log({
-    //   productSizeId: productSize._id, active:true, storeId: this.store._id
-    // });
-    // // checkeo de consistencia
-    // if (stockFetch.length > 1) {
-    //   Bert.alert('Entradas duplicadas para el stock activo del producto: ' 
-    //     + currentBarCode + ' en la sucursal ' + this.store.name, 
-    //     'warning', 'growl-top-right' ); 
-    //   return;
-    // }
-
-    // if (stockFetch.length == 0) {
-    //    Bert.alert( 'No se encuentra informacion del stock activo para producto: ' 
-    //     + currentBarCode + ' en la sucursal ' + this.store.name, 
-    //     'warning', 'growl-top-right' ); 
-    //    return;
-    // }
-
-    // let stock = stockFetch[0];
-    // console.log('stock object :' + JSON.stringify(stock));
-    // if (stock.quantity < requestedQuantity) {
-    //   Bert.alert(
-    //     'La cantidad ingresada: ' + requestedQuantity 
-    //     + 'es mayor a la disponible en stock: ' + stock.quantity 
-    //     + ' para el producto seleccionado: ' + currentBarCode, 
-    //     'warning', 'growl-top-right' ); 
-    //   return;
-
-    // } else {
-    //   let productSale = ProductSales.collection.find(
-    //     {productSizeId: productSize._id, saleId: this.sale._id}
-    //   ).fetch()[0];
-
-    //   console.log('updating stock:' + stock._id);
-    //   // update the stock, decrement the quantity field
-    //   Stocks.update(
-    //    {_id:stock._id},
-    //    {$set:{quantity:stock.quantity-requestedQuantity}}
-    //   );
-
-    //   // if found the update(increase the quantity)
-    //    console.log('current product sale:' + JSON.stringify(productSale));
-    //   if (productSale) {
-    //     console.log('updating current product sale:');
-    //     ProductSales.update(
-    //       {_id:productSale._id},
-    //       {$set:{quantity:productSale.quantity+requestedQuantity}}
-    //     );
-    //   } else {
-    //     // add a new one
-    //     console.log('updating product sales');
-    //     // update the produstsale, add the new productsize
-    //     ProductSales.insert({
-    //       productSizeId: productSize._id, 
-    //       saleId: this.sale._id,
-    //       quantity: requestedQuantity
-    //     });
-
-    //     Bert.alert('Producto agregado', 'success', 'growl-top-right'); 
-
-    //   }
-    // }
-  }
-   
-  // setQuantityTracker(index, quantity) {
-  //   this.quantityTracker[index] = quantity; 
-  //   return this.quantityTracker[index];
-  // }
-
-  // calculateSubTotal(index, productPrice) {
-  //   this.productSubTotals[index] = 
-  //     this.getPrice(productPrice) * this.quantityTracker[index];
-  //   return this.productSubTotals[index];
-  // }
-
-  // getTotal(){
-  //   var total = 0;
-  //   if (this.productSubTotals.length > 0) {
-  //     for (let subTotal of this.productSubTotals) {
-  //       total += subTotal;
-  //     }
-  //   }
-  //   return total;
-  // }
-
-  // getPrice(productPrice){
-  //   if (this.paymentForm == 1) {
-  //     return productPrice.priceCash;
-  //   } else {
-  //     return productPrice.priceCard;
-  //   }
-  // }
-
-  // checkLength(){
-  //   if (this.selectedProductSizeBarCode.length == 12){
-  //     this.addProduct();
-  //   }
-  // }
-  
-  // increaseAmount(index, stock) {
-  //   if (stock.quantity - this.quantityTracker[index] > 0) {
-  //     this.quantityTracker[index] +=1;
-  //   }
-  // }
-
-  // decreaseAmount(index) {
-  //   if (this.quantityTracker[index] > 1) {
-  //     this.quantityTracker[index] -=1;
-  //   }
-  // }
-
-  // removeFormList(product){
- 
-  // }
-
-  // cancelSale(){
+   removeFormPurchaseList(product){
+    // console.log(this.purchase._id, product._id, this.getSizes(product), this.getCost(product));
+    MeteorObservable.call('removeProductSizesPurchase', 
+      this.purchase._id, 
+      this.getProductSizeIds(product)
+    ).subscribe(
+      () => {
+      Bert.alert('Se quito el producto de la lista', 'success', 'growl-top-right' ); 
     
-  // }
+      // TODO: investigate why changes are not propagate automatically 
+      this.productSizes = this.findProductSizes(this.productPurchases).zone();
+      this.products = this.findProducts(this.productSizes).zone();
+    
+    }, (error) => {
+      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+    });
+  }
 
-  // notifyProductFound(barCode:string) {
-  //   this.selectedProductSizeBarCode = barCode;
-  //   this.addProduct();
-  // }
 }

@@ -110,7 +110,7 @@
               <select 
                 name="select-{{rowIndex}}" class="form-control" required  
                 [(ngModel)]="editedCategory.sectionId">
-                <option value="" disabled currentIndex hidden>Nombre de Seccion</option>
+                <option value=undefined disabled currentIndex hidden>Seccion</option>
                 <option *ngFor="let section of sections | async" 
                 [ngValue]="section._id">{{section.name}}</option>
               </select> 
@@ -162,7 +162,7 @@
                 type="text" 
                 name="name" 
                 class="form-control" 
-                placeholder="Nombre de Categoria" [formControl]="complexForm.controls['name']">
+                placeholder="Categoria" [formControl]="complexForm.controls['name']">
                 <!-- The hasError method will tell us if an error exists -->
                 <div *ngIf="complexForm.controls['name'].hasError('required') && complexForm.controls['name'].touched" 
                 class="alert alert-danger">
@@ -179,8 +179,8 @@
               name="sectionOptions" 
               class="form-control" 
                [formControl]="complexForm.controls['section']">
-                <option value="" disabled currentIndex hidden>
-                  Nombre de Seccion
+                <option value=undefined disabled currentIndex hidden>
+                  Seccion
                 </option>
                 <option *ngFor="let section of sections | async" [ngValue]="section">
                   {{section.name}}

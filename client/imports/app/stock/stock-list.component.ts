@@ -39,7 +39,7 @@ import { Section } from '../../../../both/models/section.model';
 import { Store } from '../../../../both/models/store.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
-import { isNumeric } from '../validators/validators';
+import { isNumeric } from '../../validators/validators';
 
 import template from "./stock-list.component.html";
 import style from "./stock-list.component.scss";
@@ -107,7 +107,7 @@ export class StockListComponent implements OnInit, OnDestroy {
 
   editedStock: any;
   editing: boolean = false;
-  selectedCategory: Category;
+  selectedCategory: Category ;
 
   productSizes: Observable<ProductSize[]>;
   stocks: Observable<Stock[]>;

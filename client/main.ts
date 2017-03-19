@@ -7,9 +7,6 @@ import { AppModule } from "./imports/app";
 
 //enableProdMode();
 
-// load meteor methods. e.g: to use latency compensation 
-import '../both/methods/parties.methods';
-
 Meteor.startup(() => {
    platformBrowserDynamic().bootstrapModule(AppModule);
 });

@@ -135,7 +135,7 @@
             <select multiple 
               name="select-{{rowIndex}}" class="form-control" required  
               [(ngModel)]="editedUser.storeIds">
-              <option value="" disabled currentIndex hidden>Sucursal</option>
+              <option value=undefined disabled currentIndex hidden>Sucursal</option>
               <option *ngFor="let store of stores | async" 
               (ngModel)="editedUser.storeIds"
               [ngValue]="store">
@@ -217,7 +217,7 @@
               name="options" 
               class="form-control" 
                [formControl]="complexForm.controls['store']">
-                <option value="" disabled currentIndex hidden>
+                <option value=undefined disabled currentIndex hidden>
                   Sucursales
                 </option>
                 <option *ngFor="let store of stores | async" [ngValue]="store">

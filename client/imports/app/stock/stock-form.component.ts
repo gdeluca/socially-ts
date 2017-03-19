@@ -19,7 +19,7 @@ import { Sections } from '../../../../both/collections/sections.collection';
 import { Category } from '../../../../both/models/category.model';
 import { Section } from '../../../../both/models/section.model';
 
-import { isNumeric } from '../validators/validators';
+import { isNumeric } from '../../validators/validators';
 
 import template from "./stock-form.component.html";
 import style from "./stock-form.component.scss";

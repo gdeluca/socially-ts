@@ -26,9 +26,8 @@ import { UserStores } from '../../../../both/collections/user-stores.collection'
 import { Stores } from '../../../../both/collections/stores.collection';
 
 import { Dictionary } from '../../../../both/models/dictionary';
-import { Container } from '../../../../both/models/container';
 
-import { emailValidator, matchingPasswords } from '../validators/validators';
+import { emailValidator, matchingPasswords } from '../../validators/validators';
 
 import { UserStore } from '../../../../both/models/user-store.model';
 import { Store } from '../../../../both/models/store.model';

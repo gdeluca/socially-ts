@@ -8,7 +8,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
 
-import { emailValidator, matchingPasswords } from '../validators/validators';
+import { emailValidator, matchingPasswords } from '../../validators/validators';
 
 import { Store } from '../../../../both/models/store.model';
 import { Stores } from '../../../../both/collections/stores.collection';
