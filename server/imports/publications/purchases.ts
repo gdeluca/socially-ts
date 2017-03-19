@@ -44,10 +44,10 @@ Meteor.publishComposite('purchases', function(options: SearchOptions, filters: a
   }
 });
 
-Meteor.publishComposite('purchase-details', function(purchaseNumber: string, options: SearchOptions) {
+Meteor.publishComposite('purchase-orders', function(purchaseNumber: string) {
   return {
     find: function() {
-      return Purchases.collection.find({ purchaseNumber: purchaseNumber }, options);
+      return Purchases.collection.find({ purchaseNumber: purchaseNumber });
     },
     children: [
       {

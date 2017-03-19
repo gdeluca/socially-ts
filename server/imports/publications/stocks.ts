@@ -72,3 +72,39 @@ Meteor.publishComposite('productsSize-stock', function(options: SearchOptions, f
     ]
   }
 });
+
+Meteor.publishComposite('products-stock', function() {
+
+  return {
+    find: function() { 
+      Counts.publish(this, 'numberOfProductStock', ProductSizes.collection.find(), { noReady: true });
+      return ProductSizes.collection.find();
+    },
+    children: [
+      {
+        find: function(productSize) {
+          return Stocks.collection.find({ productSizeId: productSize._id });
+        }
+      }, 
+      {
+        find: function(productSize) {
+          return Products.collection.find({ _id: productSize.productId });
+        },
+        children: [
+          {
+            find: function(product) {
+              return ProductPrices.collection.find({ productId: product._id });
+            },
+            children: [
+              {
+                find: function(stock) {
+                  return Stores.collection.find({ _id: stock.storeId });
+                }
+              } 
+            ]
+          }
+        ]
+      }
+    ]
+  }
+});

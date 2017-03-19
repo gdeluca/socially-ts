@@ -39,29 +39,55 @@ import { Accounts } from 'meteor/accounts-base';
 export function loadData() {
   if (Products.find().cursor.count() === 0) {
 
+
+    // // counters setup
+    // MeteorObservable.call('getNextId', "balance").subscribe((id) => {
+    //   console.log(id);
+    //   Counters.insert({
+    //     _id: "01", 
+    //     lastCode: id,
+    //     type:"balance"
+    //   });
+    // });
+    
+    // MeteorObservable.call('getNextId', "purchase").subscribe((id) => {
+    //   Counters.insert({
+    //     _id: "02",
+    //     lastCode:  id,
+    //     type:"purchase"
+    //   });
+    // });
+
+    // MeteorObservable.call('getNextId', "purchase").subscribe((id) => {
+    //   Counters.insert({
+    //     _id: "03", 
+    //     lastCode:  id,
+    //     type:"sale"
+    //   });
+    // });
     // counters setup
     Counters.insert({
       _id: "01", 
-      lastCode: "000001",
+      lastCode: 10,
       type:"balance"
     });
     
     Counters.insert({
       _id: "02", 
-      lastCode: "000001",
+      lastCode:  10,
       type:"purchase"
     });
 
     Counters.insert({
       _id: "03", 
-      lastCode: "000001",
+      lastCode: 10,
       type:"sale"
     });
 
     // tags setup
     Tags.insert({
       code:"00",
-      type:"name",
+      type:"name", 
       description:"active"
     });
     Tags.insert({

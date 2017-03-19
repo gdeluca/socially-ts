@@ -23,16 +23,11 @@ Meteor.publishComposite('productById', function(productId: string) {
   }
 });
 
-Meteor.publishComposite('productByName', function(productName) {
+Meteor.publishComposite('provider-products', function(provider) {
 return {
     find: function() {
-        return Products.collection.find({ name: productName })
-    }, 
-    children: [{
-        find: function(product) {
-            return Categories.collection.find({_id: product.categoryId});
-        }
-    }]
+        return Products.collection.find({ provider: provider })
+    }
   }
 });
  

@@ -18,10 +18,3 @@ Products.allow({
   update: loggedIn,
   remove: loggedIn
 });
-
-Products.collection["helpers"]({ 
-  category() {
-    return Categories.collection.find({ _id: this.categoryId });
-  }
-  
-});

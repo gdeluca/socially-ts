@@ -85,7 +85,7 @@ export class StockListComponent implements OnInit, OnDestroy {
   ];
 
   collectionCount: number = 0;
-  PAGESIZE: number = 19;  
+  PAGESIZE: number = 10;  
   
   paginatedSub: Subscription;
   optionsSub: Subscription;
@@ -151,7 +151,6 @@ export class StockListComponent implements OnInit, OnDestroy {
           this.stores = Stores.find({}).zone();
           this.products = Products.find({}).zone();
           this.productPrices = ProductPrices.find({}).zone();
-          console.log('into');
       });
 
     });

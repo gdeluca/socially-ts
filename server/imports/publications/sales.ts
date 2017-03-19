@@ -23,7 +23,7 @@ import { Stores } from '../../../both/collections/stores.collection';
 import { Users } from '../../../both/collections/users.collection';
 
 
-Meteor.publishComposite('sale-details', function(saleNumber: string, options: SearchOptions) {
+Meteor.publishComposite('sale-orders', function(saleNumber: string, options: SearchOptions) {
   return {
     find: function() {
       return Sales.collection.find({ saleNumber: saleNumber }, options);

@@ -1,4 +1,4 @@
-import { SaleDetailsComponent } from './sale-details.component';
+import { SaleOrderComponent } from './sale-order.component';
 import { SalesComponent } from './sales.component';
 import { ProductSearchComponent } from './product-search.component';
 
@@ -6,6 +6,6 @@ import { ProductSearchComponent } from './product-search.component';
  
 export const SALES_DECLARATIONS = [
   SalesComponent,
-  SaleDetailsComponent,
+  SaleOrderComponent,
   ProductSearchComponent,
 ];

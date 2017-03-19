@@ -3,12 +3,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 // import { Injectable, Inject, NgModule, Input, Output, EventEmitter  } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 // import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute, CanActivate } from '@angular/router';
+import {  Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
  
-import { Bert } from 'meteor/themeteorchef:bert';
+import { Bert } from 'meteor/themeteorchef:bert'; 
 
 // reactiveX
 import { Observable } from 'rxjs/Observable';
@@ -43,7 +43,7 @@ import { Stores } from '../../../../both/collections/stores.collection';
 // model 
 // import { Balance } from '../../../../both/models/balance.model';
 // import { Category } from '../../../../both/models/category.model';
-// import { Counter } from '../../../../both/models/counter.model';
+import { Counter } from '../../../../both/models/counter.model';
 // import { UserStore } from '../../../../both/models/user-store.model';
 import { ProductPurchase } from '../../../../both/models/product-purchase.model';
 // import { ProductSale } from '../../../../both/models/product-sale.model';
@@ -59,18 +59,19 @@ import { Store } from '../../../../both/models/store.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
 import { isNumeric } from '../validators/validators';
+import * as moment from 'moment';
+import 'moment/locale/es';
 
-
-import template from "./orders.component.html";
-import style from "./orders.component.scss";
+import template from "./purchases.component.html";
+import style from "./purchases.component.scss";
 
 @Component({
-  selector: "orders",
+  selector: "purchases",
   template,
   styles: [ style ]
 })
 @InjectUser('currentUser')
-export class OrdersComponent {
+export class PurchasesComponent {
   
   // pagination related
   pageSize: Subject<number> = new Subject<number>();
@@ -135,6 +136,7 @@ export class OrdersComponent {
 
   constructor(
     private paginationService: PaginationService,
+    private router:Router,
   ){
 
   }
@@ -224,5 +226,29 @@ export class OrdersComponent {
         Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
       });  
     }
+  }
+
+
+  addOrder(){
+     MeteorObservable.call('getNextId', 'purchase').subscribe(
+       (counter) => {
+         this.createOrder(counter);
+         this.router.navigate(['purchases/'+counter]); 
+       }, (error) => {
+         Bert.alert('Error al crear el pedido: ' +  error, 'danger', 'growl-top-right' ); 
+      });  
+  }
+
+  createOrder(number){
+    MeteorObservable.call('createPurchaseOrder',
+      number, 'loaded', 
+      moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+      moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+      "undefined", 0,0).subscribe(
+      (response) => {
+
+      }, (error) => {
+         Bert.alert('Error al crear el pedido: ' +  error, 'danger', 'growl-top-right' ); 
+      });  
   }
 }

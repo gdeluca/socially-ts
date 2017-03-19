@@ -62,8 +62,8 @@ import { User } from '../../../../both/models/user.model';
 import { Dictionary } from '../../../../both/models/dictionary';
 import { isNumeric } from '../validators/validators';
 
-import template from "./sale-details.component.html";
-import style from "./sale-details.component.scss";
+import template from "./sale-order.component.html";
+import style from "./sale-order.component.scss";
 
 import { ProductSearchComponent } from './product-search.component';
 
@@ -73,9 +73,9 @@ import { ProductSearchComponent } from './product-search.component';
   styles: [ style ] 
 })
 @InjectUser('currentUser')
-export class SaleDetailsComponent implements OnInit, OnDestroy {
+export class SaleOrderComponent implements OnInit, OnDestroy {
  
-  saleStatus = salesStatusMapping; // from Sales;
+  orderStatus = salesStatusMapping; // from Sales;
   salePayment = salePaymentMapping;
   workShift = workShiftMapping;
    
@@ -97,7 +97,7 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
   paymentForm: number = 1;
   quantityTracker: number[] = [];
   productSubTotals: number[] = [];
-  saleNumber: number;
+  orderNumber: number;
   total: number = 0;
 
   selectedProductSizeBarCode: string;
@@ -129,18 +129,18 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
 
     // console.log('init sale details subscribers');
     this.paramsSub = this.activeRoute.params
-      .map(params => params['saleNumber'])
-      .subscribe(saleNumber => {
-        this.saleNumber = saleNumber
+      .map(params => params['orderNumber'])
+      .subscribe(orderNumber => {
+        this.orderNumber = orderNumber
         
         if (this.saleSub) {
           this.saleSub.unsubscribe();
         }
-        this.saleSub = MeteorObservable.subscribe('sale-details', this.saleNumber).subscribe(() => {
+        this.saleSub = MeteorObservable.subscribe('sale-orders', this.orderNumber).subscribe(() => {
           // MeteorObservable.autorun().subscribe(() => {
             // console.log('getting subscriber data');
 
-            this.sale = Sales.findOne({saleNumber:this.saleNumber});
+            this.sale = Sales.findOne({saleNumber:this.orderNumber});
             this.productSales = ProductSales.find({}).zone();
             this.productSizes = ProductSizes.find({}).zone();
             this.productPrices = ProductPrices.find({}).zone();
@@ -172,7 +172,7 @@ export class SaleDetailsComponent implements OnInit, OnDestroy {
   }
   
   getOrderStatus(value){
-    return this.saleStatus[value];
+    return this.orderStatus[value];
   }
 
   /** search the product by code and add it to the table  */

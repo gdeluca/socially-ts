@@ -1,0 +1,195 @@
+
+  
+  <!-- sumario de compra -->
+  <div class="row">
+    <h4 class="col-12 text-center">Detalle del Pedido</h4>
+    <div  class="form-inline">
+
+      <div class="ml-4 mt-4">
+        <a>Nº de Compra: {{purchase?.purchaseNumber}}</a>
+      </div>
+
+      <div class="ml-4 mt-4">
+        <select 
+          [disabled]="lockProvider" 
+          name="select-provider" class="form-control" required  
+          [(ngModel)]="selectedProvider">
+          <option value="" disabled currentIndex hidden>Proveedor</option>
+          <option *ngFor="let provider of allProviders | async" 
+          [ngValue]="provider">{{provider.description}}</option>
+        </select> 
+      </div>
+
+      <div class=" ml-4 mt-4">
+        <button 
+            type="button" 
+            class="form-control btn btn-primary ml-2" 
+            (click)="registerProductProvider()"  
+            [disabled]="lockProvider">
+          Seleccionar
+        </button>
+      </div>
+
+      <div class=" ml-4 mt-4">
+        <button 
+            type="button" 
+            class="form-control btn btn-primary ml-2" 
+            (click)="selectedProvider=null;registerProductProvider();"  
+            [disabled]="!lockProvider">
+          Descartar cambios
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- selection table -->
+  <div class="row">
+    <h4 class="col-12 text-center">En existencia</h4>
+    <table class="table table-bordered table-hover ">
+      <!-- headers -->
+      <thead class="thead-default">
+        <th class="text-center" 
+          style="vertical-align:middle;" 
+          *ngFor="let header of productsHeaders; let colIndex = index; ">
+          <div class="form-horizontal" >
+            {{header.key}}
+            <button 
+              [hidden]="idx !== colIndex || direction !== 'up'" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+              <span class="fa fa-chevron-up" aria-hidden="true"></span>
+            </button>
+            <button 
+                [hidden]="idx !== colIndex || direction !== 'down'" 
+                type="button" 
+                class="btn btn-default"  
+                (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
+                <span class="fa fa-chevron-down" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="direction && idx === colIndex " 
+              type="button" 
+              class="btn btn-default"   
+              (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+              <span class="fa fa-sort" aria-hidden="true"></span>
+            </button>
+          </div>
+        </th>
+        <th class="text-center" style="vertical-align:middle;"  >
+          #
+        </th> 
+      </thead>
+      
+      <tbody>
+        <!-- provider data -->
+        <!-- 'Codigo', 'Descripcion', 'Color', 'Marca', 'Modelo', 'Precio Costo'  -->
+        <tr *ngFor="let providerProduct of providerProducts | async;">
+          <ng-container *ngIf="!isProductSelected(providerProduct) ">
+
+            <td class="text-center">
+              <a [routerLink]="['/products', providerProduct.code]">{{providerProduct.code}}</a>
+            </td>
+
+            <td class="text-center">
+              <a>{{providerProduct.name}}</a>
+            </td>
+
+            <td class="text-center">
+              <a>{{providerProduct.color}}</a>
+            </td>
+
+            <td class="text-center">
+              <a>{{providerProduct.brand}}</a>
+            </td>
+
+            <td class="text-center">
+              <a>{{providerProduct.model}}</a>
+            </td>
+
+            <td class="text-center">
+              <a>{{getCost(providerProduct)}}</a>
+            </td> 
+            
+            <td class="text-center">
+              <button 
+                type="button" 
+                class="btn btn-default form-control"
+                (click)="addToPurchaseList(providerProduct)"
+                >
+              Agregar
+              </button>
+            </td>
+          </ng-container> 
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- selected table -->
+  <div class="row">
+    <h4 class="col-12 text-center">Pedido</h4>
+    <table class="table table-bordered table-hover ">
+      <!-- headers -->
+      <thead class="thead-default">
+        <th class="text-center" 
+          style="vertical-align:middle;" 
+          *ngFor="let header of orderHeaders; let colIndex = index; ">
+          <div class="form-horizontal" >
+            {{header.key}}
+          </div>
+        </th>
+        <th class="text-center" style="vertical-align:middle;"  >
+          Cantidad por talle
+        </th> 
+      </thead>
+      <tbody>
+        <!-- selected data -->
+        <!-- 'Codigo', 'Descripcion', 'Color', 'Marca', 'Modelo', 'Precio Costo', 'En stock'  -->
+        <tr *ngFor="let product of products | async; let rowIndex = index; ">
+          <td class="text-center">
+            <a [routerLink]="['/products', product.code]">{{product.code}}</a>
+          </td>
+
+          <td class="text-center">
+            <a>{{product.name}}</a>
+          </td>
+
+          <td class="text-center">
+            <a>{{product.color}}</a>
+          </td>
+
+          <td class="text-center">
+            <a>{{product.brand}}</a>
+          </td>
+
+          <td class="text-center">
+            <a>{{product.model}}</a>
+          </td>
+
+          <td class="text-center">
+            <a>{{getCost(product)}}</a>
+          </td> 
+          
+          <td class="text-center">
+            <a>{{getTotalStock(product)}}</a>                      
+          </td>
+         <!--  <td class="text-center">
+            <a>{{getProductPurchaseTotal(product)}}</a>                      
+          </td> -->
+
+          <td class="text-center">
+            <input 
+              type="text" 
+              name="quantity-{{rowIndex}}" 
+              class="form-control" 
+              [value]="quantity" 
+              (input)="updateProductPurchase(product, $event.target.value)">
+          </td>
+
+          
+        </tr>
+      </tbody>
+    </table>
+  </div>

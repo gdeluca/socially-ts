@@ -19,19 +19,18 @@ import { routes, ROUTES_PROVIDERS } from './app.routes';
 
 
 // project definitions, module inport order matters
+import { AUTH_DECLARATIONS } from "./auth";
 import { BALANCES_DECLARATIONS } from './balances';
-import { STOCKS_DECLARATIONS } from './stock';
-import { SALES_DECLARATIONS } from './sales';
-import { ORDERS_DECLARATIONS } from './orders';
-import { PARTIES_DECLARATIONS } from './parties';
-import { PRODUCTS_DECLARATIONS } from './products';
 import { CATEGORIES_DECLARATIONS } from './categories';
+import { NAVBAR_DECLARATIONS } from './navbar';
+import { PURCHASES_DECLARATIONS } from './purchases';
+import { PRODUCTS_DECLARATIONS } from './products';
+import { SALES_DECLARATIONS } from './sales';
 import { SECTIONS_DECLARATIONS } from './sections';
+import { SHARED_DECLARATIONS } from './shared';
+import { STOCKS_DECLARATIONS } from './stock';
 import { STORES_DECLARATIONS } from './stores';
 import { USERS_DECLARATIONS } from './users';
-import { SHARED_DECLARATIONS } from './shared';
-import { NAVBAR_DECLARATIONS } from './navbar';
-import { AUTH_DECLARATIONS } from "./auth/index";
 
 import { FocusDirective } from '../directives/focus.directive';
 
@@ -46,8 +45,7 @@ import { FocusDirective } from '../directives/focus.directive';
     ...BALANCES_DECLARATIONS,
     ...STOCKS_DECLARATIONS,
     ...SALES_DECLARATIONS,
-    ...ORDERS_DECLARATIONS,
-    ...PARTIES_DECLARATIONS,
+    ...PURCHASES_DECLARATIONS,
     ...PRODUCTS_DECLARATIONS,
     ...CATEGORIES_DECLARATIONS,
     ...SECTIONS_DECLARATIONS,
