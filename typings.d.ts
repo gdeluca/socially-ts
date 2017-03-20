@@ -46,25 +46,6 @@ declare module 'meteor/tmeasday:publish-counts' {
   export const Counts: CountsObject;
 }
 
-declare module "meteor/hwillson:stub-collections" {
-  import { Mongo } from "meteor/mongo";
-
-  interface IStubCollections {
-    stub(collection: Mongo.Collection);
-    restore();
-  }
-
-  const StubCollections: IStubCollections;
-
-  export default StubCollections;
-}
-
-declare module "chai-spies" {
-  const chaiSpies: (chai: any, utils: any) => void;
-
-  export = chaiSpies;
-}
-
 interface SpyCalledWith extends Chai.Assertion {
   (...args: any[]): void;
   exactly(...args: any[]): void;

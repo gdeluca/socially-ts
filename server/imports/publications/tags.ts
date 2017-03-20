@@ -38,13 +38,6 @@ Meteor.publish('tags.color', function(options: SearchOptions = {limit:0,skip:0},
   return Tags.find(selector, options);
 });
 
-Meteor.publish('tags.category', function(options: SearchOptions = {limit:0,skip:0}, filters: any = {}) {
-  let filterSelector = getSelectorFilter(['category'], filters);
-  let selector = { $and: [ {type: 'category'},{code: { $ne: '00' }},filterSelector ] };
-  Counts.publish(this, 'numberOfcategory', Tags.collection.find(selector), { noReady: true });
-  return Tags.find(selector, options);
-});
-
 Meteor.publish('tags.size', function(options: SearchOptions = {limit:0,skip:0}, filters: any = {}) {
   let filterSelector = getSelectorFilter(['size'], filters);
   let selector = { $and: [ {type: 'size'},{code: { $ne: '00' }},filterSelector ] };

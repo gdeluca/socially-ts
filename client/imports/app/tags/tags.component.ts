@@ -45,7 +45,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 
 
   collectionCount: number = 0;
-  PAGESIZE: number = 2; 
+  PAGESIZE: number = 20; 
   
   paginatedSub: Subscription;
   optionsSub: Subscription;
@@ -59,13 +59,12 @@ export class TagsComponent implements OnInit, OnDestroy {
   tags: Observable<Tag[]>;
   tagNames: Observable<Tag[]>;
 
-  mapping = tagsMapping; // imported frm Tags;
+  mapping = tagsMapping; // imported from Tags;
 
   filtersParams: any = {
     'description':  ''
   };
 
-  // name <-> sortfield, touple
   headers: Dictionary[] = [
     {'key': 'Codigo', 'value': 'code'},
     {'key': 'Descripcion', 'value': 'name'},
@@ -110,42 +109,67 @@ export class TagsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.optionsSub = Observable.combineLatest(
-      this.pageSize,
-      this.curPage,
-      this.sortDirection,
-      this.sortField,
-      this.filters
-    ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
-      const options: SearchOptions = {
-        limit: pageSize as number,
-        skip: ((curPage as number) - 1) * (pageSize as number),
-        sort: {[sortField as string]: sortDirection as number }
-      };
-
-      this.paginationService.setCurrentPage(this.paginationService.defaultId(), curPage as number);           
-        this.populateTable(this.tagSelected, options, filters);
-      
-
-    });
-
-      if (this.tagsSub) {
-        this.tagsSub.unsubscribe();
-      }
-      this.tagsSub = MeteorObservable.subscribe('tags')
-      .subscribe(() => {
-        this.tagNames = Tags.find({code: '00', description:"ACTIVE"}).zone();
-        this.populateTagsData();
-        this.tagSelected = ['section'];
-      })
+    if (this.tagsSub) {
+      this.tagsSub.unsubscribe();
+    }
+    this.tagsSub = MeteorObservable.subscribe('tags')
+    .subscribe(() => {
+      this.tagNames = Tags.find({code: '00', description:"ACTIVE"}).zone();
+      this.populateTagsNames();
+      this.tagSelected = ['section'];
+    })
     
+    this.subscribeToData('section');
+  }
+  
+  ngOnDestroy() {
+    this.paginatedSub.unsubscribe();
+    this.autorunSub.unsubscribe();
+    this.optionsSub.unsubscribe(); 
+    this.tagsSub.unsubscribe();
+  }
 
-    this.autorunSub = MeteorObservable.autorun().subscribe(() => {
-        this.collectionCount = 4 //Counts.get('numberOf'+this.tagSelected[0]);
-        console.log('numberOf'+this.tagSelected[0], this.collectionCount);
-        this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
-      
-    });
+  subscribeToData(type) { 
+    if (type) {
+      if (this.optionsSub) {
+        this.optionsSub.unsubscribe();
+      }
+      this.optionsSub = Observable.combineLatest(
+        this.pageSize,
+        this.curPage,
+        this.sortDirection,
+        this.sortField,
+        this.filters
+      ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
+        const options: SearchOptions = {
+          limit: pageSize as number,
+          skip: ((curPage as number) - 1) * (pageSize as number),
+          sort: {[sortField as string]: sortDirection as number }
+        };
+
+        this.paginationService.register({
+          id: this.paginationService.defaultId(),
+          itemsPerPage: this.PAGESIZE,
+          currentPage: 1,
+          totalItems: this.collectionCount,
+        });
+
+        this.paginationService.setCurrentPage(
+          this.paginationService.defaultId(), 
+          curPage as number);           
+        
+        if (this.paginatedSub) {
+          this.paginatedSub.unsubscribe();
+        }
+        this.paginatedSub = MeteorObservable.subscribe('tags.'+type, options, filters)
+        .subscribe(() => {
+          this.tags = Tags.find({type: type, code: { $ne: '00' }}).zone();
+          this.collectionCount = Counts.get('numberOf'+type);
+          // console.log('numberOf'+type, this.collectionCount);
+          this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+        })  
+      })
+    }
 
     this.pageSize.next(this.PAGESIZE);
     this.curPage.next(1);
@@ -153,29 +177,18 @@ export class TagsComponent implements OnInit, OnDestroy {
     this.sortDirection.next(1);
     this.filters.next('');
 
-    this.paginationService.register({
-      id: this.paginationService.defaultId(),
-      itemsPerPage: this.PAGESIZE,
-      currentPage: 1,
-      totalItems: this.collectionCount,
+    this.autorunSub = MeteorObservable.autorun().subscribe(() => {
+      this.collectionCount = Counts.get('numberOf'+type);
+      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
     });
 
-  }
-  
-  ngOnDestroy() {
-    if (this.paginatedSub) {
-      this.paginatedSub.unsubscribe();
-    }
-    this.optionsSub.unsubscribe(); 
-    this.autorunSub.unsubscribe();
-    this.tagsSub.unsubscribe();
   } 
 
   getMappedTagType(value){
     return this.mapping[value];
   }
 
-  populateTagsData() {
+  populateTagsNames() {
     let result: IMultiSelectOption[] = [];
     this.tagNames.flatMap(function(tags) { return tags })
     .distinct()
@@ -237,22 +250,5 @@ export class TagsComponent implements OnInit, OnDestroy {
     this.sortDirection.next(parseInt(direction));
     this.sortField.next(fieldName);
   }
-
-  populateTable(name, options, filters){
-    if (name.length > 0) {
-      if (this.paginatedSub) {
-        this.paginatedSub.unsubscribe();
-      }
-      
-      this.paginatedSub = MeteorObservable.subscribe('tags.'+name[0])
-      .subscribe(() => {
-        this.tags = Tags.find({type: name[0], code: { $ne: '00' }}).zone();
-        this.collectionCount = Counts.get('numberOf'+this.tagSelected[0]);
-        console.log('numberOf'+this.tagSelected[0], this.collectionCount);
-        this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
-      })  
-    }
-  }
-  
 
 }
