@@ -2,11 +2,11 @@ import { CollectionObject } from './collection-object.model';
 
 export interface Sale extends CollectionObject {
   saleNumber: string;
-  saleState: string; //started submitted reserved canceled
-  payment: string; // cash, card, cuenta
+  saleState: string; //STARTED // SUBMITTED // RESERVED // CANCELED
+  payment: string;   // CASH // CARD // ACCOUNT
   lastUpdate: string;
   saleDate: string;
-  workShift: string; // morning afternoon
+  workShift: string; // MORNING AFTERNOON
   userStoreId: string;
   balanceId: string;
   discount?: number;

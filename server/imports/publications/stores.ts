@@ -15,7 +15,7 @@ import { SearchOptions } from '../../../both/search/search-options';
 Meteor.publishComposite('stores', function() {
   return {
     find: function() {
-      return Stores.collection.find({});
+      return Stores.collection.find( {}, {sort: {name: 1}} );
     }
   }
 });

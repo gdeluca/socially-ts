@@ -41,157 +41,159 @@ export function loadData() {
 
 
     // // counters setup
-    // MeteorObservable.call('getNextId', "balance").subscribe((id) => {
+    // MeteorObservable.call('getNextId', "BALANCE").subscribe((id) => {
     //   console.log(id);
     //   Counters.insert({
     //     _id: "01", 
     //     lastCode: id,
-    //     type:"balance"
+    //     type:"BALANCE"
     //   });
     // });
     
-    // MeteorObservable.call('getNextId', "purchase").subscribe((id) => {
+    // MeteorObservable.call('getNextId', "PURCHASE").subscribe((id) => {
     //   Counters.insert({
     //     _id: "02",
     //     lastCode:  id,
-    //     type:"purchase"
+    //     type:"PURCHASE"
     //   });
     // });
 
-    // MeteorObservable.call('getNextId', "purchase").subscribe((id) => {
+    // MeteorObservable.call('getNextId', "PURCHASE").subscribe((id) => {
     //   Counters.insert({
     //     _id: "03", 
     //     lastCode:  id,
-    //     type:"sale"
+    //     type:"SALE"
     //   });
     // });
     // counters setup
     Counters.insert({
       _id: "01", 
       lastCode: 10,
-      type:"balance"
+      type:"BALANCE"
     });
     
     Counters.insert({
       _id: "02", 
       lastCode:  10,
-      type:"purchase"
+      type:"PURCHASE"
     });
 
     Counters.insert({
       _id: "03", 
       lastCode: 10,
-      type:"sale"
+      type:"SALE"
     });
 
     // tags setup
     Tags.insert({
       code:"00",
-      type:"name", 
-      description:"active"
-    });
-    Tags.insert({
-      code:"01",
-      type:"name",
-      description:"Bermuda GYM"
+      type:"NAME", 
+      description:"ACTIVE"
     });
     Tags.insert({
       code:"00",
-      type:"model",
-      description:"active"
-    });
-    Tags.insert({
-      code:"01",
-      type:"model",
-      description:"Universal"
+      type:"MODEL",
+      description:"ACTIVE"
     });
     Tags.insert({
       code:"00",
-      type:"brand",
-      description:"active"
-    });
-    Tags.insert({
-      code:"01",
-      type:"brand",
-      description:"Animal"
+      type:"BRAND",
+      description:"ACTIVE"
     });
     Tags.insert({
       code:"00",
-      type:"color",
-      description:"active"
-    });
-    Tags.insert({
-      code:"01",
-      type:"color",
-      description:"Azul"
+      type:"COLOR",
+      description:"ACTIVE"
     });
     Tags.insert({
       code:"00",
-      type:"section",
-      description:"active"
-    });
-    Tags.insert({
-      code:"01",
-      type:"section",
-      description:"Dama"
-    });
-    Tags.insert({
-      code:"01",
-      type:"section",
-      description:"Caballero"
-    });
-    Tags.insert({
-      code:"01",
-      type:"section",
-      description:"Niño"
+      type:"SECTION",
+      description:"ACTIVE"
     });
     Tags.insert({
       code:"00",
-      type:"provider",
-      description:"active"
+      type:"PROVIDER",
+      description:"ACTIVE"
+    });
+
+    // tags: some test data
+    Tags.insert({
+      code:"01",
+      type:"NAME",
+      description:"BERMUDA GYM"
     });
     Tags.insert({
       code:"01",
-      type:"provider",
-      description:"Andres"
+      type:"MODEL",
+      description:"UNIVERSAL"
+    });
+    Tags.insert({
+      code:"01",
+      type:"BRAND",
+      description:"ANIMAL"
+    });
+    Tags.insert({
+      code:"01",
+      type:"COLOR",
+      description:"AZUL"
+    });
+    Tags.insert({
+      code:"01",
+      type:"SECTION",
+      description:"DAMA"
+    });
+    Tags.insert({
+      code:"01",
+      type:"SECTION",
+      description:"CABALLERO"
+    });
+    Tags.insert({
+      code:"01",
+      type:"SECTION",
+      description:"NIÑO"
+    });
+    Tags.insert({
+      code:"01",
+      type:"PROVIDER",
+      description:"ANDRES"
     });
     Tags.insert({
       code:"02",
-      type:"provider",
-      description:"Juan"
+      type:"PROVIDER",
+      description:"JUAN"
     });
 
     // 1 users
     var users = [
       {
-        username: 'guille',
-        password: 'guille',
-        email: 'guille@test.com',
+        username: 'GUIIIE',
+        password: 'GUILLE',
+        email: 'GUILLE@TEST.COM',
         profile: {
-          firstName: 'Guille',
-          lastName: 'test'
+          firstName: 'GUILLE',
+          lastName: 'TEST'
         },
         isDefault: true,
         roles: ['admin']
       },
       {
-        username: 'marce',
-        password: 'marce',
-        email: 'marce@test.com',
+        username: 'MARCE',
+        password: 'MARCE',
+        email: 'MARCE@TEST.COM',
         profile: {
-          firstName: 'Marce',
-          lastName: 'test'
+          firstName: 'MARCE',
+          lastName: 'TEST'
         },
         isDefault: true,
         roles: ['admin']
       },
       {
-        username: 'b',
-        password: 'b',
-        email: 'b@b.com',
+        username: 'B',
+        password: 'B',
+        email: 'B@B.COM',
         profile: {
-          firstName: 'b',
-          lastName: 'b'
+          firstName: 'B',
+          lastName: 'B'
         },
         isDefault: true,
         roles: ['admin']
@@ -230,98 +232,99 @@ export function loadData() {
     // 1 stores
     Stores.insert({
       _id: "01",
-      name: 'Sucursal1',
-      address: '25 de mayo 1690'
+      name: 'SUCURSAL 1',
+      address: '25 DE MAYO 1690'
     });
     Stores.insert({
       _id: "02",
-      name: 'Sucursal2',
-      address: 'colon 1460'
+      name: 'SUCURSAL 2',
+      address: 'COLON 1460'
     });
     Stores.insert({
       _id: "03",
-      name: 'Sucursal3',
-      address: 'colon 160'
+      name: 'SUCURSAL 3',
+      address: 'COLON 160'
     });
 
     // 1: purchases
     Purchases.insert({
        _id: "01",
       purchaseNumber: "000001",
-      purchaseState: "loaded",
+      purchaseState: "LOADED",
       purchaseDate: "2016-07-10T11:23:01Z",
       lastUpdate: "2016-07-10T11:23:01Z",
-      provider:"Juan",
+      provider:"JUAN",
       paymentAmount:0
     });
     Purchases.insert({
        _id: "02",
       purchaseNumber: "000002",
-      purchaseState: "received",
+      purchaseState: "RECEIVED",
       purchaseDate: "2016-01-11T11:23:01Z",
       lastUpdate: "2016-07-10T11:23:01Z",
-      provider:"Andres",
+      provider:"ANDRES",
       paymentAmount:1000
     });
     Purchases.insert({
        _id: "03",
       purchaseNumber: "000003",
-      purchaseState: "requested",
+      purchaseState: "REQUESTED",
       purchaseDate: "2017-07-12T11:23:01Z",
       lastUpdate: "2016-07-10T11:23:01Z",
-      provider:"Jose",
+      provider:"JOSE",
       paymentAmount:100
     });
 
     // 2 categories
     Categories.insert({
       _id: "01",
-      name: 'Ropa Interior',
+      name: 'ROPA INTERIOR',
       sectionId: '01'
     });
     Categories.insert({
       _id: "02",
-      name: 'Jeans',
+      name: 'JEANSS',
       sectionId: '01'
     });
     Categories.insert({
       _id: "03",
-      name: 'Panalones Friza',
+      name: 'ESCOLARES',
       sectionId: '02'
     });
     Categories.insert({
       _id: "04",
-      name: 'Calza',
+      name: 'CALZAS',
       sectionId: '01'
     });
     Categories.insert({
       _id: "05",
-      name: 'Pollera',
+      name: 'POLLERAS',
       sectionId: '01'
     });
     Categories.insert({
       _id: "06",
-      name: 'Remera',
+      name: 'REMERAS',
       sectionId: '01'
     });
     Categories.insert({
       _id: "10",
-      name: 'Musculosa',
+      name: 'MUSCULOSAS',
       sectionId: '01'
     });
     Categories.insert({
       _id: "11",
-      name: 'Buzo',
+      name: 'BUSOS',
       sectionId: '02'
     });
   
     // 2 balance open or close
+    // OPEN // CLOSE // EXTRACTION // DEPOSIT
     Balances.insert({
       _id: "01",
       balanceNumber: "000001",
       storeId: "01",
       cashExistence: 500, 
-      operation: "close", // open // close // extraction // deposit
+      operation: "CLOSE", 
       actionDate: "2017-01-10T19:23:01Z"
     });
     Balances.insert({
@@ -329,7 +332,7 @@ export function loadData() {
       balanceNumber: "000002",
       storeId: "01",
       cashExistence: 500,
-      operation: "open", // open // close // extraction // deposit
+      operation: "OPEN",
       actionDate: "2017-01-12T9:11:01Z"
     });
     Balances.insert({
@@ -337,7 +340,7 @@ export function loadData() {
       balanceNumber: "000003",
       storeId: "01",
       cashExistence: 1500,
-      operation: "open", // open // close // extraction // deposit
+      operation: "OPEM", 
       actionDate: "2017-01-13T9:11:01Z"
     });
 
@@ -371,42 +374,42 @@ export function loadData() {
     // 3: products
     Products.insert({
       _id: "01",
-      name: "Clasico",
+      name: "CLASICO",
       code: "1010101010",
-      color: "Negro",
-      brand: "Levis",
+      color: "NEGRO",
+      brand: "LEVIS",
       model: "2016",
-      provider: "Andres",
+      provider: "ANDRES",
       categoryId: "02"
     });
     Products.insert({
       _id: "02",
-      name: "Vortex Recto",
+      name: "VORTEX",
       code: "1222133010",
-      color: "Azul",
-      brand: "Cuerda",
-      model: "2017",
-      provider: "Juan",
+      color: "AZUL",
+      brand: "CUERDA",
+      model: "VIX",
+      provider: "JUAN",
       categoryId: "02"
     });
     Products.insert({
       _id: "03",
-      name: "Chomba Dama",
+      name: "CHOMBA",
       code: "1010111011",
-      color: "Negro",
-      brand: "Evase",
-      model: "2017",
-      provider: "Juan",
+      color: "NEGRO",
+      brand: "EVASE",
+      model: "TADY",
+      provider: "JUAN",
       categoryId: "02"
     });
     Products.insert({
       _id: "04",
-      name: "Remere Manga Larga",
+      name: "REMERA MANGA",
       code: "1013111011",
-      color: "Acuarela",
-      brand: "Jaspe",
-      model: "2017",
-      provider: "Andres",
+      color: "ACUARELA",
+      brand: "JASPE",
+      model: "22R",
+      provider: "ANDRES",
       categoryId: "06"
     });
    
@@ -416,9 +419,9 @@ export function loadData() {
     Sales.insert({
       _id: "01",
       saleNumber: "000001",
-      saleState: "started",
-      payment: "contado",
-      workShift: "morning",
+      saleState: "STARTED",
+      payment: "CASH",
+      workShift: "MORNING",
       saleDate: "2017-01-12T9:09:01Z",
       lastUpdate: "2017-01-12T9:11:01Z",
       userStoreId: "01", 
@@ -427,9 +430,9 @@ export function loadData() {
     Sales.insert({
       _id: "02",
       saleNumber: "000002",
-      saleState: "started",
-      payment: "contado",
-      workShift: "morning",
+      saleState: "STARTED",
+      payment: "CASH",
+      workShift: "MORNING",
       saleDate: "2017-01-12T9:07:01Z",
       lastUpdate: "2017-01-12T9:12:01Z",
       userStoreId: "02", 
@@ -614,7 +617,7 @@ export function loadData() {
       storeId: "01",
       cashExistence: 500,
       cashFlow: -100,
-      operation: "extraction", // open // close // extraction // deposit
+      operation: "EXTRACTION", // OPEN // CLOSE // EXTRACTION // DEPOSIT
       actionDate: "2017-01-13T9:32:01Z"
     }); 
     Balances.insert({
@@ -623,14 +626,14 @@ export function loadData() {
       storeId: "01",
       cashExistence: 400,
       cashFlow: 50,
-      operation: "deposit", // open // close // extraction // deposit
+      operation: "DEPOSIT", // OPEN // CLOSE // EXTRACTION // DEPOSIT
       actionDate: "2017-01-14T10:13:01Z"
     });
 
     //started submitted reserved
     Sales.update({_id:"01"},{
       $set: { 
-        saleState: "started",
+        saleState: "STARTED",
         subtotal: 930,
         taxes: 195.3,
         total: 1125.3,
@@ -656,7 +659,7 @@ export function loadData() {
       balanceNumber: "000006",
       storeId: "01",
       cashExistence: 1125.3,
-      operation: "close", // open // close // extraction // deposit
+      operation: "CLOSE", // OPEN // CLOSE // EXTRACTION // DEPOSIT
       actionDate: "2017-02-12T19:32:01Z"
     });
   }

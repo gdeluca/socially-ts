@@ -49,21 +49,23 @@ export class LoginComponent implements OnInit, OnDestroy {
       if (this.userSub){
         this.userSub.unsubscribe();
       }
+      email = email.toUpperCase();
       this.userSub = MeteorObservable.subscribe('stores.useremail', email).subscribe(() => {
-        console.log(email);
+        // console.log(email);
         var user = Users.collection.find({'emails.address': email}).fetch();
-          
-        console.log(user[0]._id);
-        let userStores = UserStores.find({userId: user[0]._id}).zone();
-        userStores.subscribe((userstores) => {
-          console.log(userstores);
-          let ids = userstores.map(function(userStore) {return userStore.storeId});
-          console.log(ids);
-          this.stores = Stores.find({_id: {$in: ids}}).zone();
-          this.stores.subscribe((stores) => {
-            console.log(stores);
+        if (user) {
+          // console.log(user[0]._id);
+          let userStores = UserStores.find({userId: user[0]._id}).zone();
+          userStores.subscribe((userstores) => {
+            // console.log(userstores);
+            let ids = userstores.map(function(userStore) {return userStore.storeId});
+            // console.log(ids);
+            this.stores = Stores.find({_id: {$in: ids}}, {sort: {name: 1}}).zone();
+            this.stores.subscribe((stores) => {
+              // console.log(stores);
+            });
           });
-        });
+        }
       })
     }
   }

@@ -311,7 +311,7 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     console.log('purchase updated with provider', provider);
     MeteorObservable.call('updatePurchaseOrder', 
       this.purchase._id,
-      'loaded',
+      'LOADED',
       null,
       moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
       provider,

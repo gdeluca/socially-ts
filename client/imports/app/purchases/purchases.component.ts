@@ -108,9 +108,8 @@ export class PurchasesComponent {
   autorunSub: Subscription;
 
   currentUser: Meteor.User;
-
   purchaseNumber: string;
-  purchaseState: string; //'loaded','requested','received','canceled', 'deleted'
+  purchaseState: string; // LOADED // REQUESTED // RECEIVED //CANCELLED
   purchaseDate: string;
   lastUpdate: string;
   total?:number;
@@ -243,7 +242,7 @@ export class PurchasesComponent {
 
   createOrder(number){
     MeteorObservable.call('createPurchaseOrder',
-      number, 'loaded', 
+      number, 'LOADED', 
       moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
       moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
       "", 0,0).subscribe(

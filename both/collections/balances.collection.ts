@@ -5,13 +5,13 @@ import { Balance } from '../models/balance.model';
 
 export const Balances = new MongoObservable.Collection<Balance>('balances');
 
-export const balanceOps = ['open','close','extraction','deposit'];
+export const balanceOps = ['OPEN','CLOSE','EXTRACTION','DEPOSIT'];
 
 export const balanceOpsMapping = {
-    'open': 'Abierto', 
-    'close': 'Cerrado', 
-    'extraction': 'Extraccion', 
-    'deposit': 'Deposito'
+    'OPEN': 'Abierto', 
+    'CLOSE': 'Cerrado', 
+    'EXTRACTION': 'Extraccion', 
+    'DEPOSIT': 'Deposito'
   };
 
 function loggedIn() {

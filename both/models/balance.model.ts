@@ -6,7 +6,7 @@ export interface Balance extends CollectionObject {
   balanceNumber: string;
   cashExistence: number;
   cashFlow?: number;
-  operation: string; // open // close // extraction // deposit
+  operation: string; // OPEN // CLOSE // EXTRACTION // DEPOSIT
   actionDate: string;
   saleIds?: string[];
   storeId: string;

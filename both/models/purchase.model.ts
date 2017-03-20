@@ -2,7 +2,7 @@ import { CollectionObject } from './collection-object.model';
 
 export interface Purchase extends CollectionObject {
   purchaseNumber: string;
-  purchaseState: string; //'loaded','requested','received','canceled', 'deleted'
+  purchaseState: string; // LOADED // REQUESTED // RECEIVED //CANCELLED
   purchaseDate: string;
   lastUpdate: string;
   total?:number;
