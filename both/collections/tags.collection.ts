@@ -4,7 +4,16 @@ import { Meteor } from 'meteor/meteor';
 import { Tag } from '../models/tag.model';
 
 export const Tags = new MongoObservable.Collection<Tag>('tags');
-export const purchaseStatus = ['LOADED','REQUESTED','RECEIVED','CANCELED'];
+export const definedTags = ['name','model','color','brand','provider','section'];
+
+export const tagsMapping = {
+    'name': 'Nombre', 
+    'model': 'Modelo', 
+    'color': 'Color',
+    'brand': 'Marca',
+    'provider':'Proveedor',
+    'section': 'Seccion'
+  };
 
 function loggedIn() {
   return !!Meteor.user();

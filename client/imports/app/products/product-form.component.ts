@@ -18,7 +18,7 @@ import { Categories } from '../../../../both/collections/categories.collection';
 import { Products } from '../../../../both/collections/products.collection';
 import { lettersSizes, uniqueSize } from '../../../../both/collections/product-sizes.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
-import { Tags } from '../../../../both/collections/tags.collection';
+import { Tags, definedTags } from '../../../../both/collections/tags.collection';
 
 
 import { ProductPrice } from '../../../../both/models/product-price.model';

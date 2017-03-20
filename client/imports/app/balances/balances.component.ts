@@ -327,9 +327,6 @@ export class BalancesComponent {
     this.daysSelected = [+moment().format('D')];
     this.daysSelected = Array.from(
         new Array(this.daysInMonthCount(month, year)),(val,index)=>index+1);
-
-
-
   }
 
   populateMonthsData(month, year) {
@@ -340,7 +337,6 @@ export class BalancesComponent {
     this.monthsData = result;
 
     this.populateDays(month, year);
-
   }
 
   daysInMonthCount(month, year) {

@@ -25,7 +25,7 @@ import { NAVBAR_DECLARATIONS } from './navbar';
 import { PURCHASES_DECLARATIONS } from './purchases';
 import { PRODUCTS_DECLARATIONS } from './products';
 import { SALES_DECLARATIONS } from './sales';
-import { SECTIONS_DECLARATIONS } from './sections';
+import { TAGS_DECLARATIONS } from './tags';
 import { PIPES_DECLARATIONS } from '../pipes';
 import { STOCKS_DECLARATIONS } from './stock';
 import { STORES_DECLARATIONS } from './stores';
@@ -46,7 +46,7 @@ import { FocusDirective } from '../directives/focus.directive';
     ...PURCHASES_DECLARATIONS,
     ...PRODUCTS_DECLARATIONS,
     ...CATEGORIES_DECLARATIONS,
-    ...SECTIONS_DECLARATIONS,
+    ...TAGS_DECLARATIONS,
     ...STORES_DECLARATIONS,
     ...USERS_DECLARATIONS,
     ...PIPES_DECLARATIONS,

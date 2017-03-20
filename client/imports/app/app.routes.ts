@@ -9,7 +9,7 @@ import { PurchaseOrderComponent } from './purchases/purchase-order.component';
 import { ProductsComponent } from './products/products.component';
 import { SalesComponent } from './sales/sales.component';
 import { SaleOrderComponent } from './sales/sale-order.component'; 
-import { SectionsComponent } from './sections/sections.component';
+import { TagsComponent } from './tags/tags.component';
 import { SignupComponent } from './auth/signup.component';
 import { StockListComponent } from './stock/stock-list.component';
 import { StoresComponent } from './stores/stores.component';
@@ -26,7 +26,7 @@ export const routes: Route[] = [
   { path: 'products', component: ProductsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'sales', component: SalesComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'sales/:orderNumber', component: SaleOrderComponent , canActivate: ['canActivateForLoggedIn'] },
-  { path: 'sections', component: SectionsComponent, canActivate: ['canActivateForLoggedIn'] },
+  { path: 'tags', component: TagsComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'stock', component: StockListComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'signup', component: SignupComponent },
   { path: 'stores', component: StoresComponent, canActivate: ['canActivateForLoggedIn'] },

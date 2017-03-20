@@ -87,79 +87,79 @@ export function loadData() {
     // tags setup
     Tags.insert({
       code:"00",
-      type:"NAME", 
+      type:"name", 
       description:"ACTIVE"
     });
     Tags.insert({
       code:"00",
-      type:"MODEL",
+      type:"model",
       description:"ACTIVE"
     });
     Tags.insert({
       code:"00",
-      type:"BRAND",
+      type:"brand",
       description:"ACTIVE"
     });
     Tags.insert({
       code:"00",
-      type:"COLOR",
+      type:"color",
       description:"ACTIVE"
     });
     Tags.insert({
       code:"00",
-      type:"SECTION",
+      type:"section",
       description:"ACTIVE"
     });
     Tags.insert({
       code:"00",
-      type:"PROVIDER",
+      type:"provider",
       description:"ACTIVE"
     });
 
     // tags: some test data
     Tags.insert({
       code:"01",
-      type:"NAME",
+      type:"name",
       description:"BERMUDA GYM"
     });
     Tags.insert({
       code:"01",
-      type:"MODEL",
+      type:"model",
       description:"UNIVERSAL"
     });
     Tags.insert({
       code:"01",
-      type:"BRAND",
+      type:"brand",
       description:"ANIMAL"
     });
     Tags.insert({
       code:"01",
-      type:"COLOR",
+      type:"color",
       description:"AZUL"
     });
     Tags.insert({
       code:"01",
-      type:"SECTION",
+      type:"section",
       description:"DAMA"
     });
     Tags.insert({
-      code:"01",
-      type:"SECTION",
+      code:"02",
+      type:"section",
       description:"CABALLERO"
     });
     Tags.insert({
-      code:"01",
-      type:"SECTION",
+      code:"03",
+      type:"section",
       description:"NIÑO"
     });
     Tags.insert({
       code:"01",
-      type:"PROVIDER",
+      type:"provider",
       description:"ANDRES"
     });
     Tags.insert({
       code:"02",
-      type:"PROVIDER",
+      type:"provider",
       description:"JUAN"
     });
 
