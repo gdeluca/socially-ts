@@ -40,9 +40,7 @@ export class StoresComponent implements OnInit, OnDestroy {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
 
-  filterField: Subject<string> = new Subject<string>();
-  filterValue: Subject<string> = new Subject<string>();
-
+  filters: Subject<any> = new Subject<any>();
 
   collectionCount: number = 0;
   PAGESIZE: number = 6; 
@@ -58,6 +56,11 @@ export class StoresComponent implements OnInit, OnDestroy {
   editing: boolean = false;
   selected: any;
   stores: Observable<Store[]>; 
+
+  filtersParams: any = {
+    'name':  '',
+    'address':  '' 
+  };
 
   // name <-> sortfield, touple
   headers: Dictionary[] = [
@@ -82,9 +85,9 @@ export class StoresComponent implements OnInit, OnDestroy {
       this.curPage,
       this.sortDirection,
       this.sortField,
-      this.filterField,
-      this.filterValue
-    ).subscribe(([pageSize, curPage, sortDirection, sortField, filterField, filterValue]) => {
+      this.filters
+
+    ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
       const options: SearchOptions = {
         limit: pageSize as number,
         skip: ((curPage as number) - 1) * (pageSize as number),
@@ -96,9 +99,9 @@ export class StoresComponent implements OnInit, OnDestroy {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('stores.with.counter', options, filterField, filterValue)
+      this.paginatedSub = MeteorObservable.subscribe('stores-paginated', options, filters)
         .subscribe(() => {
-          this.stores = Stores.find({}).zone();
+          this.stores = Stores.find().zone();
       });
       
     });
@@ -107,8 +110,7 @@ export class StoresComponent implements OnInit, OnDestroy {
     this.curPage.next(1);
     this.sortField.next('name');
     this.sortDirection.next(1);
-    this.filterField.next('name');
-    this.filterValue.next('');
+    this.filters.next('');
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfStores');
@@ -148,28 +150,36 @@ export class StoresComponent implements OnInit, OnDestroy {
       alert('Ingrese al sistema para poder guardar');
       return;
     }
-
+    let values = this.complexForm.value;
     if (this.complexForm.valid) {
-      Stores.insert({
-        name: this.complexForm.value.name,
-        address: this.complexForm.value.address
+      MeteorObservable.call('addStore', values.name, values.address).subscribe(() => {
+        alert('Se agrego la sucursal.');
+      }, (error) => {
+        alert(` Codigo de error:  ${error}`);
       });
+
       this.complexForm.reset();
     }
-    console.log(value);
+    // console.log(value);
   }
 
   copy(original: any){
     return Object.assign({}, original)
   }
 
-  search(field: string, value: string): void {
-    console.log(field);
-    console.log(value);
+   search(field: string, value: string): void {
+    if (value == 'undefined')  {
+      value = '';
+    }
+    if (this.filtersParams[field] === value) {
+      return;
+    }
+    this.filtersParams[field] = value
+
     this.curPage.next(1);
-    this.filterField.next(field);
-    this.filterValue.next(value); 
+    this.filters.next(this.filtersParams);
   }
+
   
   changeSortOrder(direction: string, fieldName: string): void {
     console.log(direction);

@@ -67,7 +67,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     {'key': 'Marca', 'value':'brand'},
     {'key': 'Proveedor', 'value':'provider'},
     {'key': 'Modelo', 'value':'model'},
-    {'key': 'Categoria', 'value':'categoryId'},
+    {'key': 'Categoria', 'value':'categoryName:name'},
   ];
 
   collectionCount: number = 0;
@@ -172,6 +172,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   search(field: string, value: string): void {
     console.log(value);
+    console.log(field);
+
+    if (value == 'undefined')  {
+      value = '';
+    }
+
     // no value change on blur
     if (this.filtersParams[field] === value) {
       return;

@@ -15,7 +15,7 @@ import { IMultiSelectOption, IMultiSelectTexts, IMultiSelectSettings } from '../
 
 // model 
 import { Categories } from '../../../../both/collections/categories.collection';
-import { Products } from '../../../../both/collections/products.collection';
+import { Products, productTagNames } from '../../../../both/collections/products.collection';
 import { lettersSizes, uniqueSize } from '../../../../both/collections/product-sizes.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
 import { Tags, definedTags } from '../../../../both/collections/tags.collection';
@@ -46,7 +46,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   tagsSubs:Subscription[] = []; 
   tags: Observable<Tag[]>[] = [];
-  tagNames = ['name','model','color','brand','provider'];
+  productTagDef = productTagNames;
   sources:string[] = [];
 
   currentUser: Meteor.User;
@@ -148,7 +148,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         this.allStores = Stores.find({}).zone();
     });
 
-    for (let name of this.tagNames) {
+    for (let name of this.productTagDef) {
       if (this.tagsSubs[name]) {
         this.tagsSubs[name].unsubscribe();
       } 
@@ -167,7 +167,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.categoriesSub.unsubscribe();
     
-    for (let name of this.tagNames) {
+    for (let name of this.productTagDef) {
       if (this.tagsSubs[name]) {
         this.tagsSubs[name].unsubscribe();
       }
@@ -307,7 +307,4 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     });  
   }
 
-
-  getData(type){
-  }
 }

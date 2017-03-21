@@ -67,7 +67,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 
   headers: Dictionary[] = [
     {'key': 'Codigo', 'value': 'code'},
-    {'key': 'Descripcion', 'value': 'name'},
+    {'key': 'Descripcion', 'value': 'description'},
   ];
 
   complexForm : FormGroup;
@@ -236,7 +236,11 @@ export class TagsComponent implements OnInit, OnDestroy {
   }
 
   search(field: string, value: string): void {
-    console.log(value);
+    
+    if (value == 'undefined')  {
+      value = '';
+    }
+
     if (this.filtersParams[field] === value) {
       return;
     }

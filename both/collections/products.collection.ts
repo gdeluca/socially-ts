@@ -8,6 +8,7 @@ import { Categories } from '../collections/categories.collection';
 
 
 export const Products = new MongoObservable.Collection<Product>('products');
+export const productTagNames = ['name','model','color','brand','provider'];
 
 function loggedIn() {
   return !!Meteor.user();

@@ -187,6 +187,10 @@ export class CategoriesComponent implements OnInit, OnDestroy {
     if (this.filters[field] === value) {
       return;
     }
+
+    if (value == 'undefined')  {
+      value = '';
+    }
     this.filters[field] = value;
     
     this.curPage.next(1);

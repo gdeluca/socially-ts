@@ -199,6 +199,10 @@ export class PurchasesComponent {
 
   search(field: string, value: string): void {
     console.log(value);
+    
+    if (value == 'undefined')  {
+      value = '';
+    }
     // no value change on blur
     if (this.filtersParams[field] === value) {
       return;

@@ -5,9 +5,8 @@ export function getSelectorFilter(filterFields:string[], filters: any) {
   let result: any = {};
 
   for (let filter of filterFields) {
-
+    
     if (filterFields.indexOf(filter) > -1 && filters[filter]) {
-
       if (typeof filters[filter] === 'string') {
         selectors.push({ [filter]: { $regex: '.*' + (filters[filter] || '') + '.*', $options: 'i' }});
       }
@@ -16,7 +15,7 @@ export function getSelectorFilter(filterFields:string[], filters: any) {
       }
     } 
   }
- 
+
   // workarround: join doesn't work 
   if (selectors.length > 0) {
     if (selectors.length == 1) {

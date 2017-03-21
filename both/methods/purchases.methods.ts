@@ -24,45 +24,38 @@ Meteor.methods({
   )},
   
   updatePurchaseOrder: function (
-  purchaseId?: string, 
-  purchaseState?: string, 
-  purchaseDate?: string,
-  lastUpdate?: string,
-  provider?:string,
-  paymentAmount?:number,
-  total?:number
+    purchaseId?: string, 
+    purchaseState?: string, 
+    purchaseDate?: string,
+    lastUpdate?: string,
+    provider?:string,
+    paymentAmount?:number,
+    total?:number
   ) {
     check(purchaseId, String);
-    // check(purchaseState, String);
-    // check(purchaseDate, String);
-    // check(lastUpdate, String);
-    // check(provider, String);
-    // check(paymentAmount, Number);
-    // check(total, Number);
-
-    let query = {};
-    if(purchaseState) {
-      query['purchaseState'] = purchaseState;
-    }
-    if(purchaseState) {
-      query['purchaseState'] = purchaseState;
-    }
-    if(purchaseDate) {
-      query['purchaseDate'] = purchaseDate;
-    }
-    if(lastUpdate) {
-      query['lastUpdate'] = lastUpdate;
-    }
-    if(provider) {
-      query['provider'] = provider;
-    }
-    if(paymentAmount) {
-      query['paymentAmount'] = paymentAmount;
-    }
-    if(total) {
-      query['total'] = total;
-    }
     if (Meteor.isServer)  {
+      let query = {};
+      if(purchaseState !== undefined) {
+        query['purchaseState'] = purchaseState;
+      }
+      if(purchaseState !== undefined) {
+        query['purchaseState'] = purchaseState;
+      }
+      if(purchaseDate !== undefined) {
+        query['purchaseDate'] = purchaseDate;
+      }
+      if(lastUpdate !== undefined) {
+        query['lastUpdate'] = lastUpdate;
+      }
+      if(provider !== undefined) {
+        query['provider'] = provider;
+      }
+      if(paymentAmount !== undefined) {
+        query['paymentAmount'] = paymentAmount;
+      }
+      if(total !== undefined) {
+        query['total'] = total;
+      }
       Purchases.update(purchaseId, {
         $set: query
       });

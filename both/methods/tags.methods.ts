@@ -34,8 +34,8 @@ Meteor.methods({
     check(description, String);
     let tag = Tags.findOne({_id: id});
 
-    updateDependantEntities(tag.type, tag.description, description.toUpperCase());
     if (Meteor.isServer) {
+      updateDependantEntities(tag.type, tag.description, description.toUpperCase());
       Tags.update(id, {
         $set: { 
           description: description.toUpperCase()

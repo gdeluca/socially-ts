@@ -10,6 +10,7 @@ import { Users } from '../../../both/collections/users.collection';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../both/search/search-options';
+import { getSelectorFilter } from './commons';
 
 
 Meteor.publishComposite('stores', function() {
@@ -57,17 +58,16 @@ Meteor.publishComposite('stores.useremail', function(email: string) {
   }
 });
 
-Meteor.publishComposite('stores.with.counter', function(options: SearchOptions, filterField?: string, filterValue?: string) {
-  let query = {}
+const storesFilters = ['name','address'];
+
+Meteor.publishComposite('stores-paginated', function(options: SearchOptions, filters: any) {
   
-  if (filterField && filterValue) {
-    const searchRegEx = { '$regex': '.*' + ([filterValue] || '') + '.*', '$options': 'i' };
-    query = { [filterField]: searchRegEx }
-  }
+  let storesSelector = getSelectorFilter(storesFilters, filters);
+
   return {
     find: function() {
-    Counts.publish(this, 'numberOfStores',Stores.collection.find(query , options), { noReady: true });
-    return Stores.collection.find(query, options);
+      Counts.publish(this, 'numberOfStores',Stores.collection.find(), { noReady: true });
+      return Stores.collection.find(storesSelector, options);
     }
   }
 });

@@ -1,12 +1,55 @@
 import {Meteor} from 'meteor/meteor';
 import {check} from 'meteor/check';
+
+// import { Balances, balanceOpsMapping, balanceOps } from '../collections/balances.collection';
+import { ProductPurchases } from '../collections/product-purchases.collection';
 import { ProductSizes, getMappingSize } from '../collections/product-sizes.collection';
 import { ProductPrices } from '../collections/product-prices.collection';
-import { Products } from '../collections/products.collection';
-import { Stores } from '../collections/stores.collection';
-import { Stocks } from '../collections/stocks.collection';
-import { Store } from '../models/store.model';
 
+// import { Purchases } from '../collections/purchases.collection';
+import { Products } from '../collections/products.collection';
+import { Stocks } from '../collections/stocks.collection';
+import { Stores } from '../collections/stores.collection';
+// import { Categories } from '../collections/categories.collection';
+// import { Counters } from '../collections/counters.collection';
+// import { UserStores } from '../collections/user-stores.collection';
+// import { ProductSales } from '../collections/product-sales.collection';
+// import { Sales } from '../collections/sales.collection';
+// import { Sections } from '../collections/sections.collection';
+// import { Tags } from '../collections/tags.collection';
+// import { Users } from '../collections/users.collection';
+
+// model 
+import { ProductPurchase } from '../models/product-purchase.model';
+import { ProductPrice } from '../models/product-price.model';
+import { ProductSize } from '../models/product-size.model';
+import { Product } from '../models/product.model';
+import { Stock } from '../models/stock.model';
+import { Store } from '../models/store.model';
+// import { Balance } from '../models/balance.model';
+// import { Category } from '../models/category.model';
+// import { Purchase } from '../models/purchase.model';
+// import { Counter } from '../models/counter.model';
+// import { UserStore } from '../models/user-store.model';
+// import { ProductSale } from '../models/product-sale.model';
+// import { Sale } from '../models/sale.model';
+// import { Section } from '../models/section.model';
+// import { Tag } from '../models/tag.model';
+// import { User } from '../models/user.model';
+
+function addStock(
+  productSizeId: string, 
+  storeId: string, 
+  quantity: number,
+  active:boolean = true
+) {
+  return Stocks.collection.insert({
+    productSizeId: productSizeId,
+    storeId: storeId,
+    quantity: quantity,
+    active: active
+  });
+}
 
 Meteor.methods({
 
@@ -16,15 +59,46 @@ Meteor.methods({
     check(quantity, Number);
     return productSizeIds.map((productSizeId) => {
       return storeIds.map((storeId) => {
-        return Stocks.collection.insert({
-          quantity: quantity,
-          storeId: storeId,
-          active: true,
-          productSizeId: productSizeId
-        });
-      })
-    });
+        return addStock(productSizeId, storeId, quantity);  
+      });
+    })
   },
+
+  addStoreToStockAndPrice: function(storeId: string) {
+    ProductSizes.find()
+    .flatMap(function(productSizes) { return productSizes })
+    .distinct()
+    .subscribe((productSize) => {
+      return addStock(productSize._id, storeId, 0);  
+    });
+
+   Products.find()
+    .flatMap(function(products) { return products })
+    .distinct()
+    .subscribe((product) => {
+      // return the prices from any store 
+      let price = ProductPrices.findOne({productId: product._id});
+      if (price) {
+        Meteor.call("addProductPrice",
+          price.lastCostPrice,
+          price.priceCash,
+          price.priceCard,
+          product._id,
+          storeId,
+          price.rateCash,
+          price.rateCard
+        );
+      } else {
+        Meteor.call("addProductPrice",
+          0,
+          product._id,
+          storeId,
+          0,
+          0
+        );
+      }
+    });
+  }, 
 
   saveStock: function (values:any) {
     check(values.size, String);

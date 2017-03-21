@@ -102,8 +102,9 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
   paramsSub: Subscription;
   storesSub: Subscription;
   purchaseSub: Subscription;
-  providersSub: Subscription;
+  providersNamesSub: Subscription;
   productsProviderSub: Subscription;
+  autorunSub: Subscription;
 
   currentUser: User;
 
@@ -140,6 +141,14 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
 
       this.registerPurchaseOrderProducts();
 
+
+      this.autorunSub = MeteorObservable.autorun().subscribe(() => {
+         // TODO: investigate why changes are not propagate automatically 
+        this.productSizes = this.findProductSizes(this.productPurchases).zone();
+        this.products = this.findProducts(this.productSizes).zone();
+       });
+
+
       if (this.storesSub) { 
         this.storesSub.unsubscribe();
       }
@@ -147,10 +156,10 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
         this.allStores = Stores.find({}).zone();
       });
 
-      if (this.providersSub) { 
-        this.providersSub.unsubscribe();
+      if (this.providersNamesSub) { 
+        this.providersNamesSub.unsubscribe();
       }
-      this.providersSub = MeteorObservable.subscribe('tags.provider').subscribe(() => {
+      this.providersNamesSub = MeteorObservable.subscribe('tags.provider').subscribe(() => {
         this.allProviders = Tags.find({type: 'provider'}).zone();
       });
 
@@ -161,10 +170,8 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
     this.paramsSub.unsubscribe();
     this.purchaseSub.unsubscribe();
     this.storesSub.unsubscribe();
-    this.providersSub.unsubscribe();
-    if (this.productsProviderSub) {
-        this.productsProviderSub.unsubscribe();
-    }
+    this.providersNamesSub.unsubscribe();
+    this.autorunSub.unsubscribe();
   }
 
   findProductSizes(productPurchasesObs: Observable<ProductPurchase[]>): Observable<ProductSize[]> {
@@ -344,12 +351,12 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
       Bert.alert('Se agrego el producto a la lista', 'success', 'growl-top-right' ); 
     
       // TODO: investigate why changes are not propagate automatically 
-      this.productSizes = this.findProductSizes(this.productPurchases).zone();
-      this.products = this.findProducts(this.productSizes).zone();
+      // this.productSizes = this.findProductSizes(this.productPurchases).zone();
+      // this.products = this.findProducts(this.productSizes).zone();
     
     }, (error) => {
       Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
-    });
+    }); 
   }
 
    removeFormPurchaseList(product){
@@ -362,8 +369,8 @@ export class PurchaseOrderComponent implements OnInit, OnDestroy {
       Bert.alert('Se quito el producto de la lista', 'success', 'growl-top-right' ); 
     
       // TODO: investigate why changes are not propagate automatically 
-      this.productSizes = this.findProductSizes(this.productPurchases).zone();
-      this.products = this.findProducts(this.productSizes).zone();
+      // this.productSizes = this.findProductSizes(this.productPurchases).zone();
+      // this.products = this.findProducts(this.productSizes).zone();
     
     }, (error) => {
       Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 

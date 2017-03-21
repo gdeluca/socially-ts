@@ -253,8 +253,12 @@ export class StockListComponent implements OnInit, OnDestroy {
 
   search(field: string, value: string): void {
     console.log(value);
+
+    if (value == 'undefined')  {
+      value = '';
+    }
     // no value change on blur
-    if (this.filtersParams[field] === value) {
+    if (this.filtersParams[field] == value) {
       return;
     }
     this.filtersParams[field] = value

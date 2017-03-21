@@ -46,6 +46,7 @@ return {
 
 Meteor.publishComposite('products-with-categories', function(options: SearchOptions, filters: any) {
   let productSelector = getSelectorFilter(productFields, filters);
+  let categorySelector = getSelectorFilter(['categoryName:name'], filters);
 
   return {
     find: function() {
@@ -55,14 +56,14 @@ Meteor.publishComposite('products-with-categories', function(options: SearchOpti
     children: [
       {
         find: function(product) {
-          return Categories.collection.find( { _id: product.categoryId } );
+          return Categories.collection.find( { $and: [{ _id: product._id }, categorySelector ] })
         }
       }
     ]
   }
 });
 
-const productFields = ['code','name','color','provider','categoryId'];
+const productFields = ['code','name','brand','color','provider','model'];
 const productSizeFields = ['barCode','size'];
 
 

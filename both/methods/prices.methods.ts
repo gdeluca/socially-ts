@@ -20,6 +20,58 @@ Meteor.methods({
       productPrice['storeId'] = storeId;
       return ProductPrices.collection.insert(productPrice);
     })
-  }
+  },
+
+  addProductPrice: function (
+    lastCostPrice: number,
+    priceCash: number,
+    priceCard: number,
+    productId:string,
+    storeId: string,
+    rateCash?: number,
+    rateCard?: number
+  ) {
+    check(lastCostPrice, Number);
+    check(priceCash, Number);
+    check(priceCard, Number);
+    check(productId, String);
+    check(storeId, String);
+    if (Meteor.isServer)  {
+      // let query = {};
+      // if(lastCostPrice !== undefined) {
+      //   query['lastCostPrice'] = lastCostPrice;
+      // }
+      // if(priceCash !== undefined) {
+      //   query['priceCash'] = priceCash;
+      // }
+      // if(priceCard !== undefined) {
+      //   query['priceCard'] = priceCard;
+      // }
+      // if(productId !== undefined) {
+      //   query['productId'] = productId;
+      // }
+      // if(storeId !== undefined){
+      //   query['storeId'] = storeId;
+      // }
+      // if(rateCash !== undefined) {
+      //   query['rateCash'] = rateCash;
+      // }
+      // if(rateCard !== undefined) {
+      //   query['rateCard'] = rateCard;
+      // }
+   
+      // return ProductPrices.insert(query);
+      ProductPrices.insert(
+        {
+          lastCostPrice:lastCostPrice,
+          priceCash:priceCash,
+          priceCard:priceCard,
+          productId:productId,
+          storeId:storeId
+
+        }
+      );
+    }
+  },
 
 });
