@@ -250,7 +250,7 @@ export function loadData() {
     Purchases.insert({
        _id: "01",
       purchaseNumber: "000001",
-      purchaseState: "LOADED",
+      purchaseState: "SELECTION",
       purchaseDate: "2016-07-10T11:23:01Z",
       lastUpdate: "2016-07-10T11:23:01Z",
       provider:"JUAN",
@@ -259,7 +259,7 @@ export function loadData() {
     Purchases.insert({
        _id: "02",
       purchaseNumber: "000002",
-      purchaseState: "RECEIVED",
+      purchaseState: "VERIFICATION",
       purchaseDate: "2016-01-11T11:23:01Z",
       lastUpdate: "2016-07-10T11:23:01Z",
       provider:"ANDRES",
@@ -268,7 +268,7 @@ export function loadData() {
     Purchases.insert({
        _id: "03",
       purchaseNumber: "000003",
-      purchaseState: "REQUESTED",
+      purchaseState: "CANCELED",
       purchaseDate: "2017-07-12T11:23:01Z",
       lastUpdate: "2016-07-10T11:23:01Z",
       provider:"JOSE",

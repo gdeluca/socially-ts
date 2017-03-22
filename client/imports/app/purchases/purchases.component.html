@@ -2,22 +2,45 @@
   <div class="row">
     <h2 class="col-12 text-center">Compras</h2>
 
-  <div class="form-inline">
+    <div class="form-inline">
+      
       <div class=" ml-4 mt-4">
         <button 
+          [disabled]="!selectedProvider" 
           type="button" 
           class="form-control btn btn-primary ml-2" 
-          (click)="addOrder()"
+          (click)="createOrder()"
           >
           Nuevo Pedido
         </button>
       </div>
+
+      <div class="ml-4 mt-4">
+        <select 
+          name="select-provider" 
+          class="form-control" 
+          required  
+          [(ngModel)]="selectedProvider"
+          >
+          <option value=undefined disabled currentIndex hidden>
+            Proveedor
+          </option>
+          <option *ngFor="let provider of providers | async" 
+          [ngValue]="provider.description">{{provider.description}}
+          </option>
+        </select> 
+      </div>
+
     </div>
   </div>
 
   <div class="row">
     <div class="col-12 text-center">
-      <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+      <pagination-controls 
+        (pageChange)="onPageChanged($event)"
+        [hidden]="collectionCount < PAGESIZE" 
+        >
+      </pagination-controls>
     </div>
   </div>
 
@@ -61,7 +84,7 @@
 
         <!-- filter fields on table header -->
         <tr>
-        <td></td>
+        <!-- <td></td> -->
           <ng-container *ngFor="let header of headers; let colIndex=index; ">
             <td class="text-center">
               <ng-container *ngIf="header.showHeaderFilter ">
@@ -83,7 +106,7 @@
         <tr *ngFor="let purchase of purchases | async; let rowIndex=index; ">
      
           <!-- action buttons for to edit stock fields -->
-          <td>
+          <!-- <td>
             <button 
               [hidden]="currentIndex === rowIndex && editing"
               type="button" 
@@ -105,9 +128,9 @@
               (click)="currentIndex=rowIndex; editing=false; ">
               <span class="fa fa-ban" aria-hidden="true"></span>
             </button>
-          </td>
+          </td> -->
           <td class="text-center">
-            <a [routerLink]="['/purchases', purchase.purchaseNumber]">{{purchase.purchaseNumber}}
+            <a [routerLink]="['/purchases', purchase.purchaseNumber, purchase.purchaseState.toLowerCase()]">{{purchase.purchaseNumber}}
             </a>
           </td>
 
@@ -154,4 +177,13 @@
     </table>
   </div>
 
+  <div class="row">
+    <div class="col-12 text-center">
+      <pagination-controls 
+        (pageChange)="onPageChanged($event)"
+        [hidden]="collectionCount < PAGESIZE" 
+        >
+      </pagination-controls>
+    </div>
+  </div>
 </div>

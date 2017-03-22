@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { } from 'meteor-publish-composite';
+//import { publishComposite } from 'meteor/reywood:publish-composite';
 
 import { getSelectorFilter } from './commons';
 

@@ -53,7 +53,27 @@ function addStock(
 
 Meteor.methods({
 
-  saveStocksForStores: function (productSizeIds: string[], storeIds: string[], quantity: number) {
+  increaseStock: function (
+    productSizeId: string, 
+    storeId: string, 
+    quantity: number
+  ) {
+    check(productSizeId, String);
+    check(storeId, String);
+    check(quantity, Number);
+    let stock = Stocks.findOne({productSizeId:productSizeId, storeId:storeId});
+    Stocks.update(stock._id, {
+      $set: { 
+       quantity: stock.quantity + quantity,
+      }
+    });
+  },
+
+  saveStocksForStores: function (
+    productSizeIds: string[], 
+    storeIds: string[], 
+    quantity: number
+  ) {
     check(productSizeIds, [String]);
     check(storeIds, [String]);
     check(quantity, Number);

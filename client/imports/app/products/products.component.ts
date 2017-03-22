@@ -171,9 +171,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   search(field: string, value: string): void {
-    console.log(value);
-    console.log(field);
-
     if (value == 'undefined')  {
       value = '';
     }
@@ -182,8 +179,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
     if (this.filtersParams[field] === value) {
       return;
     }
-    this.filtersParams[field] = value
+    this.filtersParams[field] = value.toUpperCase();
 
+    console.log(this.filtersParams);
     this.curPage.next(1);
     this.filters.next(this.filtersParams);
   }

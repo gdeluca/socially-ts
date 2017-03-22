@@ -6,6 +6,7 @@ import { getSelectorFilter } from './commons';
 
 import { Products } from '../../../both/collections/products.collection';
 import { ProductSizes } from '../../../both/collections/product-sizes.collection';
+import { ProductPrices } from '../../../both/collections/product-prices.collection';
 import { Categories } from '../../../both/collections/categories.collection';
 
 import { SearchOptions } from '../../../both/search/search-options';
@@ -23,11 +24,27 @@ Meteor.publishComposite('productById', function(productId: string) {
   }
 });
 
-Meteor.publishComposite('provider-products', function(provider) {
+
+const productFields = ['code','name','brand','color','provider','model'];
+const productSizeFields = ['barCode','size']; 
+const categoryFields = ['sectionId'];
+
+Meteor.publishComposite('provider-products', function(provider, options: SearchOptions, filters: any) {
+
+let productSelector = getSelectorFilter(productFields, filters);
+let selector = { provider: provider };
 return {
     find: function() {
-        return Products.collection.find({ provider: provider })
-    }
+        Counts.publish(this, 'numberOfProducts',Products.collection.find(selector), { noReady: true });
+        return Products.collection.find({ $and: [selector, productSelector] })
+    }, 
+    children: [
+      {
+        find: function(product) {
+            return ProductPrices.collection.find({productId: product._id});
+        }
+      }
+    ]
   }
 });
  
@@ -45,6 +62,7 @@ return {
 });
 
 Meteor.publishComposite('products-with-categories', function(options: SearchOptions, filters: any) {
+
   let productSelector = getSelectorFilter(productFields, filters);
   let categorySelector = getSelectorFilter(['categoryName:name'], filters);
 
@@ -63,8 +81,6 @@ Meteor.publishComposite('products-with-categories', function(options: SearchOpti
   }
 });
 
-const productFields = ['code','name','brand','color','provider','model'];
-const productSizeFields = ['barCode','size'];
 
 
 Meteor.publishComposite('products-search', function(options: SearchOptions, filters: any) {

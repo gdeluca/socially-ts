@@ -37,7 +37,7 @@ import { Purchases, purchasesStatusMapping} from '../../../../both/collections/p
 // import { Sections } from '../../../../both/collections/sections.collection';
 import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
-// import { Tags } from '../../../../both/collections/tags.collection';
+import { Tags } from '../../../../both/collections/tags.collection';
 // import { Users } from '../../../../both/collections/users.collection';
 
 // model 
@@ -54,7 +54,7 @@ import { Purchase } from '../../../../both/models/purchase.model';
 // import { Section } from '../../../../both/models/section.model';
 import { Stock } from '../../../../both/models/stock.model';
 import { Store } from '../../../../both/models/store.model';
-// import { Tag } from '../../../../both/models/tag.model';
+import { Tag } from '../../../../both/models/tag.model';
 // import { User } from '../../../../both/models/user.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
@@ -89,7 +89,6 @@ export class PurchasesComponent {
   };
 
   // purchaseNumber, purchaseState, purchaseDate, lastUpdate, total, provider, paymentAmount
-   // name <-> sortfield, touple
   headers: Dictionary[] = [
     {'key': 'Nº Compra', 'value':'purchaseNumber'},
     {'key': 'Estado', 'value':'purchaseState', 'showHeaderFilter': true},
@@ -101,43 +100,25 @@ export class PurchasesComponent {
   ];
 
   collectionCount: number = 0;
-  PAGESIZE: number = 10; 
+  PAGESIZE: number = 6; 
 
   paginatedSub: Subscription;
   optionsSub: Subscription;
   autorunSub: Subscription;
+  providersSub: Subscription;
 
   currentUser: Meteor.User;
-  purchaseNumber: string;
-  purchaseState: string; // LOADED // REQUESTED // RECEIVED //CANCELLED
-  purchaseDate: string;
-  lastUpdate: string;
-  total?:number;
-  provider:string;
-  paymentAmount:number;
-  emptyPurchase = 
-    {
-      purchaseNumber:'', 
-      purchaseState:'',
-      purchaseDate:'',
-      lastUpdate:'',
-      total:'',
-      provider:'',
-      paymentAmount:'',
-      quantity:'',
-    };
-  editedPurchase: any;
-  editing: boolean = false;
+  selectedProvider: string; // drowpdown selected provider
 
   valuesMapping = purchasesStatusMapping;
 
   purchases: Observable<Purchase[]>;
+  providers: Observable<Tag[]>;
 
   constructor(
     private paginationService: PaginationService,
     private router:Router,
-  ){
-
+  ){ 
   }
 
   ngOnInit() {
@@ -156,20 +137,29 @@ export class PurchasesComponent {
             
       this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
 
+      // paginate the purchases
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
       this.paginatedSub = MeteorObservable.subscribe('purchases', options, filters)
         .subscribe(() => {
-          // this.productPurchases = ProductPurchases.find({}).zone();
           this.purchases = Purchases.find({}).zone();
       });
+
+      // provider names for select dropdown
+      if (this.providersSub) { 
+        this.providersSub.unsubscribe();
+      }
+      this.providersSub = MeteorObservable.subscribe('tags.provider').subscribe(() => {
+        this.providers = Tags.find({type: 'provider'}).zone();
+      });
+
     });
 
     this.pageSize.next(this.PAGESIZE);
     this.curPage.next(1);
     this.sortField.next('purchaseNumber');
-    this.sortDirection.next(1);
+    this.sortDirection.next(-1);
     this.filters.next('');
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
@@ -190,6 +180,11 @@ export class PurchasesComponent {
     this.paginatedSub.unsubscribe();
     this.optionsSub.unsubscribe();
     this.autorunSub.unsubscribe();
+    this.providersSub.unsubscribe();
+  }
+
+  onPageChanged(page: number): void {
+    this.curPage.next(page);
   }
 
   changeSortOrder(direction: string, fieldName: string): void {
@@ -197,9 +192,7 @@ export class PurchasesComponent {
     this.sortField.next(fieldName);
   }
 
-  search(field: string, value: string): void {
-    console.log(value);
-    
+  search(field: string, value: string): void {    
     if (value == 'undefined')  {
       value = '';
     }
@@ -207,53 +200,60 @@ export class PurchasesComponent {
     if (this.filtersParams[field] === value) {
       return;
     }
-    this.filtersParams[field] = value
+    this.filtersParams[field] = value.toUpperCase();
 
     this.curPage.next(1);
     this.filters.next(this.filtersParams);
   }
 
-  copy(original: any){
-    return Object.assign({}, original)
-  }
-
-  update(editedPurchase, purchase) {
-    if (editedPurchase.purchaseState != purchase.purchaseState) {
-      MeteorObservable.call(
-        'updatePurchaseOrderStatus', 
-        purchase._id, 
-        editedPurchase.purchaseState
-      ).subscribe(
-        (response) => {
-         Bert.alert('Se actualizo el pedidio al nuevo estado: ' 
-           + editedPurchase.purchaseState, 'success', 'growl-top-right' ); 
-      }, (error) => {
-        Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
-      });  
-    }
-  }
-
-
-  addOrder(){
-     MeteorObservable.call('getNextId', 'purchase').subscribe(
-       (counter) => {
-         this.createOrder(counter);
-         this.router.navigate(['purchases/'+counter]); 
-       }, (error) => {
-         Bert.alert('Error al crear el pedido: ' +  error, 'danger', 'growl-top-right' ); 
-      });  
-  }
-
-  createOrder(number){
-    MeteorObservable.call('createPurchaseOrder',
-      number, 'LOADED', 
-      moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-      moment(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-      "", 0,0).subscribe(
-      (response) => {
-
-      }, (error) => {
-         Bert.alert('Error al crear el pedido: ' +  error, 'danger', 'growl-top-right' ); 
-      });  
+  createOrder(orderNumber){
+    MeteorObservable.call('createPurchaseOrder', 
+      this.selectedProvider   
+    ).subscribe( 
+    (orderNumber) => {
+      this.router.navigate(['purchases/'+orderNumber+'/selection']); 
+    }, (error) => {
+       Bert.alert('Error al crear el pedido: ' +  error, 'danger', 'growl-top-right' ); 
+    });  
   }
 }
+
+// emptyPurchase = 
+  //   {
+  //     purchaseNumber:'', 
+  //     purchaseState:'',
+  //     purchaseDate:'',
+  //     lastUpdate:'',
+  //     total:'',
+  //     provider:'',
+  //     paymentAmount:'',
+  //     quantity:'',
+  //   };
+  // editedPurchase: any;
+  // editing: boolean = false;
+
+  // copy(original: any){
+  //   return Object.assign({}, original)
+  // }
+
+  // update(editedPurchase, purchase) {
+  //   if (editedPurchase.purchaseState != purchase.purchaseState) {
+  //     MeteorObservable.call(
+  //       'updatePurchaseOrderStatus', 
+  //       purchase._id, 
+  //       editedPurchase.purchaseState
+  //     ).subscribe(
+  //       (response) => {
+  //        Bert.alert('Se actualizo el pedidio al nuevo estado: ' 
+  //          + editedPurchase.purchaseState, 'success', 'growl-top-right' ); 
+  //     }, (error) => {
+  //       Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+  //     });  
+  //   }
+  // }
+
+  // getCurrentDate(){
+  //   return moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+  // }
+
+

@@ -4,13 +4,14 @@ import { Meteor } from 'meteor/meteor';
 import { Purchase } from '../models/purchase.model';
 
 export const Purchases = new MongoObservable.Collection<Purchase>('purchases');
-export const purchaseStatus = ['LOADED','REQUESTED','RECEIVED','CANCELED'];
+export const purchaseStatus = ['SELECTION','VERIFICATION','ASIGNATION','FINISHED','CANCELED'];
 
 export const purchasesStatusMapping = {
-    'LOADED': 'Redactada', 
-    'REQUESTED': 'Pedido relizado', 
-    'RECEIVED': 'Pedido recibido', 
-    'CANCELED': 'Cancelada' // only can be canceled a loaded order.
+    'SELECTION': 'Seleccion de articulos', 
+    'VERIFICATION': 'Verificacion de stock',
+    'ASIGNATION': 'Distribucion del stock',
+    'FINISHED': 'Finalizada', 
+    'CANCELED': 'Cancelada' // only can be canceled on verification.
   };
 
 function loggedIn() {

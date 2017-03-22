@@ -261,7 +261,7 @@ export class StockListComponent implements OnInit, OnDestroy {
     if (this.filtersParams[field] == value) {
       return;
     }
-    this.filtersParams[field] = value
+    this.filtersParams[field] = value.toUpperCase();
 
     this.curPage.next(1);
     this.filters.next(this.filtersParams);

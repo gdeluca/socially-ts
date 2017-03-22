@@ -14,7 +14,7 @@ import { Product } from '../models/product.model';
 let tagNames = definedTags;
 
 function getSevenDigitsCounters(){
-  return ['balance','purchase', 'sales'];
+  return ['BALANCE','PURCHASE', 'SALE'];
 }
 
 function getTwoDigitsCounters(){
@@ -41,7 +41,7 @@ Meteor.methods({
           return Array(3-lastCode.length).join("0")+""+lastCode; 
         }
 
-        return "ee"+lastCode;
+        return ""+lastCode;
     }
   }
 

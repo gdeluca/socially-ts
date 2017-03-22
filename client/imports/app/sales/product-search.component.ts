@@ -30,8 +30,6 @@ import { ProductSize } from '../../../../both/models/product-size.model';
 import { Category } from '../../../../both/models/category.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
-
-
  
 import template from './product-search.component.html';
 import style from './product-search.component.scss';
@@ -41,7 +39,7 @@ import style from './product-search.component.scss';
   template,
   styles: [ style ],
 })
-@InjectUser('user')
+@InjectUser('currentUser')
 export class ProductSearchComponent implements OnInit, OnDestroy {
   
   // pagination related
@@ -79,7 +77,7 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
   optionsSub: Subscription;
   autorunSub: Subscription;
 
-  user: Meteor.User;
+  currentUser: Meteor.User;
   selectedProduct: Product;
   products: Observable<Product[]>;
   productSizes: Observable<ProductSize[]>;
@@ -154,7 +152,7 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
     if (this.filtersParams[field] == value) {
       return;
     }
-    this.filtersParams[field] = value
+    this.filtersParams[field] = value.toUpperCase();
 
     this.curPage.next(1);
     this.filters.next(this.filtersParams);

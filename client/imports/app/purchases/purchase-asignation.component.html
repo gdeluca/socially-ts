@@ -1,0 +1,119 @@
+<div class="row">
+  <h4 class="col-12 text-center">Asignacion del stock a sucursales</h4>
+</div>
+
+<div class="row">
+  <table class="table table-bordered table-hover ">
+    <!-- headers -->
+      <thead class="thead-default">
+        <th class="text-center" 
+          style="vertical-align:middle;" 
+          *ngFor="let header of headers; let colIndex = index; ">
+          <div class="form-horizontal" >
+            {{header.key}}
+            <button 
+              [hidden]="idx !== colIndex || direction !== 'up'" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+              <span class="fa fa-chevron-up" aria-hidden="true"></span>
+            </button>
+            <button 
+                [hidden]="idx !== colIndex || direction !== 'down'" 
+                type="button" 
+                class="btn btn-default"  
+                (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
+                <span class="fa fa-chevron-down" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="direction && idx === colIndex " 
+              type="button" 
+              class="btn btn-default"   
+              (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+              <span class="fa fa-sort" aria-hidden="true"></span>
+            </button>
+          </div>
+        </th>
+        <th class="text-center" *ngFor="let store of allStores | async; let colIndex = index; ">
+          A asignar a {{store.name}}
+        </th>
+         <th class="text-center" *ngFor="let store of allStores | async; let colIndex = index; ">
+          Actualmente en {{store.name}}
+        </th> 
+      </thead>
+
+      <tbody>
+        <!-- 'Codigo', 'Descripcion', 'Color', 'Marca', 'Modelo', 'Talle', 'Cantidad a distribuir X talle', 'valores de stock en cada store' -->
+        <tr *ngFor="let productPurchase of productPurchases | async; let rowIndex = index; ">
+          <ng-container *ngFor="let productSize of productSizes | async; ">
+            <ng-container *ngIf="productSize._id == productPurchase.productSizeId ">
+              <td class="text-center">
+                <a [routerLink]="['/products', productSize.barCode]">{{productSize.barCode}}</a>
+              </td>
+
+              <td class="text-center">
+                <a>{{getProduct(productSize.productId)?.name}}</a>
+              </td>
+
+              <td class="text-center">
+                <a>{{getProduct(productSize.productId)?.color}}</a>
+              </td>
+
+              <td class="text-center">
+                <a>{{getProduct(productSize.productId)?.brand}}</a>
+              </td>
+
+              <td class="text-center">
+                <a>{{getProduct(productSize.productId)?.model}}</a>
+              </td>
+
+              <td class="text-center">
+                <a>{{productSize.size}}</a>
+              </td> 
+
+              <td class="text-center">
+                <a>{{productPurchase.quantity}}</a>
+              </td>
+              <ng-container *ngFor="let store of allStores | async; let stockIndex=index; ">
+                <td class="text-center">
+                  <input 
+                    type="text" 
+                    name="stock-{{rowIndex}}" 
+                    class="form-control" 
+                    [(ngModel)]="asignedQuantity[productPurchase.productSizeId + store._id]"
+                    >
+                </td>
+              </ng-container>
+              <ng-container *ngFor="let store of allStores | async; let stockIndex=index; ">
+                <td class="text-center">
+                  <a>{{getStockQuantityForSizeAndStore(productSize._id, store._id)}}</a>
+                </td>
+              </ng-container>
+            </ng-container>
+          </ng-container>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="row">
+  <div class="col-12 text-center">
+    <pagination-controls 
+      (pageChange)="onPageChanged($event)"
+      [hidden]="collectionCount < PAGESIZE" 
+      >
+    </pagination-controls>
+  </div>
+</div>
+
+<div class="row">
+  <button 
+    [disabled]="purchase?.purchaseState == 'FINISHED'"
+    type="button" 
+    class="form-control btn btn-secondary ml-2" 
+    (click)="saveAndChangeAsignationState()"
+    >
+    Guardar y asignar Stock
+  </button>
+</div>
+ 

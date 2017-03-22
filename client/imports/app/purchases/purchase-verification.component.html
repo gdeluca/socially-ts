@@ -1,0 +1,137 @@
+<div class="row">
+  <h4 class="col-12 text-center">Verificacion del Pedido</h4>
+</div>
+
+<div class="row">
+  <table class="table table-bordered table-hover ">
+    <!-- headers -->
+      <thead class="thead-default">
+        <th class="text-center" 
+          style="vertical-align:middle;" 
+          *ngFor="let header of headers; let colIndex = index; ">
+          <div class="form-horizontal" >
+            {{header.key}}
+            <button 
+              [hidden]="idx !== colIndex || direction !== 'up'" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+              <span class="fa fa-chevron-up" aria-hidden="true"></span>
+            </button>
+            <button 
+                [hidden]="idx !== colIndex || direction !== 'down'" 
+                type="button" 
+                class="btn btn-default"  
+                (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
+                <span class="fa fa-chevron-down" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="direction && idx === colIndex " 
+              type="button" 
+              class="btn btn-default"   
+              (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+              <span class="fa fa-sort" aria-hidden="true"></span>
+            </button>
+          </div>
+        </th>
+      </thead>
+
+      <tbody>
+        <!-- 'Codigo', 'Descripcion', 'Color', 'Marca', 'Modelo', 'Talle', 'Cantidad Recibida', 'Precio Costo', 'Precio contado', 'Precio tarjeta', 'En stock',  -->
+        <tr *ngFor="let productPurchase of productPurchases | async; let rowIndex = index; ">
+          <ng-container *ngFor="let productSize of productSizes | async; ">
+            <ng-container *ngIf="productSize._id == productPurchase.productSizeId ">
+              <td class="text-center">
+                <a [routerLink]="['/products', getProduct(productSize.productId)?.code]">{{getProduct(productSize.productId)?.code}}</a>
+              </td>
+
+              <td class="text-center">
+                <a>{{getProduct(productSize.productId)?.name}}</a>
+              </td>
+
+              <td class="text-center">
+                <a>{{getProduct(productSize.productId)?.color}}</a>
+              </td>
+
+              <td class="text-center">
+                <a>{{getProduct(productSize.productId)?.brand}}</a>
+              </td>
+
+              <td class="text-center">
+                <a>{{getProduct(productSize.productId)?.model}}</a>
+              </td>
+
+              <td class="text-center">
+                <a>{{productSize.size}}</a>
+              </td> 
+
+              <td class="text-center">
+                <input 
+                  type="text" 
+                  name="costPrice-{{rowIndex}}" 
+                  class="form-control" 
+                  [(ngModel)]="productPurchase.quantity"
+                  >
+              </td>
+
+              <td class="text-center">
+                <input 
+                  type="text" 
+                  name="costPrice-{{rowIndex}}" 
+                  class="form-control" 
+                  [(ngModel)]="costPrices[productSize.productId]"
+                  (ngModelChange)="costPrices[productSize.productId] = $event"
+                  >
+              </td>
+
+              <td class="text-center">
+                <input 
+                  type="text" 
+                  name="cashPrice-{{rowIndex}}" 
+                  class="form-control" 
+                  [(ngModel)]="cashPrices[productSize.productId]"
+                  (ngModelChange)="cashPrices[productSize.productId] = $event"
+                  >
+              </td>
+
+              <td class="text-center">
+                <input 
+                  type="text" 
+                  name="cardPrice-{{rowIndex}}" 
+                  class="form-control" 
+                  [(ngModel)]="cardPrices[productSize.productId]"
+                  (ngModelChange)="cardPrices[productSize.productId] = $event"
+                  >
+              </td>
+              
+              <td class="text-center">
+                <a>{{getStockQuantityForSize(productSize._id)}}</a>                      
+              </td> 
+             
+            </ng-container>
+          </ng-container>
+        </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="row">
+  <div class="col-12 text-center">
+    <pagination-controls 
+      (pageChange)="onPageChanged($event)"
+      [hidden]="collectionCount < PAGESIZE" 
+      >
+    </pagination-controls>
+  </div>
+</div>
+
+<div class="row">
+  <button 
+    type="button" 
+    class="form-control btn btn-secondary ml-2" 
+    (click)="saveAndChangeVerificationState()"
+    >
+    Guardar pasar a asignar el stock
+  </button>
+</div>
+ 

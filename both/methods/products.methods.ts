@@ -20,6 +20,12 @@ Meteor.methods({
     check(product.model, String);
     check(product.provider, String);
     check(product.categoryId, String); 
+    product.name = product.name.toUpperCase();
+    product.color = product.color.toUpperCase();
+    product.brand = product.brand.toUpperCase();
+    product.model = product.model.toUpperCase();
+    product.provider = product.provider.toUpperCase();
+
     if (Meteor.isServer) { 
       // add tags on product add if they are missed
       let productTagDef = productTagNames;
@@ -42,6 +48,12 @@ Meteor.methods({
     check(product.model, String);
     check(product.provider, String);
     check(product.categoryId, String);
+    product.name = product.name.toUpperCase();
+    product.color = product.color.toUpperCase();
+    product.brand = product.brand.toUpperCase();
+    product.model = product.model.toUpperCase();
+    product.provider = product.provider.toUpperCase();
+
     if (Meteor.isServer) { 
       return Products.update(selector, product);
     }
