@@ -3,18 +3,31 @@ import {check} from 'meteor/check';
 import { ProductSizes, getMappingSize } from '../collections/product-sizes.collection';
 import { ProductPrices } from '../collections/product-prices.collection';
 import { Products, productTagNames } from '../collections/products.collection';
+import { Tags } from '../collections/tags.collection';
 import { Stores } from '../collections/stores.collection';
 import { Stocks } from '../collections/stocks.collection';
+
 import { Store } from '../models/store.model';
 import { Product } from '../models/product.model';
+import { Tag } from '../models/tag.model';
 
+function generateProductCode(product: Product): string {
+  let productTagDef = productTagNames;
+  let code = "";
+  for (let tagType of productTagNames) {
+    console.log({type: tagType, description: product[tagType]}, {fields: {code: 1}});
+    let tag = Tags.findOne({type: tagType, description: product[tagType]}, {fields: {code: 1}});
+    code += ""+tag.code;
+  }
 
+  console.log(code);
+  return code;
+}
 
 Meteor.methods({
 
   saveProduct: function (product: Product) {
     check(product.name, String);
-    check(product.code, String);
     check(product.color, String);
     check(product.brand, String);
     check(product.model, String);
@@ -27,7 +40,7 @@ Meteor.methods({
     product.provider = product.provider.toUpperCase();
 
     if (Meteor.isServer) { 
-      // add tags on product add if they are missed
+      // add tags on product if they are missed
       let productTagDef = productTagNames;
       productTagDef.forEach((tag) => {
         Meteor.call("addTag",
@@ -35,41 +48,63 @@ Meteor.methods({
           product[tag]
         );
       });
+      product.code = generateProductCode(product);
       return Products.collection.insert(product);
     }
   },
 
   updateProduct: function (selector: string, product: Product) {
     check(selector, String);
-    check(product.name, String);
-    check(product.code, String);
-    check(product.color, String);
-    check(product.brand, String);
-    check(product.model, String);
-    check(product.provider, String);
-    check(product.categoryId, String);
-    product.name = product.name.toUpperCase();
-    product.color = product.color.toUpperCase();
-    product.brand = product.brand.toUpperCase();
-    product.model = product.model.toUpperCase();
-    product.provider = product.provider.toUpperCase();
-
+    let query = {};
+    if(product.name != null) {
+      check(product.name, String);
+      product.name = product.name.toUpperCase();
+    }
+    if(product.code != null) {
+      check(product.code, String);
+    }
+    if(product.color != null) {
+      check(product.color, String);
+      product.color = product.color.toUpperCase();
+    }
+    if(product.brand != null) {
+      check(product.brand, String);
+      product.brand = product.brand.toUpperCase();
+    }
+    if(product.model != null) {
+      check(product.model, String);
+      product.model = product.model.toUpperCase();
+    }
+    if(product.provider != null) {
+      check(product.provider, String);
+      product.provider = product.provider.toUpperCase();
+    }
+    if(product.categoryId != null) {
+      check(product.categoryId, String);
+    }
     if (Meteor.isServer) { 
+      // we cannot change the product code. Since it can have printed barcodes already
+      // but we can change the description for a tag code with a warning message
+      // this will change the description for all the product that have that code assigned
       return Products.update(selector, product);
     }
   },
 
-  saveProductSizes: function (productId: string, productCode: string, sizes: string[]) {
+  saveProductSizes: function (
+    productId: string, 
+    sizes: string[]
+  ) {
     check(productId, String);
-    check(productCode, String);
     check(sizes, [String]);
     if (Meteor.isServer) { 
       let ids = [];
+      let product = Products.findOne({_id:productId}, {fields: {code: 1}});
+
       sizes.forEach((item, index) => {
         var productSize = { 
           productId: productId, 
           size: sizes[index], 
-          barCode: productCode + getMappingSize(sizes[index]) 
+          barCode: product.code + getMappingSize(sizes[index]) 
         };
         ids.push(ProductSizes.collection.insert(productSize));
       });

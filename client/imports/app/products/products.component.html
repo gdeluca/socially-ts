@@ -60,6 +60,7 @@
             [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
             type="button" 
             class="btn btn-default" 
+            data-toggle="modal" data-target="#exampleModal"
             (click)="currentIndex=rowIndex; editing=false; update(editedProduct)">
             <span class="fa fa-check-square-o" aria-hidden="true"></span>
           </button>
@@ -86,7 +87,9 @@
           <input 
             type="text" 
             name="name-{{rowIndex}}" 
-            class="form-control" 
+            class="form-control"
+            auto-complete
+            [source]="sources['name']"
             [(ngModel)]="editedProduct.name">
         </td>
         
@@ -104,7 +107,7 @@
           <input 
             type="text" 
             name="code-{{rowIndex}}" 
-            class="form-control" 
+            class="form-control"
             [(ngModel)]="editedProduct.code">
         </td>
 
@@ -122,7 +125,9 @@
           <input 
             type="text" 
             name="color-{{rowIndex}}" 
-            class="form-control" 
+            class="form-control"
+            auto-complete
+            [source]="sources['color']" 
             [(ngModel)]="editedProduct.color">
         </td>
         
@@ -140,7 +145,9 @@
           <input 
             type="text" 
             name="brand-{{rowIndex}}" 
-            class="form-control" 
+            class="form-control"
+            auto-complete
+            [source]="sources['brand']" 
             [(ngModel)]="editedProduct.brand">
         </td>
 
@@ -158,7 +165,9 @@
           <input 
             type="text" 
             name="provider-{{rowIndex}}" 
-            class="form-control" 
+            class="form-control"
+            auto-complete
+            [source]="sources['provider']" 
             [(ngModel)]="editedProduct.provider">
         </td>
 
@@ -176,7 +185,9 @@
           <input 
             type="text" 
             name="model-{{rowIndex}}" 
-            class="form-control" 
+            class="form-control"
+            auto-complete
+            [source]="sources['model']" 
             [(ngModel)]="editedProduct.model">
         </td>
 
@@ -206,6 +217,24 @@
     </tbody>
   </table>
 </div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content panel-warning">
+      <div class="modal-header panel-heading">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Actualizando un producto</h4>
+      </div>
+      <div class="modal-body">
+        Cuidado al actualizar un producto
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <div class="row-fluid">
   <!-- submission form -->

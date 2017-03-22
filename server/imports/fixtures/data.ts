@@ -83,6 +83,40 @@ export function loadData() {
       lastCode: 10,
       type:"SALE"
     });
+    Counters.insert({
+      _id: "04", 
+      lastCode: 10,
+      type:"name"
+    });
+    
+    Counters.insert({
+      _id: "05", 
+      lastCode:  10,
+      type:"model"
+    });
+
+    Counters.insert({
+      _id: "06", 
+      lastCode: 10,
+      type:"brand"
+    });
+    Counters.insert({
+      _id: "07", 
+      lastCode: 10,
+      type:"color"
+    });
+    
+    Counters.insert({
+      _id: "08", 
+      lastCode:  10,
+      type:"section"
+    });
+
+    Counters.insert({
+      _id: "09", 
+      lastCode: 10,
+      type:"provider"
+    });
 
     // tags setup
     Tags.insert({

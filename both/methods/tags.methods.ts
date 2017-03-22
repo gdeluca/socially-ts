@@ -5,7 +5,6 @@ import { MeteorObservable } from 'meteor-rxjs';
 import { Products } from '../collections/products.collection';
 import { ProductSizes } from '../collections/product-sizes.collection';
 
-
 import { Tags } from '../collections/tags.collection';
 import { Tag } from '../models/tag.model';
 import { Product } from '../models/product.model';

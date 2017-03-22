@@ -47,7 +47,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   tagsSubs:Subscription[] = []; 
   tags: Observable<Tag[]>[] = [];
   productTagDef = productTagNames;
-  sources:string[] = [];
+  sources:string[] = []; 
 
   currentUser: Meteor.User;
   adding: boolean = false;
@@ -107,7 +107,6 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   ){
     this.complexForm = formBuilder.group({
       name:          ['', Validators.compose([Validators.required, Validators.minLength(3)])],
-      code:          ['', Validators.compose([Validators.required, Validators.minLength(10)])],
       color:         ['', Validators.required],
       brand:         ['', Validators.required],
       model:         ['', Validators.required],
@@ -236,12 +235,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
   saveProduct(values) {
     let product = {
         name: values.name, 
-        code: values.code, 
         color: values.color, 
         brand: values.brand, 
         model: values.model, 
@@ -270,8 +266,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         });
         this.saveProductPriceForAllStores(productPrice, storeIds);
 
-        this.saveProductSizesForAllStocks(productId, product.code, sizes, storeIds);
-        Bert.alert('Se agrego el producto: ' + product.code , 'success', 'growl-top-right' ); 
+        this.saveProductSizesForAllStocks(productId, sizes, storeIds);
+        Bert.alert('Se agrego el producto: ' + productId , 'success', 'growl-top-right' ); 
       }, (error) => {
         Bert.alert('Error al guardar:  ${error} ', 'danger', 'growl-top-right' ); 
     });
@@ -287,8 +283,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  saveProductSizesForAllStocks(id, code, sizes: string[], storeIds: string[]) {
-    MeteorObservable.call('saveProductSizes', id, code, sizes).subscribe(
+  saveProductSizesForAllStocks(productId, sizes: string[], storeIds: string[]) {
+    MeteorObservable.call('saveProductSizes', productId, sizes).subscribe(
       (productSizeIds) => {
       Bert.alert('Se agregaron los talles: ' + JSON.stringify(sizes), 'success', 'growl-top-right' ); 
       this.saveStocks(productSizeIds, storeIds);

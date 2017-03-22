@@ -19,13 +19,18 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/search/search-options';
 import { Bert } from 'meteor/themeteorchef:bert';
 
-// model 
-import { Products } from '../../../../both/collections/products.collection';
+//collections
+import { Products, productTagNames } from '../../../../both/collections/products.collection';
 import { Categories } from '../../../../both/collections/categories.collection';
 import { Sections } from '../../../../both/collections/sections.collection';
+import { Tags, definedTags } from '../../../../both/collections/tags.collection';
+
+
+// model 
 import { Product } from '../../../../both/models/product.model';
 import { Category } from '../../../../both/models/category.model';
 import { Section } from '../../../../both/models/section.model';
+import { Tag } from '../../../../both/models/tag.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
 
@@ -77,14 +82,29 @@ export class ProductsComponent implements OnInit, OnDestroy {
   paginatedSub: Subscription;
   optionsSub: Subscription;
   autorunSub: Subscription;
+ 
+  tagsSubs:Subscription[] = []; 
+  tags: Observable<Tag[]>[] = [];
+  productTagDef = productTagNames;
+  sources:string[] = [];
 
   currentUser: Meteor.User;
-  editedProduct: Product = {code: '0', name: '', color: '', brand: '', model: '', categoryId : '', provider:''};
+  editedProduct: Product = 
+  {
+    code: '0', 
+    name: '', 
+    color: '', 
+    brand: '', 
+    model: '', 
+    categoryId : '', 
+    provider:''
+  };
+
   adding: boolean = false;
   editing: boolean = false;
   selected: any;
   products: Observable<Product[]>;
-  paginatedCategories: Observable<Category[]>;
+  // paginatedCategories: Observable<Category[]>;
   categories: Observable<Category[]>;
 
   constructor(
@@ -114,8 +134,23 @@ export class ProductsComponent implements OnInit, OnDestroy {
       this.paginatedSub = MeteorObservable.subscribe('products-with-categories', options, filters)
         .subscribe(() => {
           this.products = Products.find({}).zone();
-          this.paginatedCategories = Categories.find({}).zone();
+          // this.paginatedCategories = Categories.find({}).zone();
       });
+
+      for (let name of this.productTagDef) {
+        if (this.tagsSubs[name]) {
+          this.tagsSubs[name].unsubscribe();
+        } 
+        this.tagsSubs[name] = MeteorObservable.subscribe('tags.'+name)
+          .subscribe(() => {
+          this.tags[name] = Tags.find({type: name}).zone();
+          this.tags[name].subscribe((tags)=>{
+            this.sources[name] = tags.map((tag) => {
+              return tag.description;
+            });
+          })
+        });
+      }
       
     });
 
@@ -151,6 +186,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.paginatedSub.unsubscribe();
     this.optionsSub.unsubscribe(); 
     this.autorunSub.unsubscribe();
+    for (let name of this.productTagDef) {
+      if (this.tagsSubs[name]) {
+        this.tagsSubs[name].unsubscribe();
+      }
+    } 
   } 
 
   onPageChanged(page: number): void {
