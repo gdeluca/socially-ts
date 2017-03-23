@@ -10,7 +10,7 @@ export const formOfPayment = ['CASH','CARD','ACCOUNT'];
 export const salesStatusMapping = {
     'STARTED': 'En Proceso', 
     'SUBMITTED': 'Finalizada', 
-    'RESERVED': 'Mercadera Reservada o Señada', 
+    'RESERVED': 'Reservado/Señado', 
     'CANCELED': 'Cancelada'
   };
 

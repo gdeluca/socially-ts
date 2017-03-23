@@ -340,6 +340,28 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     });  
   }
 
+  submitOrder(){
+    MeteorObservable.call('updateSaleOrderStatus', this.sale._id, 'SUBMITTED')
+    .subscribe(
+    () => {
+      this.router.navigate(['sales']); 
+      Bert.alert('Se marco la venta como finalizada', 'success', 'growl-top-right' ); 
+    }, (error) => {
+      Bert.alert('Error al crear la venta: ' +  error, 'danger', 'growl-top-right' ); 
+    });  
+  }
+
+  reserveOrder(){
+    MeteorObservable.call('updateSaleOrderStatus', this.sale._id, 'RESERVED')
+    .subscribe(
+    () => {
+      this.router.navigate(['sales']); 
+      Bert.alert('Se marco la venta como reservada', 'success', 'growl-top-right' ); 
+    }, (error) => {
+      Bert.alert('Error al crear la venta: ' +  error, 'danger', 'growl-top-right' ); 
+    });  
+  }
+
   notifyProductFound(barCode:string) {
     this.selectedProductSizeBarCode = barCode;
     this.addProduct();

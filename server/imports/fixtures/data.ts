@@ -456,8 +456,8 @@ export function loadData() {
       saleState: "STARTED",
       payment: "CASH",
       workShift: "MORNING",
-      saleDate: "2017-01-12T9:09:01Z",
-      lastUpdate: "2017-01-12T9:11:01Z",
+      saleDate: "2017-02-23 18:27:32",
+      lastUpdate: "2017-02-23 18:27:32",
       userStoreId: "01", 
       balanceId: "02"
     });
@@ -467,8 +467,8 @@ export function loadData() {
       saleState: "STARTED",
       payment: "CASH",
       workShift: "MORNING",
-      saleDate: "2017-01-12T9:07:01Z",
-      lastUpdate: "2017-01-12T9:12:01Z",
+      saleDate: "2017-02-23 18:27:32",
+      lastUpdate: "2017-02-23 18:27:32",
       userStoreId: "02", 
       balanceId: "03"
     });
@@ -671,7 +671,7 @@ export function loadData() {
         subtotal: 930,
         taxes: 195.3,
         total: 1125.3,
-        lastUpdate: "2017-02-12T9:11:01Z"
+        lastUpdate: "2017-02-23 18:27:32"
       }
     });
 
