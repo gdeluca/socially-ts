@@ -1,92 +1,87 @@
 <!-- selection table -->
-<div class="row">
-  <h5 class="col-12 text-center">Articulos del proveedor</h5>
-  <table class="table table-bordered table-hover ">
-    <!-- headers -->
-    <thead class="thead-default">
-      <th class="text-center" 
-        style="vertical-align:middle;" 
-        *ngFor="let header of headers; let colIndex = index; ">
-        <div class="form-horizontal" >
-          {{header.key}}
-          <button 
-            [hidden]="idx !== colIndex || direction !== 'up'" 
+<table class="table table-bordered table-hover ">
+  <!-- headers -->
+  <thead class="thead-default">
+    <th class="text-center" 
+      style="vertical-align:middle;" 
+      *ngFor="let header of headers; let colIndex = index; ">
+      <div class="form-horizontal" >
+        {{header.key}}
+        <button 
+          [hidden]="idx !== colIndex || direction !== 'up'" 
+          type="button" 
+          class="btn btn-default" 
+          (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+          <span class="fa fa-chevron-up" aria-hidden="true"></span>
+        </button>
+        <button 
+            [hidden]="idx !== colIndex || direction !== 'down'" 
             type="button" 
-            class="btn btn-default" 
-            (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
-            <span class="fa fa-chevron-up" aria-hidden="true"></span>
-          </button>
+            class="btn btn-default"  
+            (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
+            <span class="fa fa-chevron-down" aria-hidden="true"></span>
+        </button>
+        <button 
+          [hidden]="direction && idx === colIndex " 
+          type="button" 
+          class="btn btn-default"   
+          (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
+          <span class="fa fa-sort" aria-hidden="true"></span>
+        </button>
+      </div>
+    </th>
+    <th class="text-center" style="vertical-align:middle;"  >
+      #
+    </th> 
+  </thead>
+  
+  <tbody>
+    <!-- provider data -->
+    <!-- 'Codigo', 'Descripcion', 'Color', 'Marca', 'Modelo', 'Precio Costo'  -->
+    <tr *ngFor="let product of products | async;">
+      <ng-container *ngIf="!isProductSelected(product) ">
+
+        <td class="text-center">
+          <a [routerLink]="['/products', product.code]">{{product.code}}</a>
+        </td>
+
+        <td class="text-center">
+          <a>{{product.name}}</a>
+        </td>
+
+        <td class="text-center">
+          <a>{{product.color}}</a>
+        </td>
+
+        <td class="text-center">
+          <a>{{product.brand}}</a>
+        </td>
+
+        <td class="text-center">
+          <a>{{product.model}}</a>
+        </td>
+
+        <td class="text-center">
+          <a>{{getCost(product._id)}}</a>
+        </td> 
+        
+        <td class="text-center">
           <button 
-              [hidden]="idx !== colIndex || direction !== 'down'" 
-              type="button" 
-              class="btn btn-default"  
-              (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
-              <span class="fa fa-chevron-down" aria-hidden="true"></span>
-          </button>
-          <button 
-            [hidden]="direction && idx === colIndex " 
             type="button" 
-            class="btn btn-default"   
-            (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
-            <span class="fa fa-sort" aria-hidden="true"></span>
+            class="btn btn-default form-control"
+            (click)="doEmit(product._id)"
+            >
+          Agregar
           </button>
-        </div>
-      </th>
-      <th class="text-center" style="vertical-align:middle;"  >
-        #
-      </th> 
-    </thead>
-    
-    <tbody>
-      <!-- provider data -->
-      <!-- 'Codigo', 'Descripcion', 'Color', 'Marca', 'Modelo', 'Precio Costo'  -->
-      <tr *ngFor="let product of products | async;">
-        <ng-container *ngIf="!isProductSelected(product) ">
-
-          <td class="text-center">
-            <a [routerLink]="['/products', product.code]">{{product.code}}</a>
-          </td>
-
-          <td class="text-center">
-            <a>{{product.name}}</a>
-          </td>
-
-          <td class="text-center">
-            <a>{{product.color}}</a>
-          </td>
-
-          <td class="text-center">
-            <a>{{product.brand}}</a>
-          </td>
-
-          <td class="text-center">
-            <a>{{product.model}}</a>
-          </td>
-
-          <td class="text-center">
-            <a>{{getCost(product._id)}}</a>
-          </td> 
-          
-          <td class="text-center">
-            <button 
-              type="button" 
-              class="btn btn-default form-control"
-              (click)="doEmit(product._id)"
-              >
-            Agregar
-            </button>
-          </td>
-        </ng-container> 
-      </tr>
-    </tbody>
-  </table>
-</div>
-<div class="row">
-  <div class="col-12 text-center">
-    <pagination-controls 
-      (pageChange)="onPageChanged($event)"
-      [hidden]="collectionCount < PAGESIZE" 
-      >
-    </pagination-controls>
-  </div>
+        </td>
+      </ng-container> 
+    </tr>
+  </tbody>
+</table>
+<div class="col-12 text-center">
+  <pagination-controls 
+    (pageChange)="onPageChanged($event)"
+    [hidden]="collectionCount < PAGESIZE" 
+    >
+  </pagination-controls>
 </div>

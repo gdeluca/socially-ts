@@ -10,7 +10,8 @@ import { Stores } from '../../../both/collections/stores.collection';
 import { UserStore } from '../../../both/models/user-store.model';
 import { Store } from '../../../both/models/store.model';
 import { User } from '../../../both/models/user.model';
- 
+import { getSelectorFilter } from './commons';
+
 
 // Meteor.publishComposite('user.byEmail', function(email: string) {
 //   return {
@@ -34,7 +35,13 @@ import { User } from '../../../both/models/user.model';
 //     }
 //   }); 
 // });
- 
+
+Meteor.publish('users', function(options: SearchOptions = {limit:0,skip:0}, filters: any = {}) {
+  let filterSelector = getSelectorFilter(['username'], filters);
+  Counts.publish(this, 'numberOfUsers', Users.collection.find(filterSelector), { noReady: true });
+  return Users.collection.find(filterSelector, options);
+}); 
+
 Meteor.publishComposite('users.stores', function(options: SearchOptions, filterField?: string, filterValue?: string) {
   let query = {}
   

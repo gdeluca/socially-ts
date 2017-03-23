@@ -86,6 +86,8 @@ export class LoginComponent implements OnInit, OnDestroy {
           } else {
             Session.setPersistent("currentUserEmail", this.loginForm.value.email);
             Session.setPersistent("currentStoreName", this.selectedStore.name);
+            Session.setPersistent("currentStoreId", this.selectedStore._id);
+
             this.router.navigate(['/']);
           }
         });

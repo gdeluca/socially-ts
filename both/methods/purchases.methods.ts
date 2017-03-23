@@ -23,12 +23,12 @@ function getCurrentDate(){
 
 Meteor.methods({
 
-  updatePurchaseOrderStatus: function (purchaseId: string, purchaseState: string) {
+  updatePurchaseOrderStatus: function (purchaseId: string, newState: string) {
     check(purchaseId, String);
-    check(purchaseState, String);
+    check(newState, String);
     Purchases.update(purchaseId, {
       $set: { 
-        purchaseState: purchaseState,
+        purchaseState: newState,
       }
     }
   )},

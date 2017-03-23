@@ -313,8 +313,31 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
  
   }
 
-  cancelSale(){
-    
+  getCurrentStoreName(){
+    let val = Session.get("currentStoreName"); 
+    return (val != null)?val:'';
+  }
+
+  getCurrentStoreId(): string{
+    let val = Session.get("currentStoreId"); 
+    return (val != null)?val:'';
+  }
+
+  getUser(userStoreId) {
+    let userId =  UserStores.findOne({_id: userStoreId}).userId;
+    return Users.findOne({_id: userId});
+  }
+
+
+  cancelOrder(){
+    MeteorObservable.call('updateSaleOrderStatus', this.sale._id, 'CANCELED')
+    .subscribe(
+    () => {
+      this.router.navigate(['sales']); 
+      Bert.alert('Se cancelo la venta', 'success', 'growl-top-right' ); 
+    }, (error) => {
+      Bert.alert('Error al crear la venta: ' +  error, 'danger', 'growl-top-right' ); 
+    });  
   }
 
   notifyProductFound(barCode:string) {

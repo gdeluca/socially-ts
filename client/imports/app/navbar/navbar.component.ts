@@ -23,7 +23,7 @@ export class NavbarComponent {
     Meteor.logout();
   }
 
-  getCurrentStore(){
+  getCurrentStoreName(){
     let val = Session.get("currentStoreName"); 
     return (val != null)?val:'';
   }

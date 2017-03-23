@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 // import { Injectable, Inject, NgModule, Input, Output, EventEmitter  } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 // import { CommonModule } from '@angular/common';
-import {  Router, ActivatedRoute, CanActivate } from '@angular/router';
+import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
@@ -135,9 +135,9 @@ export class PurchasesComponent {
         sort: { [sortField as string] : sortDirection as number }
       };
             
-      this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
+      this.paginationService.setCurrentPage(
+        this.paginationService.defaultId() , curPage as number);
 
-      // paginate the purchases
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }

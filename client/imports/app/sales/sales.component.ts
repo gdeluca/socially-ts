@@ -33,7 +33,7 @@ import { ProductSales } from '../../../../both/collections/product-sales.collect
 // import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
 // import { Products } from '../../../../both/collections/products.collection';
 // import { Purchases } from '../../../../both/collections/purchases.collection';
-import { Sales, salesStatusMapping, formOfPayment } from '../../../../both/collections/sales.collection';
+import { Sales, salesStatusMapping, salePaymentMapping, workShiftMapping } from '../../../../both/collections/sales.collection';
 // import { Sections } from '../../../../both/collections/sections.collection';
 // import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
@@ -59,7 +59,8 @@ import { User } from '../../../../both/models/user.model';
 
 import { Dictionary } from '../../../../both/models/dictionary';
 import { isNumeric } from '../../validators/validators';
-
+import * as moment from 'moment';
+import 'moment/locale/es';
 
 import template from "./sales.component.html";
 import style from "./sales.component.scss";
@@ -71,7 +72,8 @@ import style from "./sales.component.scss";
 })
 @InjectUser('currentUser')
 export class SalesComponent {
-   // pagination related
+   
+  // pagination related
   pageSize: Subject<number> = new Subject<number>();
   curPage: Subject<number> = new Subject<number>();
   sortDirection: Subject<number> = new Subject<number>();
@@ -80,58 +82,68 @@ export class SalesComponent {
   filters: Subject<any> = new Subject<any>();
 
   filtersParams: any = {
-    'year':  '',
-    'month': '',
-    'day': '',
+    'saleState':  '',
+    'saleDate': '',
+    'lastUpdate': '',
     'seller': '',
-    'paymentForm': '',
-    'saleState': ''
+    'paymentForm': ''
   };
 
   // name <-> sortfield, touple
   headers: Dictionary[] = [
     {'key': 'Nº Venta', 'value':'saleNumber'},
-    {'key': 'Forma de Pago', 'value': 'payment', 'showHeaderFilter': true},
-    {'key': 'Descuento', 'value':'discount', 'showHeaderFilter': false},
     {'key': 'Estado', 'value':'status', 'showHeaderFilter': true},
+    {'key': 'Forma de Pago', 'value': 'payment', 'showHeaderFilter': true},
     {'key': 'Fecha de Venta', 'value':'saleDate', 'showHeaderFilter': true},
     {'key': 'Ultimo Cambio', 'value':'lastUpdate', 'showHeaderFilter': false},
-    {'key': 'Vendedor', 'value':'seller', 'showHeaderFilter': true},
-    {'key': 'Sucursal', 'value':'name', 'showHeaderFilter': true},
+    {'key': 'Responsable', 'value':'seller', 'showHeaderFilter': true},
+    // {'key': 'Sucursal', 'value':'name', 'showHeaderFilter': true},
+    {'key': 'Descuento', 'value':'discount', 'showHeaderFilter': false},
     {'key': 'Total', 'value':'total', 'showHeaderFilter': false},
   ];
 
   collectionCount: number = 0;
-  PAGESIZE: number = 15; 
+  PAGESIZE: number = 6 
 
   paginatedSub: Subscription;
   optionsSub: Subscription;
   autorunSub: Subscription;
+  usersSub: Subscription;
 
-  complexForm: FormGroup;
+  // complexForm: FormGroup;
 
   currentUser: Meteor.User;
-  emptySale = 
-    {
-      saleNumber:'', 
-      saleState:'' 
-    };
-  editedSale: any;
-  editing: boolean = false;
+
+  // emptySale = 
+  //   {
+  //     saleNumber:'', 
+  //     saleState:'' 
+  //   };
+  // editedSale: any;
+  // editing: boolean = false;
+
+  salesStatusValues = salesStatusMapping;
+  salePaymentValues = salePaymentMapping;
+  workShiftValues = workShiftMapping;
 
   sales: Observable<Sale[]>;
-  productSales: Observable<ProductSale[]>;
   userStores: Observable<UserStore[]>;
-  stores: Observable<Store[]>;
   users: Observable<User[]>;
+  // productSales: Observable<ProductSale[]>;
+  // stores: Observable<Store[]>;
+
+// balanceId has to be parametrized or stored in persistent session
+// hardcoded by now to be able to work on sales development
+  balanceId = 1;  
 
   constructor(
-    private paginationService: PaginationService, 
-    private formBuilder: FormBuilder
+    private paginationService: PaginationService,
+    private router:Router,
+    // private formBuilder: FormBuilder
   ){
-    this.complexForm = formBuilder.group({
-      saleState: ['', Validators.required],
-    });
+    // this.complexForm = formBuilder.group({
+    //   saleState: ['', Validators.required],
+    // });
   }
 
   ngOnInit() {
@@ -148,18 +160,29 @@ export class SalesComponent {
         sort: { [sortField as string] : sortDirection as number }
       };
             
-      this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
+      this.paginationService.setCurrentPage(
+        this.paginationService.defaultId() , curPage as number);
 
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('sales-store', options, filters)
+      this.paginatedSub = MeteorObservable.subscribe(
+        'store-sales', 
+        options, 
+        filters,
+        this.balanceId, //verify this
+        this.getCurrentStoreId()
+      )
         .subscribe(() => {
           this.sales = Sales.find({}).zone();
-          this.productSales = ProductSales.find({}).zone();
           this.userStores= UserStores.find({}).zone();
-          this.stores = Stores.find({}).zone();
-          this.users = Users.find({}).zone();
+      });
+
+      if (this.usersSub) { 
+        this.usersSub.unsubscribe();
+      }
+      this.usersSub = MeteorObservable.subscribe('users').subscribe(() => {
+        this.users = Users.find({}).zone();
       });
 
     });
@@ -167,7 +190,7 @@ export class SalesComponent {
     this.pageSize.next(this.PAGESIZE);
     this.curPage.next(1);
     this.sortField.next('saleNumber');
-    this.sortDirection.next(1);
+    this.sortDirection.next(-1);
     this.filters.next('');
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
@@ -188,15 +211,59 @@ export class SalesComponent {
     this.paginatedSub.unsubscribe();
     this.optionsSub.unsubscribe();
     this.autorunSub.unsubscribe();
+    this.usersSub.unsubscribe();
   }
   
+  onPageChanged(page: number): void {
+    this.curPage.next(page);
+  }
+
   changeSortOrder(direction: string, fieldName: string): void {
     this.sortDirection.next(parseInt(direction));
     this.sortField.next(fieldName);
+  }
+
+  search(field: string, value: string): void {    
+    if (value == 'undefined')  {
+      value = '';
+    }
+    // no value change on blur
+    if (this.filtersParams[field] === value) {
+      return;
+    }
+    this.filtersParams[field] = value.toUpperCase();
+
+    this.curPage.next(1);
+    this.filters.next(this.filtersParams);
   }
 
   copy(original: any){
     return Object.assign({}, original)
   }
 
+  getCurrentStoreName(){
+    let val = Session.get("currentStoreName"); 
+    return (val != null)?val:'';
+  }
+
+  getCurrentStoreId(): string{
+    let val = Session.get("currentStoreId"); 
+    return (val != null)?val:'';
+  }
+
+  getUser(userStoreId) {
+    let userId =  UserStores.findOne({_id: userStoreId}).userId;
+    return Users.findOne({_id: userId});
+  }
+
+  createOrder(orderNumber){
+    let userStoreId = UserStores.findOne({storeId: this.getCurrentStoreId()})._id;
+    MeteorObservable.call('createSaleOrder', userStoreId)
+    .subscribe(
+    (orderNumber) => {
+      this.router.navigate(['sales/'+orderNumber]); 
+    }, (error) => {
+      Bert.alert('Error al crear la venta: ' +  error, 'danger', 'growl-top-right' ); 
+    });  
+  }
 }

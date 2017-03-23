@@ -21,8 +21,8 @@ export const salePaymentMapping = {
   };
 
 export const workShiftMapping = {
-    'morning': 'Mañana', 
-    'afternoon': 'Tarde', 
+    'MORNING': 'Mañana', 
+    'AFTERNOON': 'Tarde', 
   };
 
 function loggedIn() {

@@ -85,53 +85,121 @@ const saleFields = ['paymentForm', 'saleState', 'saleDate'];
 const userFields = ['seller'];
 const storeFields = ['name'];
 
-
-Meteor.publishComposite('sales-store', function(options: SearchOptions, filters: any, balanceId?: string) {
+Meteor.publishComposite('store-sales', function(
+  options: SearchOptions, 
+  filters: any, 
+  balanceId: string,
+  storeId: string
+) {
   
-  let salesSelector = getSelectorFilter(saleFields, filters);
-  let usersSelector = getSelectorFilter(userFields, filters);
-  let storesSelector = getSelectorFilter(storeFields, filters);
+  let salesFilter = getSelectorFilter(saleFields, filters);
+  let usersFilter = getSelectorFilter(userFields, filters);
+  let storesFilter = getSelectorFilter(storeFields, filters);
 
   return {
     find: function() {
-      // filter by balance
-      if (balanceId) {
-        salesSelector = { $and: [{ balanceId: balanceId }, salesSelector ] };
-      }
-
-      Counts.publish(this, 'numberOfSales',Sales.collection.find(salesSelector , options), { noReady: true });
-      return Sales.collection.find(salesSelector, options);
+      let storesSelector = {_id: storeId};
+      return Stores.collection.find(storesSelector);
     },
     children: [
       {
-        find: function(sale) {
-          return UserStores.collection.find({ _id: sale.userStoreId });
+        find: function(store) {
+          return UserStores.collection.find({storeId: storeId});
         },
         children: [
           {
             find: function(userStore) {
-              return Stores.collection.find(
-                { $and: [{ _id: userStore.storeId }, storesSelector ] }
-              );
+              Counts.publish(this, 'numberOfSales',Sales.collection.find({} , options), { noReady: true });
+              return Sales.collection.find({userStoreId: userStore._id});
             }
-          },
+          }, 
           {
             find: function(userStore) {
+              let usersSelector: any = {};
+              usersSelector["$and"] = [];
+              usersSelector["$and"].push({_id: userStore.userId});
+              usersSelector["$and"].push(usersFilter);
+              
               return  Meteor.users.find(
-                { $and: [{ _id: userStore.userId }, usersSelector ] }, 
+                usersSelector, 
                 {fields: {username: 1}}
               );
             }
           }
         ]
-      },
-      {
-        find: function(sale) {
-          return ProductSales.collection.find({ saleId: sale._id });
-        }
       }
     ]
   }
 });
+
+
+
+// Meteor.publishComposite('sales-store', function(
+//   options: SearchOptions, 
+//   filters: any, 
+//   storeId: string, 
+//   balanceId?: string
+// ) {
+  
+//   let salesFilter = getSelectorFilter(saleFields, filters);
+//   let usersFilter = getSelectorFilter(userFields, filters);
+//   let storesFilter = getSelectorFilter(storeFields, filters);
+
+//   return {
+//     find: function() {
+//       let salesSelector: any = {};
+//        salesSelector["$and"] = [];
+
+//       // filter by balance
+//       // uncomment this when balance integration is ready
+//       // if (balanceId) {
+//       //   salesSelector["$and"].push({balanceId: balanceId});      
+//       // }
+//       salesSelector["$and"].push(salesFilter);
+
+//       Counts.publish(this, 'numberOfSales',Sales.collection.find(salesSelector , options), { noReady: true });
+//       return Sales.collection.find(salesSelector, options);
+//     },
+//     children: [
+//       {
+//         find: function(sale) {
+//           return UserStores.collection.find({_id: sale.userStoreId});
+//         },
+//         children: [
+//           {
+//             find: function(userStore) {
+//               let storesSelector: any = {};
+//               storesSelector["$and"] = [];
+//               storesSelector["$and"].push({_id: userStore.storeId});
+//               storesSelector["$and"].push(storesFilter);
+//               return Stores.collection.find(storesSelector);
+//             }
+//           },
+//           {
+//             find: function(userStore, storeId) {
+//               let usersSelector: any = {};
+//                usersSelector["$and"] = [];
+//               if (storeId) {
+//                 usersSelector["$and"].push({storeId: userStore.userId});
+//               }
+//               usersSelector["$and"].push({_id: userStore.userId});
+//               usersSelector["$and"].push(usersFilter);
+              
+//               return  Meteor.users.find(
+//                 usersSelector, 
+//                 {fields: {username: 1}}
+//               );
+//             }
+//           }
+//         ]
+//       },
+//       {
+//         find: function(sale) {
+//           return ProductSales.collection.find({saleId: sale._id});
+//         }
+//       }
+//     ]
+//   }
+// });
 
 

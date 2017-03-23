@@ -229,7 +229,13 @@
         <h4>Total: $ {{getTotal()}}</h4>
       </div>        
       <div class="col span2">
-        <a class="btn btn-block btn-info" routerLink="/sales" routerLinkActive="active">Cancelar Orden</a>
+        <a class="btn btn-block btn-info" 
+        routerLink="/sales" 
+        routerLinkActive="active"
+        (click)="cancelOrder()"
+        >
+          Cancelar Orden
+        </a>
       </div>
       <div class="col span2">
         <button type="button" class="btn btn-block btn-info" (click)="submitSale()">Confirmar Venta</button>
