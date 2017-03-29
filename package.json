@@ -13,7 +13,9 @@
   "devDependencies": {
     "@types/chai": "3.4.35",
     "@types/meteor-publish-composite": "0.0.32",
+    "@types/meteor-roles": "^1.2.29",
     "@types/mocha": "2.2.40",
+    "@types/moment": "^2.13.0",
     "@types/underscore": "^1.8.0",
     "chai": "3.5.0",
     "chai-spies": "0.7.1",

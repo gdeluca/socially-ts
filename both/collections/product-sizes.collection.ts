@@ -4,25 +4,19 @@ import { Meteor } from 'meteor/meteor';
 import { ProductSize } from '../models/product-size.model';
 
 export const ProductSizes = new MongoObservable.Collection<ProductSize>('productSizes');
-export const lettersSizes = {'S':'70','M':'71','L':'72','XL':'73','XXL':'74','XXXL':'75','XXXXL':'76'};
-export const uniqueSize = {'UNICO':'00'};
+export const lettersSizes = {'S':'700','M':'701','L':'702','XL':'703','XXL':'704','XXXL':'705','XXXXL':'706'};
+export const uniqueSize = {'UNICO':'699'};
 
 export function getMappingSize(size: string){
   if (size) {
-    if (size.length == 1 && !isNaN(+size)){
-      size = '0'+size;
-    } else if (isNaN(+size)) {
-      size = size.toUpperCase();
-      if (lettersSizes[size]) {
-        return lettersSizes[size];
-      } else if (uniqueSize[size]) {
-        return uniqueSize[size];
-      } else {
-        return 'TALLE-INVALIDO'
-      }
+    if (lettersSizes[size.toUpperCase()]) {
+      return lettersSizes[size.toUpperCase()];
+    } else if (isNaN(+size)) { 
+      return "talle-invalido";
+    } else {
+      return Array(3-size.length).join("0")+""+size; 
     }
   }
-  return size;
 }
 
 function loggedIn() {

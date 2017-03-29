@@ -9,9 +9,6 @@ import { Store } from '../models/store.model';
 import { Product } from '../models/product.model';
 import { ProductPrice } from '../models/product-price.model';
 
-
-
-
 Meteor.methods({
 
   savePricesForStores: function (productPrice: ProductPrice, storeIds: string[]) {

@@ -11,6 +11,8 @@ import { Stocks } from '../collections/stocks.collection';
 import { Store } from '../models/store.model';
 import { Product } from '../models/product.model';
 
+// import { rateLimit } from '../modules/rate-limit';
+
 let tagNames = definedTags;
 
 function getSevenDigitsCounters(){
@@ -20,6 +22,7 @@ function getSevenDigitsCounters(){
 function getTwoDigitsCounters(){
   return ['name','model','color','brand','provider','section'];
 }
+
 
 Meteor.methods({
 
@@ -39,14 +42,10 @@ Meteor.methods({
           return Array(8-lastCode.length).join("0")+""+lastCode; 
         } else if (getTwoDigitsCounters().indexOf(type) > -1) {
           return Array(3-lastCode.length).join("0")+""+lastCode; 
-        }
+        } 
 
         return ""+lastCode;
     }
   }
 
 });
-
-
-
-

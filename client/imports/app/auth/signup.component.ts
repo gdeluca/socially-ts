@@ -80,6 +80,19 @@ export class SignupComponent implements OnInit, OnDestroy {
           this.router.navigate(['/']);
         }
       });
+
+
+     // Ensuring every user has an email address, should be in server-side code
+      // Accounts.validateNewUser((user) => {
+      // new SimpleSchema({
+      //   _id: { type: String },
+      //   emails: { type: Array },
+      //   'emails.$': { type: Object },
+      //   'emails.$.address': { type: String },
+      //   'emails.$.verified': { type: Boolean },
+      //   createdAt: { type: Date },
+      //   services: { type: Object, blackbox: true }
+      // }).validate(user);
     }
   }
 

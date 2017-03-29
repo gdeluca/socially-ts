@@ -62,11 +62,16 @@ Meteor.methods({
     check(storeId, String);
     check(quantity, Number);
     let stock = Stocks.findOne({productSizeId:productSizeId, storeId:storeId});
-    Stocks.update(stock._id, {
-      $set: { 
-       quantity: stock.quantity + quantity,
-      }
-    });
+    if (stock) {
+      Stocks.update(stock._id, {
+        $set: { 
+         quantity: stock.quantity + quantity,
+        }
+      });
+    } else {
+      console.log('can not find stock for productSizeId ' 
+        + productSizeId + 'and store id ' + storeId);
+    }
   },
 
   saveStocksForStores: function (

@@ -9,9 +9,33 @@ function loggedIn() {
   return !!Meteor.user();
 }
  
+// Counters.allow({
+//   insert: loggedIn,
+//   update: loggedIn,
+//   remove: loggedIn
+// });
+
+
 Counters.allow({
-  insert: loggedIn,
-  update: loggedIn,
-  remove: loggedIn
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
 });
 
+Counters.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
+});
+
+Meteor.users.allow({
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
+});
+
+Meteor.users.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
+});

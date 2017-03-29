@@ -7,7 +7,9 @@
 /// <reference types="meteor-typings" />
 /// <reference types="@types/meteor-publish-composite" />
 /// <reference types="@types/meteor-persistent-session" />
-/// <reference types="moment/moment.d.ts" />
+/// <reference types="./typings/alanning-roles" />
+/// <reference types="./typings/publish-counts" />
+/// <reference types="./typings/themeteorchef:bert" />
 
 
 declare module "*.html" {
@@ -33,17 +35,6 @@ declare module "*.css" {
 declare module "*.sass" {
   const style: string;
   export default style;
-}
-
-declare module 'meteor/tmeasday:publish-counts' {
-  import { Mongo } from 'meteor/mongo';
- 
-  interface CountsObject {
-    get(publicationName: string): number;
-    publish(context: any, publicationName: string, cursor: Mongo.Cursor, options: any): number;
-  }
- 
-  export const Counts: CountsObject;
 }
 
 interface SpyCalledWith extends Chai.Assertion {

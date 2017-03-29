@@ -34,3 +34,7 @@ u2622:persistent-session
 msavin:jetsetter
 session@1.1.7
 twbs:bootstrap@4.0.0-alpha.2
+alanning:roles
+underscore
+ddp-rate-limiter
+audit-argument-checks
