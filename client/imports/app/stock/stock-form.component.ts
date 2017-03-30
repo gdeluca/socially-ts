@@ -13,11 +13,11 @@ import { Subject } from 'rxjs/Subject';
 
 // collections
 import { Categories } from '../../../../both/collections/categories.collection';
-import { Sections } from '../../../../both/collections/sections.collection';
+import { Tags } from '../../../../both/collections/tags.collection';
 
 // model 
 import { Category } from '../../../../both/models/category.model';
-import { Section } from '../../../../both/models/section.model';
+import { Tag } from '../../../../both/models/tag.model';
 
 import { isNumeric } from '../../validators/validators';
 
@@ -38,7 +38,7 @@ export class StockFormComponent implements OnInit, OnDestroy {
   currentUser: Meteor.User;
 
   allCategories: Observable<Category[]>;
-  allSections: Observable<Section[]>;
+  allSections: Observable<Tag[]>;
 
   complexForm : FormGroup;
 
@@ -63,10 +63,10 @@ export class StockFormComponent implements OnInit, OnDestroy {
 
     if (this.sectionsSub) {
       this.sectionsSub.unsubscribe();
-    } 
-    this.sectionsSub = MeteorObservable.subscribe('sections')
+    }
+    this.sectionsSub = MeteorObservable.subscribe('tags.section')
       .subscribe(() => {
-        this.allSections = Sections.find({}).zone();
+        this.allSections = Tags.find({}).zone();
     });
 
     if (this.categoriesSub) {

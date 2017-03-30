@@ -17,7 +17,7 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../../both/search/search-options';
+import { SearchOptions } from '../../../../both/domain/search-options';
 import { Bert } from 'meteor/themeteorchef:bert';
 
 // collections
@@ -26,8 +26,8 @@ import { ProductPrices } from '../../../../both/collections/product-prices.colle
 import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Products } from '../../../../both/collections/products.collection';
 import { Categories } from '../../../../both/collections/categories.collection';
-import { Sections } from '../../../../both/collections/sections.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
+import { Tags } from '../../../../both/collections/tags.collection';
 
 // model 
 import { ProductSize } from '../../../../both/models/product-size.model';
@@ -35,10 +35,10 @@ import { ProductPrice } from '../../../../both/models/product-price.model';
 import { Stock } from '../../../../both/models/stock.model';
 import { Product } from '../../../../both/models/product.model';
 import { Category } from '../../../../both/models/category.model';
-import { Section } from '../../../../both/models/section.model';
 import { Store } from '../../../../both/models/store.model';
+import { Tag } from '../../../../both/models/tag.model';
 
-import { Dictionary } from '../../../../both/models/dictionary';
+import { Dictionary } from '../../../../both/domain/dictionary';
 import { isNumeric } from '../../validators/validators';
 
 import template from "./stock-list.component.html";
@@ -49,7 +49,7 @@ import style from "./stock-list.component.scss";
   template,
   styles: [ style ]
 })
-@InjectUser('user')
+@InjectUser('currentUser')
 export class StockListComponent implements OnInit, OnDestroy {
   // pagination related
   pageSize: Subject<number> = new Subject<number>();
@@ -94,7 +94,7 @@ export class StockListComponent implements OnInit, OnDestroy {
   sectionsSub: Subscription;
   storesSub: Subscription;
 
-  user: Meteor.User;
+  currentUser: Meteor.User;
   emptyStock: any = 
     {
       barCode:'', 
@@ -117,7 +117,7 @@ export class StockListComponent implements OnInit, OnDestroy {
   categories: Observable<Category[]>; 
 
   allCategories: Observable<Category[]>;
-  allSections: Observable<Section[]>;
+  allSections: Observable<Tag[]>;
   allStores: Observable<Store[]>;
 
   constructor(
@@ -158,9 +158,9 @@ export class StockListComponent implements OnInit, OnDestroy {
     if (this.sectionsSub) {
       this.sectionsSub.unsubscribe();
     } 
-    this.sectionsSub = MeteorObservable.subscribe('sections')
+    this.sectionsSub = MeteorObservable.subscribe('tags.section')
       .subscribe(() => {
-        this.allSections = Sections.find({}).zone();
+        this.allSections = Tags.find({}).zone();
     });
 
     if (this.storesSub) {

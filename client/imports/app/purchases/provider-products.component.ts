@@ -22,7 +22,7 @@ import { Subject } from 'rxjs/Subject';
 // import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../../both/search/search-options';
+import { SearchOptions } from '../../../../both/domain/search-options';
 
 // collections
 // import { Counters } from '../../../../both/collections/counters.collection';
@@ -50,7 +50,7 @@ import { Store } from '../../../../both/models/store.model';
 import { Tag } from '../../../../both/models/tag.model';
 import { User } from '../../../../both/models/user.model';
 
-import { Dictionary } from '../../../../both/models/dictionary';
+import { Dictionary } from '../../../../both/domain/dictionary';
 import { isNumeric } from '../../validators/validators';
 
 // import * as moment from 'moment';

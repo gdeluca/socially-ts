@@ -1,71 +1,57 @@
 import { Meteor } from 'meteor/meteor';
 import { Counts } from 'meteor/tmeasday:publish-counts';
+import { } from 'meteor-publish-composite';
+import {check} from 'meteor/check';
 
-import { getSelectorFilter } from './commons';
-
+import { getSelectorFilter, checkOptions } from './commons';
+import { SearchOptions } from '../../../both/domain/search-options';
+import { Filter, Filters } from '../../../both/domain/filter';
 
 import { Products } from '../../../both/collections/products.collection';
 import { ProductSizes } from '../../../both/collections/product-sizes.collection';
 import { ProductPrices } from '../../../both/collections/product-prices.collection';
 import { Categories } from '../../../both/collections/categories.collection';
 
-import { SearchOptions } from '../../../both/search/search-options';
-
-Meteor.publishComposite('productById', function(productId: string) {
- return { 
-    find: function() {
-        return Products.collection.find({ _id: productId })
-    }, 
-    children: [{
-        find: function(product) {
-            return Categories.collection.find({_id: product.categoryId});
-        }
-    }]
-  }
-});
-
 
 const productFields = ['code','name','brand','color','provider','model'];
 const productSizeFields = ['barCode','size']; 
 const categoryFields = ['sectionId'];
 
-Meteor.publishComposite('provider-products', function(provider, options: SearchOptions, filters: any) {
-
-let productSelector = getSelectorFilter(productFields, filters);
-let selector = { provider: provider };
-return {
+Meteor.publishComposite('provider-products', 
+  function(
+    provider: string, 
+    options: SearchOptions, 
+    filters: Filters)
+{
+  check(provider, String);
+  let productFilter = getSelectorFilter(productFields, filters);
+  let selector: any = {};
+  selector["$and"] = [];
+  selector["$and"].push({ provider: provider });
+  selector["$and"].push(productFilter);
+  return {
     find: function() {
-        Counts.publish(this, 'numberOfProducts',Products.collection.find(selector), { noReady: true });
-        return Products.collection.find({ $and: [selector, productSelector] })
+      Counts.publish(this, 'numberOfProducts',
+        Products.collection.find(selector), { noReady: true });
+      return Products.collection.find(selector, options)
     }, 
     children: [
       {
         find: function(product) {
-            return ProductPrices.collection.find({productId: product._id});
+          return ProductPrices.collection.find({productId: product._id});
         }
       }
     ]
   }
 });
- 
-Meteor.publishComposite('products', function() {
-return {
-    find: function() {
-        return Products.collection.find()
-    }, 
-    children: [{
-        find: function(product) {
-            return Categories.collection.find({_id: product.categoryId});
-        }
-    }]
-  }
-});
 
-Meteor.publishComposite('products-with-categories', function(options: SearchOptions, filters: any) {
+Meteor.publishComposite('products.categories', function(
+  options: SearchOptions, 
+  filters: Filters
+) {
 
   let productSelector = getSelectorFilter(productFields, filters);
   let categorySelector = getSelectorFilter(['categoryName:name'], filters);
-
   return {
     find: function() {
       Counts.publish(this, 'numberOfProducts',Products.collection.find(productSelector , options), { noReady: true });
@@ -74,29 +60,38 @@ Meteor.publishComposite('products-with-categories', function(options: SearchOpti
     children: [
       {
         find: function(product) {
-          return Categories.collection.find( { $and: [{ _id: product._id }, categorySelector ] })
+          let selector: any = {};
+          selector["$and"] = [];
+          selector["$and"].push({ _id: product._id });
+          selector["$and"].push(categorySelector);
+          return Categories.collection.find(selector)
         }
       }
     ]
   }
 });
 
-
-
-Meteor.publishComposite('products-search', function(options: SearchOptions, filters: any) {
-  
+Meteor.publishComposite('products-search', function(
+  options: SearchOptions, 
+  filters: Filters
+) {
   let productSelector = getSelectorFilter(productFields, filters);
   let productSizeSelector = getSelectorFilter(productSizeFields, filters);
-
+  checkOptions(options);
   return {
     find: function() {
-      Counts.publish(this, 'numberOfProducts',Products.collection.find(productSelector , options), { noReady: true });
+      Counts.publish(this, 'numberOfProducts',
+        Products.collection.find(productSelector), { noReady: true });
       return Products.collection.find(productSelector, options);
     },
     children: [
       {
         find: function(product) {
-          return ProductSizes.collection.find({ $and: [{ productId: product._id }, productSizeSelector ] })
+          let selector: any = {};
+          selector["$and"] = [];
+          selector["$and"].push({ productId: product._id });
+          selector["$and"].push(productSizeSelector);
+          return ProductSizes.collection.find(selector)
         }
       },  
       {  

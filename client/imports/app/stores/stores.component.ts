@@ -14,12 +14,12 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/combineLatest';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../../both/search/search-options';
+import { SearchOptions } from '../../../../both/domain/search-options';
 
 // model 
 import { Stores } from '../../../../both/collections/stores.collection';
 import { Store } from '../../../../both/models/store.model';
-import { Dictionary } from '../../../../both/models/dictionary';
+import { Dictionary } from '../../../../both/domain/dictionary';
 
 
  

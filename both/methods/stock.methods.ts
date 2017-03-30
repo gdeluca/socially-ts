@@ -1,7 +1,7 @@
 import {Meteor} from 'meteor/meteor';
 import {check} from 'meteor/check';
 
-// import { Balances, balanceOpsMapping, balanceOps } from '../collections/balances.collection';
+// import { Balances } from '../collections/balances.collection';
 import { ProductPurchases } from '../collections/product-purchases.collection';
 import { ProductSizes, getMappingSize } from '../collections/product-sizes.collection';
 import { ProductPrices } from '../collections/product-prices.collection';
@@ -15,7 +15,6 @@ import { Stores } from '../collections/stores.collection';
 // import { UserStores } from '../collections/user-stores.collection';
 // import { ProductSales } from '../collections/product-sales.collection';
 // import { Sales } from '../collections/sales.collection';
-// import { Sections } from '../collections/sections.collection';
 // import { Tags } from '../collections/tags.collection';
 // import { Users } from '../collections/users.collection';
 
@@ -33,7 +32,6 @@ import { Store } from '../models/store.model';
 // import { UserStore } from '../models/user-store.model';
 // import { ProductSale } from '../models/product-sale.model';
 // import { Sale } from '../models/sale.model';
-// import { Section } from '../models/section.model';
 // import { Tag } from '../models/tag.model';
 // import { User } from '../models/user.model';
 

@@ -48,6 +48,7 @@
               name=filter-{{header.key}}
               placeholder={{header.key}}
               #tmp
+              (keyup.enter)="search(header.value, tmp.value)"
               (blur)="search(header.value, tmp.value)">
           </td>
         </ng-container> 
@@ -66,7 +67,7 @@
             [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
             type="button" 
             class="btn btn-default" 
-            (click)="currentIndex=rowIndex; editing=false; update(editedCategory)">
+            (click)="currentIndex=rowIndexq; editing=false; updateCategory(editedCategory, category)">
             <span class="fa fa-check-square-o" aria-hidden="true"></span>
           </button>
           <button 
@@ -97,12 +98,13 @@
         
         <!-- sections field-->
         <ng-container *ngFor="let section of paginatedSections | async"> 
-          <ng-container *ngIf="category.sectionId === section._id">
+          <ng-container *ngIf="category.sectionId === section.code">
             <!-- display mode fields -->
             <td 
               [hidden]="currentIndex === rowIndex && editing"
               class="text-center">
-              <a [routerLink]="['/sections', section._id]">{{section.name}}</a>
+              <!-- <a [routerLink]="['/sections', section._id]">{{section.name}}</a> -->
+              <a>{{section.description}}</a>
             </td>
             <!-- editing mode fields -->
             <td 
@@ -112,7 +114,7 @@
                 [(ngModel)]="editedCategory.sectionId">
                 <option value=undefined disabled currentIndex hidden>Seccion</option>
                 <option *ngFor="let section of sections | async" 
-                [ngValue]="section._id">{{section.name}}</option>
+                [ngValue]="section.code">{{section.description}}</option>
               </select> 
             </td>
           </ng-container>
@@ -150,7 +152,7 @@
               [disabled]="!complexForm.valid" 
               type="button" 
               class="btn btn-default" 
-              (click)="adding=false; saveCategory(complexForm.value)">
+              (click)="adding=false; saveCategory()">
               <span class="fa fa-check-square-o" aria-hidden="true"></span>
             </button>
           </td> 
@@ -178,12 +180,12 @@
               [hidden]="!adding" 
               name="sectionOptions" 
               class="form-control" 
-               [formControl]="complexForm.controls['section']">
+               [formControl]="complexForm.controls['sectionCode']">
                 <option value=undefined disabled currentIndex hidden>
                   Seccion
                 </option>
-                <option *ngFor="let section of sections | async" [ngValue]="section">
-                  {{section.name}}
+                <option *ngFor="let section of sections | async" [ngValue]="section.code">
+                  {{section.description}}
                 </option>
             </select> 
           </td>

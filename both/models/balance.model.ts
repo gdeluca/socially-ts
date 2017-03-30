@@ -1,13 +1,11 @@
 
 import { CollectionObject } from './collection-object.model';
 
-// should be in open status to allow close
 export interface Balance extends CollectionObject {
-  balanceNumber: string;
+  balanceNumber: number;
   cashExistence: number;
-  cashFlow?: number;
-  operation: string; // OPEN // CLOSE // EXTRACTION // DEPOSIT
-  actionDate: string;
-  saleIds?: string[];
+  workShift: string;
+  createdAt: Date;
   storeId: string;
+  status: string;  // OPEN // CLOSE
 }

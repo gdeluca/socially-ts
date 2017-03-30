@@ -1,8 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import { Counts } from 'meteor/tmeasday:publish-counts';
-//import { publishComposite } from 'meteor/reywood:publish-composite';
+import { } from 'meteor-publish-composite';
+import {check} from 'meteor/check';
 
-import { getSelectorFilter } from './commons';
+import { getSelectorFilter, checkOptions } from './commons';
+import { SearchOptions } from '../../../both/domain/search-options';
+import { Filter, Filters } from '../../../both/domain/filter';
 
 // collections
 // import { Counters } from '../../../both/collections/counters.collection';
@@ -29,22 +32,27 @@ import { Stock } from '../../../both/models/stock.model';
 import { Tag } from '../../../both/models/tag.model';
 import { User } from '../../../both/models/user.model';
 
+const purchaseFields = ['purchaseState', 'purchaseDate', 'lastUpdate', 'provider'];
 
-import { SearchOptions } from '../../../both/search/search-options';
-
-const purchaseFilters = ['purchaseState', 'purchaseDate', 'lastUpdate', 'provider'];
-
-Meteor.publishComposite('purchases', function(options: SearchOptions, filters: any) {
-  let purchaseSelector = getSelectorFilter(purchaseFilters, filters);
+Meteor.publishComposite('purchases', function(
+  options: SearchOptions, 
+  filters: Filters
+) {
+  let purchaseSelector = getSelectorFilter(purchaseFields, filters);
+  checkOptions(options);
   return {
     find: function() { 
-      Counts.publish(this, 'numberOfPurchases', Purchases.collection.find(purchaseSelector , options), { noReady: true });
+      Counts.publish(this, 'numberOfPurchases', 
+        Purchases.collection.find(purchaseSelector), { noReady: true });
       return Purchases.collection.find(purchaseSelector, options);
     }
   }
 });
 
-Meteor.publishComposite('purchase-orders', function(purchaseNumber: string) {
+Meteor.publishComposite('purchase-orders', function(
+  purchaseNumber: number
+) {
+  check(purchaseNumber, Number);
   return {
     find: function() {
       return Purchases.collection.find({ purchaseNumber: purchaseNumber });

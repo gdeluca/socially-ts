@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, OnDestroy, Injectable, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
@@ -14,16 +14,21 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/combineLatest';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../../both/search/search-options';
+import { SearchOptions } from '../../../../both/domain/search-options';
+
+// collections
+import { Categories } from '../../../../both/collections/categories.collection';
+import { Tags } from '../../../../both/collections/tags.collection';
 
 // model 
-import { Categories } from '../../../../both/collections/categories.collection';
-import { Sections } from '../../../../both/collections/sections.collection';
 import { Category } from '../../../../both/models/category.model';
-import { Section } from '../../../../both/models/section.model';
-import { Dictionary } from '../../../../both/models/dictionary';
+import { Tag } from '../../../../both/models/tag.model';
 
-
+// domain
+import { Dictionary } from '../../../../both/domain/dictionary';
+import { Filter, Filters } from '../../../../both/domain/filter';
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
  
 import template from './categories.component.html';
 import style from './categories.component.scss';
@@ -33,7 +38,7 @@ import style from './categories.component.scss';
   template,
   styles: [ style ],
 })
-@InjectUser('user')
+@InjectUser('currentUser')
 export class CategoriesComponent implements OnInit, OnDestroy {
   
   // pagination related
@@ -42,9 +47,18 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
 
-  filterField: Subject<string> = new Subject<string>();
-  filterValue: Subject<string> = new Subject<string>();
+  filters: Subject<Filters> = new Subject<Filters>();
 
+  filtersParams: Filters = [
+    {key: 'name', value:''},
+    {key: 'section:name', value:''},
+  ];
+
+  // name, sortfield, touple
+  headers: Dictionary[] = [
+    {'key': 'Nombre', 'value': 'name'},
+    {'key': 'Seccion', 'value':'section:name'}
+  ];
 
   collectionCount: number = 0;
   PAGESIZE: number = 6   ; 
@@ -54,26 +68,13 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   optionsSub: Subscription;
   autorunSub: Subscription;
 
-
-  user: Meteor.User;
+  currentUser: Meteor.User;
   editedCategory: Category = {sectionId:'', name:''};
-  adding: boolean = false;
-  editing: boolean = false;
-  selected: any;
+
   categories: Observable<Category[]>;
-  paginatedSections: Observable<Section[]>;
-  sections: Observable<Section[]>;
+  paginatedSections: Observable<Tag[]>;
+  sections: Observable<Tag[]>;
 
-  filters: any = {
-    'name':  '',
-    'sectionId': ''
-  };
-
-  // name, sortfield, touple
-  headers: Dictionary[] = [
-    {'key': 'Nombre', 'value': 'name'},
-    {'key': 'Seccion', 'value':'sectionId'}
-  ];
   complexForm : FormGroup;
 
   constructor(
@@ -82,7 +83,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   ){
     this.complexForm = formBuilder.group({
       name: ['', Validators.compose([Validators.required, Validators.minLength(5)])],
-      section: ['', Validators.required],
+      sectionCode: ['', Validators.required],
     });
   }
 
@@ -92,55 +93,55 @@ export class CategoriesComponent implements OnInit, OnDestroy {
       this.curPage,
       this.sortDirection,
       this.sortField,
-      this.filterField,
-      this.filterValue
-    ).subscribe(([pageSize, curPage, sortDirection, sortField, filterField, filterValue]) => {
+      this.filters,
+    ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
       const options: SearchOptions = {
         limit: pageSize as number,
         skip: ((curPage as number) - 1) * (pageSize as number),
         sort: { [sortField as string] : sortDirection as number }
       };
       
-      this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
+      this.paginationService.setCurrentPage(
+        this.paginationService.defaultId() , curPage as number);
 
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('categories.sections', options, filterField, filterValue)
+      this.paginatedSub = MeteorObservable.subscribe(
+        'categories.sections', options, filters)
         .subscribe(() => {
           this.categories = Categories.find({}).zone();
-          this.paginatedSections = Sections.find({}).zone();
+          this.paginatedSections = Tags.find({}).zone();
       });
       
     });
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfCategories');
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+      this.paginationService.setTotalItems(
+        this.paginationService.defaultId(), this.collectionCount);
     });
 
-    this.pageSize.next(this.PAGESIZE);
-    this.curPage.next(1);
-    this.sortField.next('name');
-    this.sortDirection.next(1);
-    this.filterField.next('name');
-    this.filterValue.next('');
-
     if (this.sectionsSub) {
-        this.sectionsSub.unsubscribe();
-      }
-      this.sectionsSub = MeteorObservable.subscribe('sections')
-        .subscribe(() => {
-          this.sections = Sections.find({}).zone();
-      });
+      this.sectionsSub.unsubscribe();
+    }
+    this.sectionsSub = MeteorObservable.subscribe('tags.section')
+      .subscribe(() => {
+        this.sections = Tags.find({}).zone();
+    });
     
-
     this.paginationService.register({
       id: this.paginationService.defaultId(),
       itemsPerPage: this.PAGESIZE,
       currentPage: 1,
       totalItems: this.collectionCount,
     });
+
+    this.pageSize.next(this.PAGESIZE);
+    this.curPage.next(1);
+    this.sortField.next('name');
+    this.sortDirection.next(1);
+    this.filters.next(this.filtersParams);
 
   }
   
@@ -154,48 +155,55 @@ export class CategoriesComponent implements OnInit, OnDestroy {
     this.curPage.next(page);
   }
 
-  update = function(category){
-    Categories.update(category._id, {
-      $set: { 
-         name: category.name,
-         sectionId: category.sectionId,
-      }
+  updateCategory = function(newCategory, category) {
+    MeteorObservable.call('updateCategory',category._id, newCategory.name, newCategory.sectionId)
+      .subscribe(() => {
+      Bert.alert('Categoria actualizada: ', 'success', 'growl-top-right' ); 
+    }, (error) => {
+      Bert.alert('Error al actualizar la categoria:' +  error, 'danger', 'growl-top-right' ); 
     });
   }
 
-  saveCategory(value: any){
+  saveCategory(){
     if (!Meteor.userId()) {
       alert('Ingrese al sistema para guardar');
       return;
     }
 
     if (this.complexForm.valid) {
-      Categories.insert({
-        name: this.complexForm.value.name, 
-        sectionId: this.complexForm.value.section._id 
+      let values =  this.complexForm.value;
+      MeteorObservable.call('saveCategory', values.name, values.sectionCode)
+      .subscribe(() => {
+        Bert.alert('Categoria agregada: ', 'success', 'growl-top-right' ); 
+      }, (error) => {
+        Bert.alert('Error al agregar la categoria: ' + error , 'danger', 'growl-top-right' ); 
       });
       this.complexForm.reset();
     }
-    console.log(value);
   }
 
   copy(original: any){
     return Object.assign({}, original)
   }
 
-  search(field: string, value: string): void {
-    if (this.filters[field] === value) {
-      return;
-    }
-
+  search(fieldKey: string, value: string): void {
     if (value == 'undefined')  {
       value = '';
     }
-    this.filters[field] = value;
-    
-    this.curPage.next(1);
-    this.filterField.next(field);
-    this.filterValue.next(value); 
+
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
+
+      filter.value = value.toUpperCase();
+
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
+    }
   }
   
   changeSortOrder(direction: string, fieldName: string): void {

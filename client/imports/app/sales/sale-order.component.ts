@@ -21,7 +21,7 @@ import { Subject } from 'rxjs/Subject';
 // import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../../both/search/search-options';
+import { SearchOptions } from '../../../../both/domain/search-options';
 
 // collections
 // import { Balances } from '../../../../both/collections/balances.collection';
@@ -35,7 +35,6 @@ import { ProductPrices } from '../../../../both/collections/product-prices.colle
 import { Products } from '../../../../both/collections/products.collection';
 // import { Purchases, purchasesStatusMapping } from '../../../../both/collections/purchases.collection';
 import { Sales, salesStatusMapping, salePaymentMapping, workShiftMapping } from '../../../../both/collections/sales.collection';
-// import { Sections } from '../../../../both/collections/sections.collection';
 import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
 // import { Tags } from '../../../../both/collections/tags.collection';
@@ -53,13 +52,12 @@ import { ProductPrice } from '../../../../both/models/product-price.model';
 import { Product } from '../../../../both/models/product.model';
 // import { Purchase } from '../../../../both/models/purchase.model';
 import { Sale } from '../../../../both/models/sale.model';
-// import { Section } from '../../../../both/models/section.model';
 import { Stock } from '../../../../both/models/stock.model';
 import { Store } from '../../../../both/models/store.model';
 // import { Tag } from '../../../../both/models/tag.model';
 import { User } from '../../../../both/models/user.model';
 
-import { Dictionary } from '../../../../both/models/dictionary';
+import { Dictionary } from '../../../../both/domain/dictionary';
 import { isNumeric } from '../../validators/validators';
 
 import template from "./sale-order.component.html";

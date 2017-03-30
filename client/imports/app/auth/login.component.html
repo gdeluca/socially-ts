@@ -9,24 +9,46 @@
             <div class="form-content">
               
               <div class="form-group">
-                <input id="email" class="form-control input-underline input-lg" type="text" formControlName="email" (blur)="updatesubscription($event.target.value)" placeholder="Email" >
+                <input class="form-control" 
+                  type="text" 
+                  formControlName="username"
+                  [(ngModel)]="username"
+                  (keyup.enter)="userSearch()"
+                  (blur)="userSearch()" 
+                  placeholder="Nombre de usuario" 
+                >
               </div>
 
               <div class="form-group">
-                <input id="password" class="form-control input-underline input-lg" type="password" formControlName="password" placeholder="Password">
+                <input class="form-control" 
+                  type="text" 
+                  formControlName="email"
+                  [(ngModel)]="email"
+                  (keyup.enter)="userSearch()"
+                  (blur)="userSearch()" 
+                  placeholder="Email" 
+                >
+              </div>
+
+              <div class="form-group">
+                <input class="form-control"
+                  type="password" 
+                  formControlName="password" 
+                  placeholder="Password"
+                >
               </div>
 
               <div class="form-group">
                 <select 
                   name="store" 
                   class="form-control" 
-                  formControlName="store" 
+                  formControlName="storeId" 
                   required 
-                  [(ngModel)]="selectedStore"
+                  [(ngModel)]="storeId"
                   >
+                  <option value=-1 currentIndex>Como administrador</option>
                   <option 
-                    *ngFor="let store of stores | async; let idx = index" 
-                    [ngValue]="store">
+                    *ngFor="let store of stores | async" [ngValue]="store._id">
                     {{store.name}}
                   </option>
                 </select> 
@@ -34,10 +56,7 @@
               
             </div>
             
-            <button type="submit" class="btn btn-primary">Ingresar</button>
-            &nbsp;
-            <a type="submit" class="btn rounded-btn" routerLink="/signup">Registrarse</a>
-            
+            <button type="submit" class="btn btn-primary">Ingresar</button>    
         </fieldset>
       </form>
     </div>  

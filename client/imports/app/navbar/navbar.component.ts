@@ -1,4 +1,5 @@
 import { Component} from '@angular/core';
+import { Router } from '@angular/router';
 
 import template from './navbar.component.html';
 import style from './navbar.component.scss';
@@ -15,11 +16,16 @@ import {InjectUser} from "angular2-meteor-accounts-ui";
 export class NavbarComponent {
   isCollapsed: boolean = true;
 
+  constructor(
+    private router: Router
+    ) {}
+
   toggleCollapse(): void {
     this.isCollapsed = !this.isCollapsed;
   }
 
   logout() {
+    this.router.navigate(['/']);
     Meteor.logout();
   }
 

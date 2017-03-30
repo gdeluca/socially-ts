@@ -48,6 +48,7 @@
               name=filter-{{header.key}}
               placeholder={{header.key}}
               #tmp
+              (keyup.enter)="search(header.value, tmp.value)"
               (blur)="search(header.value, tmp.value)">
           </td>
         </ng-container> 

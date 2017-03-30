@@ -5,21 +5,31 @@ import { Balance } from '../models/balance.model';
 
 export const Balances = new MongoObservable.Collection<Balance>('balances');
 
-export const balanceOps = ['OPEN','CLOSE','EXTRACTION','DEPOSIT'];
+export const balanceStatus = ['OPEN','CLOSE'];
 
-export const balanceOpsMapping = {
+export const balanceStatusMapping = {
     'OPEN': 'Abierto', 
-    'CLOSE': 'Cerrado', 
-    'EXTRACTION': 'Extraccion', 
-    'DEPOSIT': 'Deposito'
+    'CLOSE': 'Cerrado'
   };
 
 function loggedIn() {
   return !!Meteor.user();
 }
+
+function isAdmin() {
+  // return _.include(Meteor.user()['roles'], "Administrator");
+  return false;
+}
  
 Balances.allow({
-  insert: loggedIn,
-  update: loggedIn,
-  remove: loggedIn
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
 });
+
+Balances.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
+});
+

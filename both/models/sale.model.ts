@@ -1,7 +1,7 @@
 import { CollectionObject } from './collection-object.model';
 
 export interface Sale extends CollectionObject {
-  saleNumber: string;
+  saleNumber: number;
   saleState: string; //STARTED // SUBMITTED // RESERVED // CANCELED
   payment: string;   // CASH // CARD // ACCOUNT
   saleDate: string;

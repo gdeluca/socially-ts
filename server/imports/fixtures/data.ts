@@ -1,4 +1,5 @@
 import { Balances } from '../../../both/collections/balances.collection';
+import { BalanceOperations } from '../../../both/collections/balance-operations.collection';
 import { Categories } from '../../../both/collections/categories.collection';
 import { Counters } from '../../../both/collections/counters.collection';
 import { UserStores } from '../../../both/collections/user-stores.collection';
@@ -9,13 +10,12 @@ import { ProductSizes } from '../../../both/collections/product-sizes.collection
 import { Products } from '../../../both/collections/products.collection';
 import { Purchases } from '../../../both/collections/purchases.collection';
 import { Sales } from '../../../both/collections/sales.collection';
-import { Sections } from '../../../both/collections/sections.collection';
 import { Stocks } from '../../../both/collections/stocks.collection';
 import { Stores } from '../../../both/collections/stores.collection';
 import { Tags } from '../../../both/collections/tags.collection';
 import { Users } from '../../../both/collections/users.collection';
-
 import { Balance } from '../../../both/models/balance.model';
+import { BalanceOperation } from '../../../both/models/balance-operation.model';
 import { Category } from '../../../both/models/category.model';
 import { Counter } from '../../../both/models/counter.model';
 import { UserStore } from '../../../both/models/user-store.model';
@@ -26,7 +26,6 @@ import { ProductSize } from '../../../both/models/product-size.model';
 import { Product } from '../../../both/models/product.model';
 import { Purchase } from '../../../both/models/purchase.model';
 import { Sale } from '../../../both/models/sale.model';
-import { Section } from '../../../both/models/section.model';
 import { Stock } from '../../../both/models/stock.model';
 import { Store } from '../../../both/models/store.model';
 import { Tag } from '../../../both/models/tag.model';
@@ -204,6 +203,7 @@ export function loadData() {
       roles:['administrator']};
     let userIdA = Accounts.createUser({
       email: userA.email,
+      username: userA.name,
       password: userA.password,
       profile: { name: userA.name }
     });
@@ -216,6 +216,7 @@ export function loadData() {
       roles:['administrator']};
     let userIdB = Accounts.createUser({
       email: userB.email,
+      username: userB.name,
       password: userB.password,
       profile: { name: userB.name }
     });
@@ -228,6 +229,7 @@ export function loadData() {
       roles:['supervisor']};
     let userIdC = Accounts.createUser({
       email: userC.email,
+      username: userC.name,
       password: userC.password,
       profile: { name: userC.name }
     });
@@ -240,6 +242,7 @@ export function loadData() {
       roles:['seller']};
     let userIdD = Accounts.createUser({
       email: userD.email,
+      username: userD.name,
       password: userD.password,
       profile: { name: userD.name }
     });
@@ -252,6 +255,7 @@ export function loadData() {
       roles:['anonymous']};
     let userIdE = Accounts.createUser({
       email: userE.email,
+      username: userE.name,
       password: userE.password,
       profile: { name: userE.name }
     });
@@ -792,24 +796,24 @@ export function loadData() {
     products.forEach((product) => Products.insert(product));
 
     const sales = [
-      { "_id" : "nCmZGEYNGRFTvtwa9", "saleNumber" : "0000011", "saleState" : "SUBMITTED", "payment" : "", "saleDate" : "2017-03-23 19:54:16", "lastUpdate" : "2017-03-23 19:54:16", "workShift" : "AFTERNOON", "userStoreId" : "01", "balanceId" : "10", "discount" : 0, "taxes" : 0, "subtotal" : 0, "total" : 0 }
+      { "_id" : "nCmZGEYNGRFTvtwa9", "saleNumber" : 11, "saleState" : "SUBMITTED", "payment" : "", "saleDate" : "2017-03-23 19:54:16", "lastUpdate" : "2017-03-23 19:54:16", "workShift" : "AFTERNOON", "userStoreId" : "01", "balanceId" : "10", "discount" : 0, "taxes" : 0, "subtotal" : 0, "total" : 0 }
     ];
     sales.forEach((sale) => Sales.insert(sale));
 
     const productSizes = [
-      { "_id" : "6ZjAkvoojykg7PN6Y", "productId" : "oyE9jkW7peeieDfPx", "size" : "S", "barCode" : "111111110270" },
-      { "_id" : "vXDjbE6Bai2aFWfcG", "productId" : "oyE9jkW7peeieDfPx", "size" : "M", "barCode" : "111111110271" },
-      { "_id" : "Yh3Df7fDjfE7czzvo", "productId" : "oyE9jkW7peeieDfPx", "size" : "L", "barCode" : "111111110272" },
-      { "_id" : "cWFt2hnKC84SGsEGq", "productId" : "oyE9jkW7peeieDfPx", "size" : "XL", "barCode" : "111111110273" },
-      { "_id" : "EavnKzDACr5Meqhb5", "productId" : "bDjrLj9evTrZToLvY", "size" : "S", "barCode" : "111112110270" },
-      { "_id" : "byXML7uKE2aJTnK3C", "productId" : "bDjrLj9evTrZToLvY", "size" : "M", "barCode" : "111112110271" },
-      { "_id" : "G8fanP2Q54iGRRJzt", "productId" : "bDjrLj9evTrZToLvY", "size" : "L", "barCode" : "111112110272" },
-      { "_id" : "B9tAtexgDjwRdX5v8", "productId" : "bDjrLj9evTrZToLvY", "size" : "XL", "barCode" : "111112110273" },
-      { "_id" : "TtuxwcQKdaepZ5uoT", "productId" : "QpcDBvvdx8qxezBNJ", "size" : "S", "barCode" : "111113110270" },
-      { "_id" : "j9jnfEWRdo27pxMw9", "productId" : "QpcDBvvdx8qxezBNJ", "size" : "M", "barCode" : "111113110271" },
-      { "_id" : "kgXcMEQekpWExBS5W", "productId" : "QpcDBvvdx8qxezBNJ", "size" : "L", "barCode" : "111113110272" },
-      { "_id" : "KXzFyYrYF4JbAgZBd", "productId" : "QpcDBvvdx8qxezBNJ", "size" : "XL", "barCode" : "111113110273" },
-      { "_id" : "3tHHXzhBSH7eAvSm2", "productId" : "QpcDBvvdx8qxezBNJ", "size" : "XXL", "barCode" : "111113110274" },
+      { "_id" : "6ZjAkvoojykg7PN6Y", "productId" : "oyE9jkW7peeieDfPx", "size" : "S", "barCode" : "1111111102700" },
+      { "_id" : "vXDjbE6Bai2aFWfcG", "productId" : "oyE9jkW7peeieDfPx", "size" : "M", "barCode" : "1111111102701" },
+      { "_id" : "Yh3Df7fDjfE7czzvo", "productId" : "oyE9jkW7peeieDfPx", "size" : "L", "barCode" : "1111111102702" },
+      { "_id" : "cWFt2hnKC84SGsEGq", "productId" : "oyE9jkW7peeieDfPx", "size" : "XL", "barCode" : "1111111102703" },
+      { "_id" : "EavnKzDACr5Meqhb5", "productId" : "bDjrLj9evTrZToLvY", "size" : "S", "barCode" : "1111121102700" },
+      { "_id" : "byXML7uKE2aJTnK3C", "productId" : "bDjrLj9evTrZToLvY", "size" : "M", "barCode" : "1111121102701" },
+      { "_id" : "G8fanP2Q54iGRRJzt", "productId" : "bDjrLj9evTrZToLvY", "size" : "L", "barCode" : "1111121102702" },
+      { "_id" : "B9tAtexgDjwRdX5v8", "productId" : "bDjrLj9evTrZToLvY", "size" : "XL", "barCode" : "1111121102703" },
+      { "_id" : "TtuxwcQKdaepZ5uoT", "productId" : "QpcDBvvdx8qxezBNJ", "size" : "S", "barCode" : "1111131102700" },
+      { "_id" : "j9jnfEWRdo27pxMw9", "productId" : "QpcDBvvdx8qxezBNJ", "size" : "M", "barCode" : "1111131102701" },
+      { "_id" : "kgXcMEQekpWExBS5W", "productId" : "QpcDBvvdx8qxezBNJ", "size" : "L", "barCode" : "1111131102702" },
+      { "_id" : "KXzFyYrYF4JbAgZBd", "productId" : "QpcDBvvdx8qxezBNJ", "size" : "XL", "barCode" : "1111131102703" },
+      { "_id" : "3tHHXzhBSH7eAvSm2", "productId" : "QpcDBvvdx8qxezBNJ", "size" : "XXL", "barCode" : "1111131102704" },
     ];  
     productSizes.forEach((sizes) => ProductSizes.insert(sizes));
 

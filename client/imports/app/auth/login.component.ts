@@ -14,6 +14,8 @@ import { Stores } from '../../../../both/collections/stores.collection';
 import { UserStore } from '../../../../both/models/user-store.model';
 import { UserStores } from '../../../../both/collections/user-stores.collection';
 import { Users } from '../../../../both/collections/users.collection';
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
 
 import template from './login.component.html';
  
@@ -26,48 +28,61 @@ export class LoginComponent implements OnInit, OnDestroy {
   error: string;
 
   email: string;
+  username: string;
+  storeId: string;
+  prevEmail: string;
+  prevUsername: string;
+
   stores: Observable<Store[]>;
   userSub: Subscription;
   selectedStore: Store;
 
-  constructor(private router: Router, private zone: NgZone, private formBuilder: FormBuilder) {}
+  constructor(
+    private router: Router, 
+    private zone: NgZone, 
+    private formBuilder: FormBuilder
+    ) {}
  
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
+      username: ['', Validators.required],
       email: ['', Validators.required],
       password: ['', Validators.required],
-      store: ['', Validators.required]
+      storeId: ['', Validators.required]
     });
  
     this.error = '';
-    this.updatesubscription(this.loginForm.value.email);
+    this.userSearch();
     
 }
 
-  updatesubscription(email){
-    if (email) {
-      if (this.userSub){
-        this.userSub.unsubscribe();
-      }
-      email = email.toUpperCase();
-      this.userSub = MeteorObservable.subscribe('stores.useremail', email).subscribe(() => {
-        // console.log(email);
-        var user = Users.collection.find({'emails.address': email}).fetch();
-        if (user) {
-          // console.log(user[0]._id);
-          let userStores = UserStores.find({userId: user[0]._id}).zone();
-          userStores.subscribe((userstores) => {
-            // console.log(userstores);
-            let ids = userstores.map(function(userStore) {return userStore.storeId});
-            // console.log(ids);
-            this.stores = Stores.find({_id: {$in: ids}}, {sort: {name: 1}}).zone();
-            this.stores.subscribe((stores) => {
-              // console.log(stores);
-            });
-          });
-        }
-      })
+  userSearch() {
+    if ((!this.email || !this.username) ||
+     (this.email == this.prevEmail && this.username == this.prevUsername)) {
+      return;
     }
+
+    if (this.userSub){
+      this.userSub.unsubscribe();
+    } 
+
+    let email = this.email.toUpperCase();
+    let username = this.username.toUpperCase();
+
+    this.userSub = MeteorObservable.subscribe('user.stores', email, username).subscribe(() => {
+      var user = Users.findOne();
+      if (user) {
+        let userStores = UserStores.find().zone();
+        userStores.subscribe((userstores) => {
+          let ids = _.pluck(userstores, 'storeId');
+          this.stores = Stores.find({_id: {$in: ids}}, {sort: {name: 1}}).zone();
+        });
+      } else {
+        this.prevEmail = this.email;
+        this.prevUsername = this.username;
+        Bert.alert('Usuario invalido: ', 'danger', 'growl-top-right' ); 
+      }
+    })
   }
 
   ngOnDestroy() {
@@ -77,16 +92,19 @@ export class LoginComponent implements OnInit, OnDestroy {
   } 
 
   login(event) {
+    console.log(this.loginForm);
     if (this.loginForm.valid) {
-      Meteor.loginWithPassword(this.loginForm.value.email, this.loginForm.value.password, (err) => {
+      let values = this.loginForm.value;
+      Meteor.loginWithPassword(values.email.toUpperCase(), values.password.toUpperCase(), (err) => {
         this.zone.run(() => {
           if (err) {
-            console.log(err);
-            this.error = err;
+           Bert.alert(err.reason, 'danger', 'growl-top-right' ); 
           } else {
-            Session.setPersistent("currentUserEmail", this.loginForm.value.email);
-            Session.setPersistent("currentStoreName", this.selectedStore.name);
-            Session.setPersistent("currentStoreId", this.selectedStore._id);
+            Session.setPersistent("currentUserEmail", values.email);
+            if (values.storeId > -1) {
+              Session.setPersistent("currentStoreName", Stores.findOne(values.storeId).name);
+            }
+            Session.setPersistent("currentStoreId", values.storeId);
 
             this.router.navigate(['/']);
           }

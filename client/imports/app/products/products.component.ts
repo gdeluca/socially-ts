@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, OnDestroy, Injectable, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
@@ -10,32 +10,27 @@ import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/combineLatest';
-import { CommonModule } from '@angular/common';
-import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../../both/search/search-options';
-import { Bert } from 'meteor/themeteorchef:bert';
+import { SearchOptions } from '../../../../both/domain/search-options';
 
 //collections
 import { Products, productTagNames } from '../../../../both/collections/products.collection';
 import { Categories } from '../../../../both/collections/categories.collection';
-import { Sections } from '../../../../both/collections/sections.collection';
 import { Tags, definedTags } from '../../../../both/collections/tags.collection';
-
 
 // model 
 import { Product } from '../../../../both/models/product.model';
 import { Category } from '../../../../both/models/category.model';
-import { Section } from '../../../../both/models/section.model';
 import { Tag } from '../../../../both/models/tag.model';
 
-import { Dictionary } from '../../../../both/models/dictionary';
+// domain
+import { Dictionary } from '../../../../both/domain/dictionary';
+import { Filter, Filters } from '../../../../both/domain/filter';
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
 
-
- 
 import template from './products.component.html';
 import style from './products.component.scss';
 
@@ -53,16 +48,16 @@ export class ProductsComponent implements OnInit, OnDestroy {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
 
-  filters: Subject<any> = new Subject<any>();
+  filters: Subject<Filters> = new Subject<Filters>();
 
-  filtersParams: any = {
-    'name':  '',
-    'code': '',
-    'color': '',
-    'brand': '',
-    'provider': '',
-    'model': ''
-  };
+  filtersParams: Filters = [
+    {key: 'name', value:''},
+    {key: 'code', value:''},
+    {key: 'color', value:''},
+    {key: 'brand', value:''},
+    {key: 'provider', value:''},
+    {key: 'model', value:''},
+  ];
 
    // name, sortfield, touple
   headers: Dictionary[] = [
@@ -100,17 +95,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
     provider:''
   };
 
-  adding: boolean = false;
-  editing: boolean = false;
-  selected: any;
   products: Observable<Product[]>;
   // paginatedCategories: Observable<Category[]>;
   categories: Observable<Category[]>;
 
   constructor(
     private paginationService: PaginationService, 
-  ){
-  }
+  ){ }
 
   ngOnInit() {
     this.optionsSub = Observable.combineLatest(
@@ -126,12 +117,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
         sort: { [sortField as string] : sortDirection as number }
       };
       
-      this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
+      this.paginationService.setCurrentPage(
+        this.paginationService.defaultId() , curPage as number);
 
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('products-with-categories', options, filters)
+      this.paginatedSub = MeteorObservable.subscribe(
+        'products.categories', options, filters)
         .subscribe(() => {
           this.products = Products.find({}).zone();
           // this.paginatedCategories = Categories.find({}).zone();
@@ -154,12 +147,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
       
     });
 
-    this.pageSize.next(this.PAGESIZE);
-    this.curPage.next(1);
-    this.sortDirection.next(1);
-    this.sortField.next('name');
-    this.filters.next('');
-
     if (this.categoriesSub) {
         this.categoriesSub.unsubscribe();
     }
@@ -170,7 +157,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfProducts');
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+      this.paginationService.setTotalItems(
+        this.paginationService.defaultId(), this.collectionCount);
     });
 
     this.paginationService.register({
@@ -179,6 +167,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
       currentPage: 1,
       totalItems: this.collectionCount,
     });
+
+    this.pageSize.next(this.PAGESIZE);
+    this.curPage.next(1);
+    this.sortDirection.next(1);
+    this.sortField.next('name');
+    this.filters.next(this.filtersParams);
 
   }
   
@@ -210,25 +204,25 @@ export class ProductsComponent implements OnInit, OnDestroy {
     return Object.assign({}, original)
   }
 
-  search(field: string, value: string): void {
+  search(fieldKey: string, value: string): void {
     if (value == 'undefined')  {
       value = '';
     }
 
-    // no value change on blur
-    if (this.filtersParams[field] === value) {
-      return;
-    }
-    this.filtersParams[field] = value.toUpperCase();
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
 
-    console.log(this.filtersParams);
-    this.curPage.next(1);
-    this.filters.next(this.filtersParams);
-  }
-  
-  changeSortOrder(direction: string, fieldName: string): void {
-    this.sortDirection.next(parseInt(direction));
-    this.sortField.next(fieldName);
+      filter.value = value.toUpperCase();
+
+      console.log(this.filtersParams);
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
+    }
   }
 
 }

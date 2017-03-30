@@ -23,10 +23,10 @@ import 'rxjs/add/operator/distinctUntilChanged';
 import 'rxjs/add/operator/do';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../../both/search/search-options';
+import { SearchOptions } from '../../../../both/domain/search-options';
 
 // collections
-import { Balances, balanceOpsMapping, balanceOps } from '../../../../both/collections/balances.collection';
+import { Balances, balanceStatusMapping, balanceStatus } from '../../../../both/collections/balances.collection';
 // import { Categories } from '../../../../both/collections/categories.collection';
 // import { Counters } from '../../../../both/collections/counters.collection';
 import { UserStores } from '../../../../both/collections/user-stores.collection';
@@ -36,7 +36,6 @@ import { UserStores } from '../../../../both/collections/user-stores.collection'
 // import { Products } from '../../../../both/collections/products.collection';
 // import { Purchases } from '../../../../both/collections/purchases.collection';
 import { Sales } from '../../../../both/collections/sales.collection';
-// import { Sections } from '../../../../both/collections/sections.collection';
 // import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
 // import { Tags } from '../../../../both/collections/tags.collection';
@@ -53,13 +52,14 @@ import { UserStore } from '../../../../both/models/user-store.model';
 // import { Product } from '../../../../both/models/product.model';
 // import { Purchase } from '../../../../both/models/purchase.model';
 import { Sale } from '../../../../both/models/sale.model';
-// import { Section } from '../../../../both/models/section.model';
 // import { Stock } from '../../../../both/models/stock.model';
 import { Store } from '../../../../both/models/store.model';
 // import { Tag } from '../../../../both/models/tag.model';
 import { User } from '../../../../both/models/user.model';
 
-import { Dictionary } from '../../../../both/models/dictionary';
+import { Dictionary } from '../../../../both/domain/dictionary';
+import { Filter, Filters } from '../../../../both/domain/filter';
+
 import { isNumeric } from '../../validators/validators';
 
 import { IMultiSelectOption, IMultiSelectTexts, IMultiSelectSettings } from '../../modules/multiselect';
@@ -83,15 +83,14 @@ export class BalancesComponent {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
 
-  filters: Subject<any> = new Subject<any>();
+  filters: Subject<Filters> = new Subject<Filters>();
 
-  filtersParams: any = {
-    'year':  '',
-    'month': '',
-    'day': '',
-    'store': '',
-    'workShift': ''
-  };
+  filtersParams: Filters = [
+    {'key': 'year', 'value':''},
+    {'key': 'month', 'value':''},
+    {'key': 'store', 'value':''},
+    {'key': 'workShift', 'value':''},
+  ];
 
   // name <-> sortfield, touple
   headers: Dictionary[] = [
@@ -268,7 +267,7 @@ export class BalancesComponent {
     this.curPage.next(1);
     this.sortField.next('balanceNumber');
     this.sortDirection.next(1);
-    this.filters.next('');
+    this.filters.next(null);
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfBalances');
@@ -297,6 +296,21 @@ export class BalancesComponent {
   
   doShowStores(condition:boolean){
     this.showStores = condition;
+  }
+
+  search(field: string, value: string): void {
+    if (value == 'undefined')  {
+      value = '';
+    }
+
+    // no value change on blur
+    if (this.filtersParams[field] === value) {
+      return;
+    }
+    this.filtersParams[field] = value.toUpperCase();
+
+    this.curPage.next(1);
+    this.filters.next(this.filtersParams);
   }
 
   changeSortOrder(direction: string, fieldName: string): void {

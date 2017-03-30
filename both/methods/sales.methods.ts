@@ -30,14 +30,14 @@ Meteor.methods({
   createSaleOrder(
     userStoreId:string,
     balanceId:string
-  ): string {
+  ): number {
     check(userStoreId, String);
     //check(balanceId, String);
 
-    let result:string;
+    let result:number;
     MeteorObservable.call('getNextId', 'SALE')
     .subscribe(
-      (orderNumber: string) => { 
+      (orderNumber: number) => { 
         Sales.insert({
           saleNumber: orderNumber,
           saleState: 'STARTED',

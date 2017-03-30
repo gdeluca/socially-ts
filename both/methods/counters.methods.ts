@@ -11,8 +11,6 @@ import { Stocks } from '../collections/stocks.collection';
 import { Store } from '../models/store.model';
 import { Product } from '../models/product.model';
 
-// import { rateLimit } from '../modules/rate-limit';
-
 let tagNames = definedTags;
 
 function getSevenDigitsCounters(){
@@ -27,11 +25,15 @@ function getTwoDigitsCounters(){
 Meteor.methods({
 
   getNextId(type: string): string { 
+    check(type, String);
     if (Meteor.isServer) {
         var counter = Counters.findOne({type: type});
         var lastCode = ""
         if (counter) {
-          Counters.update({type: type}, {$set:{lastCode: counter.lastCode+1}});
+          Counters.update(
+            {type: type}, 
+            {$set:{lastCode: counter.lastCode+1}}
+          );
           lastCode = ""+(counter.lastCode+1);
         } else {
           Counters.insert({type: type, lastCode: 1}); 

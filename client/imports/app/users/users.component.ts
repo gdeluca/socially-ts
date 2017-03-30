@@ -18,14 +18,14 @@ import 'rxjs/add/operator/map';
 
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../../both/search/search-options';
+import { SearchOptions } from '../../../../both/domain/search-options';
 
 // model 
 import { Users } from '../../../../both/collections/users.collection';
 import { UserStores } from '../../../../both/collections/user-stores.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
 
-import { Dictionary } from '../../../../both/models/dictionary';
+import { Dictionary } from '../../../../both/domain/dictionary';
 
 import { emailValidator, matchingPasswords } from '../../validators/validators';
 

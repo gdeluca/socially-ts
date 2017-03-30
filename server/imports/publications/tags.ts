@@ -1,9 +1,13 @@
 import { Meteor } from 'meteor/meteor';
 import { Counts } from 'meteor/tmeasday:publish-counts';
+import { } from 'meteor-publish-composite';
+import {check} from 'meteor/check';
 
-import { SearchOptions } from '../../../both/search/search-options';
+import { getSelectorFilter, checkOptions } from './commons';
+import { SearchOptions } from '../../../both/domain/search-options';
+import { Filter, Filters } from '../../../both/domain/filter';
+
 import { Tags } from '../../../both/collections/tags.collection';
-import { getSelectorFilter } from './commons';
 
 
 Meteor.publish('tags', function() {
@@ -52,7 +56,7 @@ Meteor.publish('tags.provider', function(options: SearchOptions = {limit:0,skip:
   return Tags.find(selector, options);
 });
 
-Meteor.publish('tags.section', function(options: SearchOptions = {limit:0,skip:0}, filters: any = {}) {
+Meteor.publish('tags.section', function(options: SearchOptions = {limit:0,skip:0}, filters: Filters = []) {
   let filterSelector = getSelectorFilter(['section'], filters);
   let selector = { $and: [ {type: 'section'}, {code: { $ne: '00' }}, filterSelector ]};
   Counts.publish(this, 'numberOfsection', Tags.collection.find(selector, options), { noReady: true });

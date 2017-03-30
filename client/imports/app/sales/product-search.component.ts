@@ -17,7 +17,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../../both/search/search-options';
+import { SearchOptions } from '../../../../both/domain/search-options';
 
 //collections
 import { Products } from '../../../../both/collections/products.collection';
@@ -29,7 +29,7 @@ import { Product } from '../../../../both/models/product.model';
 import { ProductSize } from '../../../../both/models/product-size.model';
 import { Category } from '../../../../both/models/category.model';
 
-import { Dictionary } from '../../../../both/models/dictionary';
+import { Dictionary } from '../../../../both/domain/dictionary';
  
 import template from './product-search.component.html';
 import style from './product-search.component.scss';

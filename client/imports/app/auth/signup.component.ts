@@ -14,7 +14,6 @@ import { Store } from '../../../../both/models/store.model';
 import { Stores } from '../../../../both/collections/stores.collection';
 import { UserStores } from '../../../../both/collections/user-stores.collection';
 
-
 import template from './signup.component.html';
  
 @Component({
@@ -29,7 +28,6 @@ export class SignupComponent implements OnInit, OnDestroy {
   storesSub: Subscription;
   selectedStore: Store;
 
-
   constructor(
     private router: Router, 
     private zone: NgZone, 
@@ -39,6 +37,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.signupForm = this.formBuilder.group({
       email: ['', Validators.compose([Validators.required,  emailValidator])],
+      username: ['', Validators.required],
       password: ['', Validators.required],
       confirmPassword: ['', Validators.required],
       stores: ['', Validators.required]
@@ -62,9 +61,12 @@ export class SignupComponent implements OnInit, OnDestroy {
   signup() {
     var user_id = ''
     if (this.signupForm.valid) {
-      user_id = Accounts.createUser({
-        email: this.signupForm.value.email,
-        password: this.signupForm.value.password
+      let values = this.signupForm.value;
+      let user_id = Accounts.createUser({
+        email: values.email,
+        username: values.name,
+        password: values.password,
+        profile: { name: values.name }
       }, (err) => {
         if (err) {
           this.zone.run(() => {

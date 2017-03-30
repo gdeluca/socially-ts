@@ -1,5 +1,11 @@
 import { Meteor } from 'meteor/meteor';
+import { Counts } from 'meteor/tmeasday:publish-counts';
 import { } from 'meteor-publish-composite';
+import {check} from 'meteor/check';
+
+import { getSelectorFilter, checkOptions } from './commons';
+import { SearchOptions } from '../../../both/domain/search-options';
+import { Filter, Filters } from '../../../both/domain/filter';
 
 import { Stores } from '../../../both/collections/stores.collection';
 import { Store } from '../../../both/models/store.model';
@@ -8,10 +14,7 @@ import { UserStores } from '../../../both/collections/user-stores.collection';
 import { User } from '../../../both/models/user.model';
 import { Users } from '../../../both/collections/users.collection';
 
-import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../both/search/search-options';
-import { getSelectorFilter } from './commons';
-
+const storesFields = ['name','address'];
 
 Meteor.publishComposite('stores', function() {
   return {
@@ -21,10 +24,13 @@ Meteor.publishComposite('stores', function() {
   }
 });
  
-Meteor.publishComposite('stores.users', function(user_id: string) {
+Meteor.publishComposite('stores.users', function(
+  userId: string
+) {
+ check(userId, String);
  return {
     find: function() {
-        return UserStores.collection.find({ userId: user_id })
+        return UserStores.collection.find({ userId: userId })
     }, 
     children: [
       {
@@ -36,37 +42,15 @@ Meteor.publishComposite('stores.users', function(user_id: string) {
   }
 });
 
-Meteor.publishComposite('stores.useremail', function(email: string) {
- return {
-    find: function() { 
-      return Users.collection.find({'emails.address': email});
-    },
-    children: [
-      {
-        find: function(user) {
-            return UserStores.collection.find({ userId: user._id})
-        },
-        children: [
-          {
-            find: function(userStore) {
-                return Stores.collection.find({_id: userStore.storeId});
-            }
-          }
-        ]
-      }
-    ]
-  }
-});
-
-const storesFilters = ['name','address'];
-
-Meteor.publishComposite('stores-paginated', function(options: SearchOptions, filters: any) {
-  
-  let storesSelector = getSelectorFilter(storesFilters, filters);
-
+Meteor.publishComposite('stores-paginated', function(
+  options: SearchOptions, 
+  filters: Filters
+) {
+  let storesSelector = getSelectorFilter(storesFields, filters);
   return {
     find: function() {
-      Counts.publish(this, 'numberOfStores',Stores.collection.find(), { noReady: true });
+      Counts.publish(this, 'numberOfStores',
+        Stores.collection.find(storesSelector), { noReady: true });
       return Stores.collection.find(storesSelector, options);
     }
   }

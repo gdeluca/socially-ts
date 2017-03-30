@@ -118,15 +118,15 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       sizesSelector: ['', Validators.required]
     });
 
-    this.numericSizesData = this.generateNumericOptions(1,69);
+    this.numericSizesData = this.generateNumericOptions(1,120);
     this.numericStartSelected = [1];
     this.numericEndSelected = [10];
     this.lettersSizesData = this.generateLettersOptions(lettersSizes);
-    this.lettersStartSelected = [70];
-    this.lettersEndSelected = [74];
+    this.lettersStartSelected = [700];
+    this.lettersEndSelected = [704];
     
     this.sizesType = 'letters';
-    this.setSizes('letters', [70], [74]);
+    this.setSizes('letters', [700], [704]);
   }
 
   ngOnInit() {

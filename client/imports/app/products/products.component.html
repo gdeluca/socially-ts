@@ -42,6 +42,7 @@
               name=filter-{{header.key}}
               placeholder={{header.key}}
               #tmp
+              (keyup.enter)="search(header.value, tmp.value)"
               (blur)="search(header.value, tmp.value)">
           </td>
         </ng-container> 
@@ -226,11 +227,11 @@
         <h4 class="modal-title">Actualizando un producto</h4>
       </div>
       <div class="modal-body">
-        Cuidado al actualizar un producto
+        Al cambiar un valor del articulo no se puede regenerar el codigo asociado si hay stock cargado, por lo tanto se cambia el valor de esa propiedad para todos los articulos que coincidan
       </div>
       <div class="modal-footer">
         <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
-        <button type="button" class="btn btn-primary">OK</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

@@ -27,12 +27,14 @@ function generateProductCode(product: Product): string {
 Meteor.methods({
 
   saveProduct: function (product: Product) {
-    check(product.name, String);
-    check(product.color, String);
-    check(product.brand, String);
-    check(product.model, String);
-    check(product.provider, String);
-    check(product.categoryId, String); 
+    check(product, {
+      name: String,
+      color: String,
+      brand: String,
+      model: String,
+      provider: String,
+      categoryId: String,
+    });
     product.name = product.name.toUpperCase();
     product.color = product.color.toUpperCase();
     product.brand = product.brand.toUpperCase();
@@ -53,34 +55,39 @@ Meteor.methods({
     }
   },
 
-  updateProduct: function (selector: string, product: Product) {
+  updateProduct: function (
+    selector: string, 
+    product: Product
+  ) {
+    console.log(product);
     check(selector, String);
+    // TODO: consistency may break if a property change 
+    // given the static code related
+    check(product, {
+      _id: Match.Maybe(String),
+      name: Match.Maybe(String),
+      //code: Match.Maybe(String),
+      color: Match.Maybe(String),
+      brand: Match.Maybe(String),
+      model: Match.Maybe(String),
+      provider: Match.Maybe(String),
+      categoryId: Match.Maybe(String),
+    });
     let query = {};
     if(product.name != null) {
-      check(product.name, String);
       product.name = product.name.toUpperCase();
     }
-    if(product.code != null) {
-      check(product.code, String);
-    }
     if(product.color != null) {
-      check(product.color, String);
       product.color = product.color.toUpperCase();
     }
     if(product.brand != null) {
-      check(product.brand, String);
       product.brand = product.brand.toUpperCase();
     }
     if(product.model != null) {
-      check(product.model, String);
       product.model = product.model.toUpperCase();
     }
     if(product.provider != null) {
-      check(product.provider, String);
       product.provider = product.provider.toUpperCase();
-    }
-    if(product.categoryId != null) {
-      check(product.categoryId, String);
     }
     if (Meteor.isServer) { 
       // we cannot change the product code. Since it can have printed barcodes already

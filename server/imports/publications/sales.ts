@@ -1,8 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import { Counts } from 'meteor/tmeasday:publish-counts';
+import { } from 'meteor-publish-composite';
+import {check} from 'meteor/check';
 
-import { getSelectorFilter } from './commons';
-import { SearchOptions } from '../../../both/search/search-options';
+import { getSelectorFilter, checkOptions } from './commons';
+import { SearchOptions } from '../../../both/domain/search-options';
+import { Filter, Filters } from '../../../both/domain/filter';
 
 // collections
 // import { Balances } from '../../../both/collections/balances.collection';
@@ -16,17 +19,27 @@ import { ProductSizes } from '../../../both/collections/product-sizes.collection
 import { Products } from '../../../both/collections/products.collection';
 // import { Purchases } from '../../../both/collections/purchases.collection';
 import { Sales } from '../../../both/collections/sales.collection';
-// import { Sections } from '../../../both/collections/sections.collection';
 import { Stocks } from '../../../both/collections/stocks.collection';
 import { Stores } from '../../../both/collections/stores.collection';
 // import { Tags } from '../../../both/collections/tags.collection';
 import { Users } from '../../../both/collections/users.collection';
 
+const saleFields = ['paymentForm', 'saleState', 'saleDate'];
+const userFields = ['seller'];
+const storeFields = ['name'];
 
-Meteor.publishComposite('sale-orders', function(saleNumber: string, options: SearchOptions) {
+Meteor.publishComposite('sale-orders', function(
+  saleNumber: number, 
+  options: SearchOptions
+) {
+  check(saleNumber, Number);
+  checkOptions(options);
   return {
     find: function() {
-      return Sales.collection.find({ saleNumber: saleNumber }, options);
+      let selector = {saleNumber: saleNumber};
+      Counts.publish(this, 'numberOfOrders', 
+        Sales.collection.find(selector), { noReady: true });
+      return Sales.collection.find(selector, options);
     },
     children: [
       {
@@ -81,21 +94,19 @@ Meteor.publishComposite('sale-orders', function(saleNumber: string, options: Sea
   }
 });
 
-const saleFields = ['paymentForm', 'saleState', 'saleDate'];
-const userFields = ['seller'];
-const storeFields = ['name'];
-
 Meteor.publishComposite('store-sales', function(
   options: SearchOptions, 
-  filters: any, 
+  filters: Filters,
   balanceId: string,
   storeId: string
 ) {
-  
+  check(balanceId, String);
+  check(storeId, String);
+  check(filters, String);
   let salesFilter = getSelectorFilter(saleFields, filters);
   let usersFilter = getSelectorFilter(userFields, filters);
   let storesFilter = getSelectorFilter(storeFields, filters);
-
+  checkOptions(options);
   return {
     find: function() {
       let storesSelector = {_id: storeId};
@@ -109,7 +120,6 @@ Meteor.publishComposite('store-sales', function(
         children: [
           {
             find: function(userStore) {
-              Counts.publish(this, 'numberOfSales',Sales.collection.find({} , options), { noReady: true });
               return Sales.collection.find({userStoreId: userStore._id});
             }
           }, 
@@ -119,7 +129,6 @@ Meteor.publishComposite('store-sales', function(
               usersSelector["$and"] = [];
               usersSelector["$and"].push({_id: userStore.userId});
               usersSelector["$and"].push(usersFilter);
-              
               return  Meteor.users.find(
                 usersSelector, 
                 {fields: {username: 1}}
@@ -131,75 +140,3 @@ Meteor.publishComposite('store-sales', function(
     ]
   }
 });
-
-
-
-// Meteor.publishComposite('sales-store', function(
-//   options: SearchOptions, 
-//   filters: any, 
-//   storeId: string, 
-//   balanceId?: string
-// ) {
-  
-//   let salesFilter = getSelectorFilter(saleFields, filters);
-//   let usersFilter = getSelectorFilter(userFields, filters);
-//   let storesFilter = getSelectorFilter(storeFields, filters);
-
-//   return {
-//     find: function() {
-//       let salesSelector: any = {};
-//        salesSelector["$and"] = [];
-
-//       // filter by balance
-//       // uncomment this when balance integration is ready
-//       // if (balanceId) {
-//       //   salesSelector["$and"].push({balanceId: balanceId});      
-//       // }
-//       salesSelector["$and"].push(salesFilter);
-
-//       Counts.publish(this, 'numberOfSales',Sales.collection.find(salesSelector , options), { noReady: true });
-//       return Sales.collection.find(salesSelector, options);
-//     },
-//     children: [
-//       {
-//         find: function(sale) {
-//           return UserStores.collection.find({_id: sale.userStoreId});
-//         },
-//         children: [
-//           {
-//             find: function(userStore) {
-//               let storesSelector: any = {};
-//               storesSelector["$and"] = [];
-//               storesSelector["$and"].push({_id: userStore.storeId});
-//               storesSelector["$and"].push(storesFilter);
-//               return Stores.collection.find(storesSelector);
-//             }
-//           },
-//           {
-//             find: function(userStore, storeId) {
-//               let usersSelector: any = {};
-//                usersSelector["$and"] = [];
-//               if (storeId) {
-//                 usersSelector["$and"].push({storeId: userStore.userId});
-//               }
-//               usersSelector["$and"].push({_id: userStore.userId});
-//               usersSelector["$and"].push(usersFilter);
-              
-//               return  Meteor.users.find(
-//                 usersSelector, 
-//                 {fields: {username: 1}}
-//               );
-//             }
-//           }
-//         ]
-//       },
-//       {
-//         find: function(sale) {
-//           return ProductSales.collection.find({saleId: sale._id});
-//         }
-//       }
-//     ]
-//   }
-// });
-
-

@@ -14,14 +14,14 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/combineLatest';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../../both/search/search-options';
+import { SearchOptions } from '../../../../both/domain/search-options';
 import { Bert } from 'meteor/themeteorchef:bert';
 import { IMultiSelectOption, IMultiSelectTexts, IMultiSelectSettings } from '../../modules/multiselect';
 
 // model 
 import { Tags, definedTags, tagsMapping } from '../../../../both/collections/tags.collection';
 import { Tag } from '../../../../both/models/tag.model';
-import { Dictionary } from '../../../../both/models/dictionary';
+import { Dictionary } from '../../../../both/domain/dictionary';
 
 
 import template from './tags.component.html';

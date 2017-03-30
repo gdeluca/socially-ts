@@ -1,9 +1,18 @@
 import { Meteor } from 'meteor/meteor';
-import { Categories } from '../../../both/collections/categories.collection';
-import { Sections } from '../../../both/collections/sections.collection';
-
 import { Counts } from 'meteor/tmeasday:publish-counts';
-import { SearchOptions } from '../../../both/search/search-options';
+import { } from 'meteor-publish-composite';
+import {check} from 'meteor/check';
+
+import { getSelectorFilter, checkOptions } from './commons';
+import { SearchOptions } from '../../../both/domain/search-options';
+import { Filter, Filters } from '../../../both/domain/filter';
+
+import { Categories } from '../../../both/collections/categories.collection';
+import { Tags } from '../../../both/collections/tags.collection';
+
+const categoryFields = ['name'];
+const sectionFields = ['section:name'];
+
 
 Meteor.publishComposite('categories', function() {
   return {
@@ -13,22 +22,34 @@ Meteor.publishComposite('categories', function() {
   }
 }); 
 
-Meteor.publishComposite('categories.sections', function(options: SearchOptions, filterField?: string, filterValue?: string) {
-  let query = {}
-  
-  if (filterField && filterValue) {
-    const searchRegEx = { '$regex': '.*' + ([filterValue] || '') + '.*', '$options': 'i' };
-    query = { [filterField]: searchRegEx }
+Meteor.publishComposite('categories.sections', function(
+  options: SearchOptions, 
+  filters: Filters
+) {  
+    let categoryFilter = getSelectorFilter(categoryFields, filters);
+    let sectionFilter = getSelectorFilter(sectionFields, filters);
+console.log(JSON.stringify(categoryFilter));
+console.log(JSON.stringify(sectionFilter));
+    checkOptions(options);
+    return {
+      find: function() {
+      Counts.publish(this, 'numberOfCategories', 
+        Categories.collection.find(categoryFilter, options), { noReady: true });
+        return Categories.collection.find(categoryFilter, options);
+      },
+      children: [
+        {
+          find: function(category) {
+            let selector: any = {};
+            selector["$and"] = [];
+            selector["$and"].push({type: 'section'});
+            selector["$and"].push({code: { $ne: '00' }});
+            selector["$and"].push({_id: category.sectionId});
+            selector["$and"].push(sectionFilter);
+            return Tags.collection.find(selector, options);
+          }
+        }
+      ]
+    }
   }
-  return {
-    find: function() {
-    Counts.publish(this, 'numberOfCategories',Categories.collection.find(query , options), { noReady: true });
-    return Categories.collection.find(query, options);
-    },
-    children: [{
-      find: function(category) {
-        return Sections.collection.find({_id: category.sectionId});
-      }
-    }]
-  }
-});
+);
