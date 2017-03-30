@@ -8,12 +8,17 @@ import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable, ObservableCursor } from 'meteor-rxjs';
 
-import { Store } from '../../../../both/models/store.model';
-import { User } from '../../../../both/models/user.model';
+// collections
 import { Stores } from '../../../../both/collections/stores.collection';
 import { UserStore } from '../../../../both/models/user-store.model';
 import { UserStores } from '../../../../both/collections/user-stores.collection';
 import { Users } from '../../../../both/collections/users.collection';
+
+// model
+import { Store } from '../../../../both/models/store.model';
+import { User } from '../../../../both/models/user.model';
+import { Balance } from '../../../../both/models/balance.model';
+
 import * as _ from 'underscore';
 import { Bert } from 'meteor/themeteorchef:bert';
 
@@ -58,7 +63,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   userSearch() {
     if ((!this.email || !this.username) ||
-     (this.email == this.prevEmail && this.username == this.prevUsername)) {
+     (this.email == this.prevEmail && 
+       this.username == this.prevUsername)) {
       return;
     }
 
@@ -69,7 +75,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     let email = this.email.toUpperCase();
     let username = this.username.toUpperCase();
 
-    this.userSub = MeteorObservable.subscribe('user.stores', email, username).subscribe(() => {
+    this.userSub = MeteorObservable.subscribe(
+      'user.stores', email, username).subscribe(() => {
       var user = Users.findOne();
       if (user) {
         let userStores = UserStores.find().zone();
@@ -92,25 +99,44 @@ export class LoginComponent implements OnInit, OnDestroy {
   } 
 
   login(event) {
-    console.log(this.loginForm);
     if (this.loginForm.valid) {
       let values = this.loginForm.value;
-      Meteor.loginWithPassword(values.email.toUpperCase(), values.password.toUpperCase(), (err) => {
-        this.zone.run(() => {
-          if (err) {
-           Bert.alert(err.reason, 'danger', 'growl-top-right' ); 
-          } else {
-            Session.setPersistent("currentUserEmail", values.email);
-            if (values.storeId > -1) {
-              Session.setPersistent("currentStoreName", Stores.findOne(values.storeId).name);
-            }
-            Session.setPersistent("currentStoreId", values.storeId);
+      Meteor.loginWithPassword(
+        values.email.toUpperCase(), 
+        values.password.toUpperCase(), (err) => 
+        {
+          this.zone.run(() => 
+            {
+              if (err) {
+               Bert.alert(err.reason, 'danger', 'growl-top-right' ); 
+              } else {
+                Session.setPersistent("currentUserEmail", values.email);
+                let currentStoreName = (values.storeId > -1)?
+                  Stores.findOne(values.storeId).name:"MODO ADMINISTRADOR";
+                Session.setPersistent("currentStoreName", currentStoreName);
+                Session.setPersistent("currentStoreId", values.storeId);
 
-            this.router.navigate(['/']);
-          }
-        });
-      });
+                this.updateBalanceStatus(values.storeId);
+                
+                this.router.navigate(['/']);
+              }
+            }
+          )
+        }
+      )
     }
+  }
+
+  updateBalanceStatus(storeId: string) {
+    MeteorObservable.call('findCurrentStoreBalance', storeId
+    ).subscribe((balance: Balance) => {
+        let balanceNumber = (balance)?balance.balanceNumber:-1;
+        Session.setPersistent("currentBalanceNumber", balanceNumber);
+        
+        let balanceStatus = (balance)?balance.status:'';
+        Session.setPersistent("currentBalanceStatus", balanceStatus);
+      }
+    ); 
   }
 
 }

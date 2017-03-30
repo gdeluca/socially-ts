@@ -23,33 +23,33 @@ import { Stores } from '../../../both/collections/stores.collection';
 // import { Tags } from '../../../both/collections/tags.collection';
 // import { Users } from '../../../both/collections/users.collection';
 
-const saleFields = ['saleDate', 'paymentForm', 'saleState'];
+const saleFields = ['createdAt', 'paymentForm', 'saleState'];
 const userFields = ['seller:name'];
 
 Meteor.publishComposite('balances-sales', function(
   options: SearchOptions, 
   filters: Filters,
-  balance: string,
+  balanceId?: string,
 ) {
   
   let salesSelector = getSelectorFilter(saleFields, filters);
   let usersSelector = getSelectorFilter(userFields, filters);
-  check(balance, String);
+  check(balanceId, Match.Maybe(String));
   checkOptions(options);
   return {
     find: function() {
       Counts.publish(this, 'numberOfBalances',
         Balances.collection.find({}), { noReady: true });
-      return Balances.collection.find({}, options);
+      return Balances.collection.find({}, options); 
     },
     children: [
       {
         find: function(balance) {
-          let salesSelector: any = {};
-          salesSelector["$and"] = [];
-          salesSelector["$and"].push({ balanceId: balance._id });
-          salesSelector["$and"].push(salesSelector);
-          return Sales.collection.find(salesSelector);
+          let selector: any = {};
+          selector["$and"] = [];
+          selector["$and"].push(salesSelector);
+          selector["$and"].push({ balanceId: balance._id });
+          return Sales.collection.find(selector);
         },
         children: [
           {
@@ -58,7 +58,7 @@ Meteor.publishComposite('balances-sales', function(
             },
             children: [
               {
-                find: function(userStore, balance) {
+                find: function(userStore) {
                   return Stores.collection.find({ _id: userStore.storeId });
                 }
               }

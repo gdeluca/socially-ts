@@ -136,7 +136,7 @@ export class SalesComponent {
 
   constructor(
     private paginationService: PaginationService,
-    private router:Router,
+    private router:Router
     // private formBuilder: FormBuilder
   ){
     // this.complexForm = formBuilder.group({
@@ -249,6 +249,11 @@ export class SalesComponent {
     return (val != null)?val:'';
   }
 
+  getCurrentBalanceId(): string{
+    let val = Session.get("currentBalanceId"); 
+    return (val != null)?val:'';
+  }
+
   getUser(userStoreId) {
     let userId =  UserStores.findOne({_id: userStoreId}).userId;
     return Users.findOne({_id: userId});
@@ -256,7 +261,11 @@ export class SalesComponent {
 
   createOrder(orderNumber){
     let userStoreId = UserStores.findOne({storeId: this.getCurrentStoreId()})._id;
-    MeteorObservable.call('createSaleOrder', userStoreId)
+    MeteorObservable.call('createSaleOrder',
+    userStoreId,
+    this.getCurrentBalanceId(),
+    this.getCurrentStoreId()
+    )
     .subscribe(
     (orderNumber) => {
       this.router.navigate(['sales/'+orderNumber]); 

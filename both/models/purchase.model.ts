@@ -1,10 +1,10 @@
 import { CollectionObject } from './collection-object.model';
 
 export interface Purchase extends CollectionObject {
-  purchaseNumber: string;
+  purchaseNumber: number;
   purchaseState: string; // SELECTION // VERIFICATION // CANCELED 
-  purchaseDate: string;
-  lastUpdate: string;
+  createdAt: Date;
+  lastUpdate: Date;
   total?:number;
   provider:string;
   paymentAmount:number;

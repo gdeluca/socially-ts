@@ -321,6 +321,11 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     return (val != null)?val:'';
   }
 
+  getCurrentBalanceId(): string{
+    let val = Session.get("currentBalanceId"); 
+    return (val != null)?val:'';
+  }
+  
   getUser(userStoreId) {
     let userId =  UserStores.findOne({_id: userStoreId}).userId;
     return Users.findOne({_id: userId});

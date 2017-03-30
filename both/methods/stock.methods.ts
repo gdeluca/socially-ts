@@ -201,6 +201,8 @@ Meteor.methods({
           console.log('productPrice updated: ', JSON.stringify(productPrice));
         } else {
           let productPriceId = ProductPrices.insert({
+            createdAt: new Date(),
+            active: true,
             lastCostPrice: +values.cost,
             priceCash: +values.cashPayment,
             priceCard: +values.cardPayment,
@@ -246,6 +248,8 @@ Meteor.methods({
         console.log('stock created');
 
         ProductPrices.insert({
+          createdAt: new Date(),
+          active: true,
           lastCostPrice: +values.cost,
           priceCash: +values.cashPayment,
           priceCard: +values.cardPayment,

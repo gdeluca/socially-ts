@@ -8,8 +8,6 @@ import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
  
-import { Bert } from 'meteor/themeteorchef:bert';
-
 // reactiveX
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -57,10 +55,13 @@ import { Store } from '../../../../both/models/store.model';
 // import { Tag } from '../../../../both/models/tag.model';
 import { User } from '../../../../both/models/user.model';
 
+// domain
 import { Dictionary } from '../../../../both/domain/dictionary';
 import { Filter, Filters } from '../../../../both/domain/filter';
-
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
 import { isNumeric } from '../../validators/validators';
+
 
 import { IMultiSelectOption, IMultiSelectTexts, IMultiSelectSettings } from '../../modules/multiselect';
 import * as moment from 'moment';
@@ -70,7 +71,7 @@ import template from "./balances.component.html";
 import style from "./balances.component.scss";
  
 @Component({
-  selector: "balances",
+  selector: "balances", 
   template,
   styles: [ style ]
 })
@@ -214,7 +215,8 @@ export class BalancesComponent {
   
   constructor(
     private paginationService: PaginationService, 
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+    private router:Router
   ){
     moment.locale("es");
 
@@ -242,7 +244,8 @@ export class BalancesComponent {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('balances-sales', options, filters)
+      this.paginatedSub = MeteorObservable.subscribe(
+        'balances-sales', options, filters)
         .subscribe(() => {
           this.balances = Balances.find({}).zone();
           this.sales = Sales.find({}).zone();
@@ -263,12 +266,6 @@ export class BalancesComponent {
 
     });
 
-    this.pageSize.next(this.PAGESIZE);
-    this.curPage.next(1);
-    this.sortField.next('balanceNumber');
-    this.sortDirection.next(1);
-    this.filters.next(null);
-
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfBalances');
       this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
@@ -280,6 +277,12 @@ export class BalancesComponent {
       currentPage: 1,
       totalItems: this.collectionCount,
     });
+
+    this.pageSize.next(this.PAGESIZE);
+    this.curPage.next(1);
+    this.sortField.next('balanceNumber');
+    this.sortDirection.next(1);
+    this.filters.next(this.filtersParams);
 
   }
 
@@ -298,25 +301,30 @@ export class BalancesComponent {
     this.showStores = condition;
   }
 
-  search(field: string, value: string): void {
+  search(fieldKey: string, value: string): void {
     if (value == 'undefined')  {
       value = '';
     }
 
-    // no value change on blur
-    if (this.filtersParams[field] === value) {
-      return;
-    }
-    this.filtersParams[field] = value.toUpperCase();
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
 
-    this.curPage.next(1);
-    this.filters.next(this.filtersParams);
+      filter.value = value.toUpperCase();
+
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
+    }
   }
 
   changeSortOrder(direction: string, fieldName: string): void {
     console.log('direction:' + direction + ' fieldname' + fieldName);
-    // this.sortDirection.next(parseInt(direction));
-    // this.sortField.next(fieldName);
+    this.sortDirection.next(parseInt(direction));
+    this.sortField.next(fieldName);
   }
 
   copy(original: any){
@@ -407,6 +415,58 @@ export class BalancesComponent {
   // operate over date or workshift
   // formula: close + extraction - deposit - open 
     return 1000;
+  }
+
+  getCurrentStoreId(): string{
+    let val = Session.get("currentStoreId"); 
+    return (val != null)?val:'';
+  }
+
+  getCurrentBalanceNumber(): number{
+    let val = Session.get("currentBalanceNumber"); 
+    return (val != null)?val: -1;
+  }
+
+  getCurrentBalanceStatus(): number{
+    let val = Session.get("currentBalanceStatus"); 
+    return (val != null)?val:'';
+  }
+
+  openBalance(){
+    MeteorObservable.call(
+      'openBalance',
+      this.getCurrentStoreId()
+    ).subscribe((balanceNumber) => {
+     this.updateBalanceStatus(this.getCurrentStoreId());
+      this.router.navigate(['sales/'+balanceNumber]); 
+    }, (error) => {
+      Bert.alert('Error al cerrar el venta: ' +  error, 'danger', 'growl-top-right' ); 
+    });  
+  }
+
+  closeBalance(){
+     MeteorObservable.call(
+      'closeBalance',
+      this.getCurrentStoreId(),
+      this.getCurrentBalanceNumber()
+    ).subscribe(() => {
+      this.updateBalanceStatus(this.getCurrentStoreId());
+      this.router.navigate(['sales/'+this.getCurrentBalanceNumber()]); 
+    }, (error) => {
+      Bert.alert('Error al cerrar el balance: ' +  error, 'danger', 'growl-top-right' ); 
+    }); 
+  }
+
+  updateBalanceStatus(storeId: string) {
+    MeteorObservable.call('findCurrentStoreBalance', storeId
+    ).subscribe((balance: Balance) => {
+        let balanceNumber = (balance)?balance.balanceNumber:-1;
+        Session.setPersistent("currentBalanceNumber", balanceNumber);
+        
+        let balanceStatus = (balance)?balance.status:'';
+        Session.setPersistent("currentBalanceStatus", balanceStatus);
+      }
+    ); 
   }
 
 }

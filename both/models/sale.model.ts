@@ -4,8 +4,8 @@ export interface Sale extends CollectionObject {
   saleNumber: number;
   saleState: string; //STARTED // SUBMITTED // RESERVED // CANCELED
   payment: string;   // CASH // CARD // ACCOUNT
-  saleDate: string;
-  lastUpdate: string;
+  createdAt: Date;
+  lastUpdate: Date;
   workShift: string; // MORNING AFTERNOON
   userStoreId: string;
   balanceId: string;

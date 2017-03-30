@@ -19,8 +19,6 @@ function generateProductCode(product: Product): string {
     let tag = Tags.findOne({type: tagType, description: product[tagType]}, {fields: {code: 1}});
     code += ""+tag.code;
   }
-
-  console.log(code);
   return code;
 }
 

@@ -13,8 +13,7 @@ import { ProductSize } from '../models/product-size.model';
 
 import * as moment from 'moment';
 import 'moment/locale/es';
-import { MongoObservable } from 'meteor-rxjs';
-import { MeteorObservable } from 'meteor-rxjs';
+import { MongoObservable, MeteorObservable } from 'meteor-rxjs';
 
 
 function getCurrentDate(){
@@ -23,7 +22,10 @@ function getCurrentDate(){
 
 Meteor.methods({
 
-  updatePurchaseOrderStatus: function (purchaseId: string, newState: string) {
+  updatePurchaseOrderStatus: function (
+    purchaseId: string, 
+    newState: string
+  ) {
     check(purchaseId, String);
     check(newState, String);
     Purchases.update(purchaseId, {
@@ -36,13 +38,19 @@ Meteor.methods({
   updatePurchaseOrder: function (
     purchaseId?: string, 
     purchaseState?: string, 
-    purchaseDate?: string,
+    createdAt?: string,
     lastUpdate?: string,
     provider?:string,
     paymentAmount?:number,
     total?:number
   ) {
-    check(purchaseId, String);
+    check(purchaseId, Match.Maybe(String));
+    check(purchaseState, Match.Maybe(String));
+    check(createdAt, Match.Maybe(String));
+    check(lastUpdate, Match.Maybe(String));
+    check(provider, Match.Maybe(String));
+    check(paymentAmount, Match.Maybe(String));
+    check(total, Match.Maybe(String));
     if (Meteor.isServer)  {
       let query = {};
       if(purchaseState != null) {
@@ -51,8 +59,8 @@ Meteor.methods({
       if(purchaseState != null) {
         query['purchaseState'] = purchaseState;
       }
-      if(purchaseDate != null) {
-        query['purchaseDate'] = purchaseDate;
+      if(createdAt != null) {
+        query['createdAt'] = createdAt;
       }
       if(lastUpdate != null) {
         query['lastUpdate'] = lastUpdate;
@@ -74,18 +82,19 @@ Meteor.methods({
 
   createPurchaseOrder(
     provider:string,
-  ):string {
+    storeId:string
+  ):number {
     check(provider, String);
-
-    let result:string;
-    MeteorObservable.call('getNextId', 'PURCHASE')
+    check(storeId, String);
+    let result:number;
+    MeteorObservable.call('getNextId', 'PURCHASE', storeId)
     .subscribe(
-      (orderNumber: string) => { 
+      (orderNumber: number) => { 
         Purchases.insert({
           purchaseNumber: orderNumber,
           purchaseState: 'SELECTION', 
-          purchaseDate:  getCurrentDate(),
-          lastUpdate: getCurrentDate(),
+          createdAt:  new Date(),
+          lastUpdate: new Date(),
           provider: provider.toUpperCase(),
           paymentAmount:0,
           total:0
@@ -95,51 +104,7 @@ Meteor.methods({
       }
     ); 
     return result;
-  },
-
-  // createPurchaseOrder: function(
-  //   purchaseNumber: string,
-  //   purchaseState: string, 
-  //   purchaseDate: string,
-  //   lastUpdate: string,
-  //   provider:string,
-  //   paymentAmount:number,
-  //   total?:number,
-  // ) {
-  //   check(purchaseNumber, String);
-  //   check(purchaseState, String);
-  //   check(purchaseDate, String);
-  //   check(lastUpdate, String);
-  //   check(provider, String);
-  //   check(paymentAmount, Number);
-  //   check(total, Number);
-
-  //   let purchase = Purchases.findOne(
-  //     {purchaseNumber: purchaseNumber}
-  //   );
-       
-  //   if (purchase) {
-  //     Meteor.call("updatePurchaseOrder",
-  //       purchase._id, 
-  //       purchaseState,
-  //       purchaseDate,
-  //       lastUpdate,
-  //       provider,
-  //       paymentAmount,
-  //       total
-  //     );
-  //   } else {
-  //     Purchases.insert({
-  //       purchaseNumber: purchaseNumber,
-  //       purchaseState: purchaseState, 
-  //       purchaseDate: purchaseDate,
-  //       lastUpdate: lastUpdate,
-  //       provider: provider,
-  //       paymentAmount:paymentAmount,
-  //       total:total
-  //     })
-  //   }
-  // },
+  }, 
 
   saveProductPurchase: function (
     purchaseId: string, 
@@ -180,10 +145,14 @@ Meteor.methods({
 
   updateProductPurchase: function ( 
     productPurchaseId: string, 
-    cost: number,
-    quantity:number,
+    cost?: number,
+    quantity?:number,
     subtotal?: number
   ) {
+    check(productPurchaseId, String);
+    check(cost, Match.Maybe(String));
+    check(quantity, Match.Maybe(String))
+    check(subtotal, Match.Maybe(String));
     let query = {};
     if(cost != null) {
         query['cost'] = cost;

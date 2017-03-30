@@ -4,4 +4,5 @@
 export interface Counter extends CollectionObject {
   lastCode: number; 
   type: string;
+  storeId?: string;
 }

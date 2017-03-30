@@ -29,21 +29,22 @@ Meteor.methods({
 
   createSaleOrder(
     userStoreId:string,
-    balanceId:string
+    balanceId:string,
+    storeId:string
   ): number {
     check(userStoreId, String);
     //check(balanceId, String);
-
+    check(storeId, String);
     let result:number;
-    MeteorObservable.call('getNextId', 'SALE')
+    MeteorObservable.call('getNextId', 'SALE', storeId)
     .subscribe(
       (orderNumber: number) => { 
         Sales.insert({
           saleNumber: orderNumber,
           saleState: 'STARTED',
           payment: '',
-          saleDate:  getCurrentDate(),
-          lastUpdate: getCurrentDate(),
+          createdAt:  new Date(),
+          lastUpdate: new Date(),
           workShift: getWorkShift(new Date()),
           userStoreId: userStoreId,
           // balanceId: balanceId,
@@ -60,7 +61,10 @@ Meteor.methods({
     return result;
   },
   
-  updateSaleOrderStatus: function (saleId: string, newState: string) {
+  updateSaleOrderStatus: function (
+    saleId: string, 
+    newState: string
+  ) {
     check(saleId, String);
     check(newState, String);
     Sales.update(saleId, {

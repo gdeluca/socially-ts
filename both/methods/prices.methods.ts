@@ -58,16 +58,6 @@ Meteor.methods({
       }
    
        return ProductPrices.insert(query);
-      // ProductPrices.insert(
-      //   {
-      //     lastCostPrice:lastCostPrice,
-      //     priceCash:priceCash,
-      //     priceCard:priceCard,
-      //     productId:productId,
-      //     storeId:storeId
-
-      //   }
-      // );
     }
   },
 

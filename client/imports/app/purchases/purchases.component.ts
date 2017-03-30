@@ -81,16 +81,16 @@ export class PurchasesComponent {
 
   filtersParams: any = {
     'purchaseState':  '',
-    'purchaseDate': '',
+    'createdAt': '',
     'lastUpdate': '',
     'provider': ''
   };
 
-  // purchaseNumber, purchaseState, purchaseDate, lastUpdate, total, provider, paymentAmount
+  // purchaseNumber, purchaseState, createdAt, lastUpdate, total, provider, paymentAmount
   headers: Dictionary[] = [
     {'key': 'Nº Compra', 'value':'purchaseNumber'},
     {'key': 'Estado', 'value':'purchaseState', 'showHeaderFilter': true},
-    {'key': 'Fecha de Compra', 'value':'purchaseDate', 'showHeaderFilter': true},
+    {'key': 'Fecha de Compra', 'value':'createdAt', 'showHeaderFilter': true},
     {'key': 'Ultimo Cambio', 'value':'lastUpdate', 'showHeaderFilter': false},
     {'key': 'Total', 'value':'total', 'showHeaderFilter': false},
     {'key': 'Proveedor', 'value':'provider', 'showHeaderFilter': true},
@@ -174,6 +174,11 @@ export class PurchasesComponent {
 
   }
 
+  getCurrentStoreId(): string{
+    let val = Session.get("currentStoreId"); 
+    return (val != null)?val:'';
+  }
+
   ngOnDestroy() {
     this.paginatedSub.unsubscribe();
     this.optionsSub.unsubscribe();
@@ -204,9 +209,10 @@ export class PurchasesComponent {
     this.filters.next(this.filtersParams);
   }
 
-  createOrder(orderNumber){
+  createOrder(){
     MeteorObservable.call('createPurchaseOrder', 
-      this.selectedProvider   
+      this.selectedProvider,
+      this.getCurrentStoreId(),
     ).subscribe( 
     (orderNumber) => {
       this.router.navigate(['purchases/'+orderNumber+'/selection']); 
@@ -220,7 +226,7 @@ export class PurchasesComponent {
   //   {
   //     purchaseNumber:'', 
   //     purchaseState:'',
-  //     purchaseDate:'',
+  //     createdAt:'',
   //     lastUpdate:'',
   //     total:'',
   //     provider:'',

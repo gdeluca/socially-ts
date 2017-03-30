@@ -101,7 +101,7 @@
         </ng-container> 
       </tr> 
 
-      <!-- purchaseNumber, purchaseState, purchaseDate, lastUpdate, total, provider, paymentAmount -->
+      <!-- purchaseNumber, purchaseState, createdAt, lastUpdate, total, provider, paymentAmount -->
       <tr *ngFor="let purchase of purchases | async; let rowIndex=index; ">
    
         <!-- action buttons for to edit stock fields -->
@@ -153,7 +153,7 @@
         </td>
 
         <td class="text-center">
-          <a>{{purchase.purchaseDate | amDateFormat:'LL hh:mmA'}}</a>
+          <a>{{purchase.createdAt | amDateFormat:'LL hh:mmA'}}</a>
         </td>
 
         <td class="text-center">

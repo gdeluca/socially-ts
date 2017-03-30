@@ -34,6 +34,17 @@ export class NavbarComponent {
     return (val != null)?val:'';
   }
 
+  getCurrentBalanceNumber(): number{
+    let val = Session.get("currentBalanceNumber"); 
+    return (val != null)?val:-1;
+  }
+
+  getCurrentBalanceStatus(): number{
+    let val = Session.get("currentBalanceStatus"); 
+    return (val != null)?val:'';
+  }
+  
+
   getCurrentUser(){
     let val = Session.get("currentUserEmail"); 
     return (val != null)?val:'';

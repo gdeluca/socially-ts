@@ -24,29 +24,29 @@ function getTwoDigitsCounters(){
 
 Meteor.methods({
 
-  getNextId(type: string): string { 
+  getNextId(type: string, storeId?: string): number { 
     check(type, String);
+    check(storeId, Match.Maybe(String));
+
     if (Meteor.isServer) {
-        var counter = Counters.findOne({type: type});
-        var lastCode = ""
-        if (counter) {
-          Counters.update(
-            {type: type}, 
-            {$set:{lastCode: counter.lastCode+1}}
-          );
-          lastCode = ""+(counter.lastCode+1);
-        } else {
-          Counters.insert({type: type, lastCode: 1}); 
-          lastCode = "1";
-        }
+      let selector = (storeId)?
+        {type: type, storeId:storeId}:
+        {type: type};
+      let counter = Counters.findOne(selector);
 
-        if (getSevenDigitsCounters().indexOf(type) > -1) {
-          return Array(8-lastCode.length).join("0")+""+lastCode; 
-        } else if (getTwoDigitsCounters().indexOf(type) > -1) {
-          return Array(3-lastCode.length).join("0")+""+lastCode; 
-        } 
+      let lastCode:number;
+      if (counter) {
+        Counters.update(
+          {type: type}, 
+          {$set:{lastCode: counter.lastCode+1}}
+        );
+        lastCode = counter.lastCode;
+      } else {
+        Counters.insert({type: type, lastCode: 10}); 
+        lastCode = 10;
+      }
 
-        return ""+lastCode;
+      return lastCode;
     }
   }
 

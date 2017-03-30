@@ -7,8 +7,23 @@
     <div class="col">
       <a class="navbar-brand" href="#">Control App</a>
     </div>
-    <div class="col mt-2" *ngIf="isLoggedin()" >
-      <h6 class="text-right">SE ENCUENTRA EN {{getCurrentStoreName()}} COMO {{getCurrentUser()}}</h6> 
+    <div class="col mt-2 mr-5" *ngIf="isLoggedin()" >
+      <h6 class="text-right">
+        SE ENCUENTRA EN {{getCurrentStoreName()}} COMO {{getCurrentUser()}}
+      </h6> 
+    </div>
+     <div class="col-4 mt-2 mr-5" *ngIf="isLoggedin()" >
+      <h6 class="text-right">
+        <ng-container *ngIf="getCurrentBalanceNumber() > -1">
+        EL BALANCE Nº {{getCurrentBalanceNumber()}} ESTA 
+          <ng-container *ngIf="!getCurrentBalanceStatus() || getCurrentBalanceStatus() == 'CLOSED'">
+            CERRADO
+          </ng-container>
+           <ng-container *ngIf="getCurrentBalanceStatus() && getCurrentBalanceStatus() == 'OPEN'">
+            ABIERTO
+          </ng-container>
+        </ng-container>
+      </h6> 
     </div>
   </div>
   <div class="navbar-collapse" id="navbar-collapse" [class.collapse]="isCollapsed">

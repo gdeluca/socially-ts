@@ -8,13 +8,6 @@ export const Counters = new MongoObservable.Collection<Counter>('counters');
 function loggedIn() {
   return !!Meteor.user();
 }
- 
-// Counters.allow({
-//   insert: loggedIn,
-//   update: loggedIn,
-//   remove: loggedIn
-// });
-
 
 Counters.allow({
   insert() { return false; },

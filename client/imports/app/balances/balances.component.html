@@ -6,27 +6,25 @@
 
     <div  class="form-inline">
       
-      <!-- <multi-dropdown 
-        [options]="myOptions" 
-        [texts]="myTexts" 
-        [settings]="mySettings" 
-        [(ngModel)]="optionsModel">
-      </multi-dropdown>
-      <!-- <fieldset class="form-group"> 
-          <legend>Agrupar por:</legend>
-          <div class="form-check">
-            <label class="form-check-label">
-              <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios1" value="option1" checked (click)="doShowOperation(false)">
-              Facturacion
-            </label>
-          </div>
-          <div class="form-check">
-          <label class="form-check-label">
-              <input type="radio" class="form-check-input" name="optionsRadios" id="optionsRadios2" value="option2" (click)="doShowOperation(true)">
-              Operaciones
-            </label>
-          </div>
-      </fieldset> -->
+      <!-- balance -->
+      <div class="ml-4 mt-4">
+        <button 
+          type="button" 
+          class="form-control btn btn-primary ml-2" 
+          (click)="openBalance()"
+          [hidden]="getCurrentBalanceNumber() < 0 || getCurrentBalanceStatus() == 'OPEN'"
+          >
+            Abrir balance
+        </button>
+        <button 
+          type="button" 
+          class="form-control btn btn-primary ml-2" 
+          (click)="closeBalance()"
+          [hidden]="getCurrentBalanceNumber() > -1 && getCurrentBalanceStatus() == 'CLOSED'"
+          >
+            Cerrar balance
+        </button>
+      </div>
 
       <!-- year -->
       <div class=" ml-4 mt-4">
@@ -180,7 +178,7 @@
                 <ng-container *ngIf="userStore._id == sale.userStoreId ">
                     <!-- userstore {{userStore._id}} -->
                   <ng-container *ngFor="let store of stores | async;  "> 
-                    <ng-container *ngIf="store._id == userStore.storeId ">
+                    <ng-container *ngIf="store._id == userStore.storeId && getCurrentStoreId() == store._id">
                       <ng-container *ngIf="balance.storeId == store._id ">
                        <!-- store  {{store._id}} -->                
                         <td class="text-center">

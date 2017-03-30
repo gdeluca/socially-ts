@@ -32,7 +32,7 @@ import { Stock } from '../../../both/models/stock.model';
 import { Tag } from '../../../both/models/tag.model';
 import { User } from '../../../both/models/user.model';
 
-const purchaseFields = ['purchaseState', 'purchaseDate', 'lastUpdate', 'provider'];
+const purchaseFields = ['purchaseState', 'createdAt', 'lastUpdate', 'provider'];
 
 Meteor.publishComposite('purchases', function(
   options: SearchOptions, 

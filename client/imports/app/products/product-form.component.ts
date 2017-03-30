@@ -248,11 +248,14 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     MeteorObservable.call('saveProduct', product).subscribe(
       (productId: string) => {
        let productPrice: ProductPrice = {
+          createdAt: new Date(),
+          active: true,
           lastCostPrice: values.cost, 
+
           priceCash: values.cashPayment, 
           priceCard: values.cashPayment, 
           productId: productId,
-          storeId: ""
+          storeId: "" 
         }; 
 
         let sizes:string[] = [];

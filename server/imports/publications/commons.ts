@@ -1,5 +1,5 @@
 import {Meteor} from 'meteor/meteor';
-import {check} from 'meteor/check';
+import {check, Match} from 'meteor/check';
 import { SearchOptions } from '../../../both/domain/search-options';
 import { Filter, Filters } from '../../../both/domain/filter';
 import * as _ from 'underscore';
@@ -35,7 +35,6 @@ export function getSelectorFilter(filterFields:string[] = [], filters: Filters =
       result["$and"] = selectors;
     }
   }
- console.log(result);
   return result;
 }
 
