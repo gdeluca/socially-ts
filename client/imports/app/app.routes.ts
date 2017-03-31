@@ -19,8 +19,9 @@ import { UsersComponent } from './users/users.component';
 
    
 export const routes: Route[] = [
-  { path: '', redirectTo: '/categories', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
+  { path: '', redirectTo: '/balances', pathMatch: 'full', canActivate: ['canActivateForLoggedIn'] },
   { path: 'balances', component: BalancesComponent, canActivate: ['canActivateForLoggedIn'] },
+  { path: 'balances/:balanceNumber', component: SalesComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'categories', component: CategoriesComponent, canActivate: ['canActivateForLoggedIn'] },
   { path: 'login', component: LoginComponent },
   { path: 'purchases', component: PurchasesComponent, canActivate: ['canActivateForLoggedIn'] },

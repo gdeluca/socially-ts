@@ -124,21 +124,19 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-
-    // console.log('init sale details subscribers');
     this.paramsSub = this.activeRoute.params
       .map(params => params['orderNumber'])
       .subscribe(orderNumber => {
-        this.orderNumber = orderNumber
+        this.orderNumber = +orderNumber
         
         if (this.saleSub) {
           this.saleSub.unsubscribe();
         }
-        this.saleSub = MeteorObservable.subscribe('sale-orders', this.orderNumber).subscribe(() => {
-          // MeteorObservable.autorun().subscribe(() => {
-            // console.log('getting subscriber data');
-
-            this.sale = Sales.findOne({saleNumber:this.orderNumber});
+        this.saleSub = MeteorObservable.subscribe(
+          'sale-orders', this.orderNumber).subscribe(() => {
+            this.sale = Sales.findOne(
+              {saleNumber:this.orderNumber}
+            );
             this.productSales = ProductSales.find({}).zone();
             this.productSizes = ProductSizes.find({}).zone();
             this.productPrices = ProductPrices.find({}).zone();
@@ -146,8 +144,6 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
             this.userStore = UserStores.findOne();
             this.seller = Users.find({_id: this.userStore.userId}).fetch()[0];
             this.store = Stores.findOne({});
-           // this.stocks = Stocks.find({}).zone();
-          // });
         });
  
 

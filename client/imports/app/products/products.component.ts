@@ -173,7 +173,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.sortDirection.next(1);
     this.sortField.next('name');
     this.filters.next(this.filtersParams);
-
   }
   
   ngOnDestroy() {
@@ -219,7 +218,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
       filter.value = value.toUpperCase();
 
-      console.log(this.filtersParams);
       this.curPage.next(1);
       this.filters.next(this.filtersParams);
     }

@@ -8,8 +8,6 @@ import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
 
-import { Bert } from 'meteor/themeteorchef:bert';
-
 // reactiveX
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -55,8 +53,13 @@ import { Store } from '../../../../both/models/store.model';
 // import { Tag } from '../../../../both/models/tag.model';
 import { User } from '../../../../both/models/user.model';
 
+// domain
 import { Dictionary } from '../../../../both/domain/dictionary';
+import { Filter, Filters } from '../../../../both/domain/filter';
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
 import { isNumeric } from '../../validators/validators';
+
 import * as moment from 'moment';
 import 'moment/locale/es';
 
@@ -77,15 +80,15 @@ export class SalesComponent {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
 
-  filters: Subject<any> = new Subject<any>();
+  filters: Subject<Filters> = new Subject<Filters>();
 
-  filtersParams: any = {
-    'saleState':  '',
-    'saleDate': '',
-    'lastUpdate': '',
-    'seller': '',
-    'paymentForm': ''
-  };
+  filtersParams: Filters = [
+    {key: 'saleState', value:''},
+    {key: 'saleDate', value:''},
+    {key: 'lastUpdate', value:''},
+    {key: 'seller', value:''},
+    {key: 'paymentForm', value:''},
+  ];
 
   // name <-> sortfield, touple
   headers: Dictionary[] = [
@@ -103,8 +106,11 @@ export class SalesComponent {
   collectionCount: number = 0;
   PAGESIZE: number = 6 
 
+  balanceNumber: number;
+
+
   paginatedSub: Subscription;
-  optionsSub: Subscription;
+  optionsAndParamsSub: Subscription;
   autorunSub: Subscription;
   usersSub: Subscription;
 
@@ -136,6 +142,7 @@ export class SalesComponent {
 
   constructor(
     private paginationService: PaginationService,
+    private activeRoute: ActivatedRoute,
     private router:Router
     // private formBuilder: FormBuilder
   ){
@@ -145,13 +152,16 @@ export class SalesComponent {
   }
 
   ngOnInit() {
-    this.optionsSub = Observable.combineLatest(
+    this.optionsAndParamsSub = Observable.combineLatest(
       this.pageSize,
       this.curPage,
       this.sortDirection,
       this.sortField,
-      this.filters
-    ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
+      this.filters,
+      this.activeRoute.params.map(params => params['balanceNumber'])
+    ).subscribe(([pageSize, curPage, sortDirection, sortField, filters, balanceNumber]) => {
+      this.balanceNumber = +balanceNumber; 
+
       const options: SearchOptions = {
         limit: pageSize as number,
         skip: ((curPage as number) - 1) * (pageSize as number),
@@ -168,12 +178,11 @@ export class SalesComponent {
         'store-sales', 
         options, 
         filters,
-        this.balanceId, //verify this
-        this.getCurrentStoreId()
-      )
-        .subscribe(() => {
-          this.sales = Sales.find({}).zone();
-          this.userStores= UserStores.find({}).zone();
+        this.getCurrentStoreId(),
+        this.balanceNumber
+      ).subscribe(() => {
+        this.sales = Sales.find({}).zone();
+        this.userStores= UserStores.find({}).zone();
       });
 
       if (this.usersSub) { 
@@ -185,15 +194,10 @@ export class SalesComponent {
 
     });
 
-    this.pageSize.next(this.PAGESIZE);
-    this.curPage.next(1);
-    this.sortField.next('saleNumber');
-    this.sortDirection.next(-1);
-    this.filters.next('');
-
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfSales');
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+      this.paginationService.setTotalItems(
+        this.paginationService.defaultId(), this.collectionCount);
     });
 
     this.paginationService.register({
@@ -203,11 +207,17 @@ export class SalesComponent {
       totalItems: this.collectionCount,
     });
 
+    this.pageSize.next(this.PAGESIZE);
+    this.curPage.next(1);
+    this.sortField.next('saleNumber');
+    this.sortDirection.next(-1);
+    this.filters.next(this.filtersParams);
+
   }
 
   ngOnDestroy() {
     this.paginatedSub.unsubscribe();
-    this.optionsSub.unsubscribe();
+    this.optionsAndParamsSub.unsubscribe();
     this.autorunSub.unsubscribe();
     this.usersSub.unsubscribe();
   }
@@ -221,18 +231,24 @@ export class SalesComponent {
     this.sortField.next(fieldName);
   }
 
-  search(field: string, value: string): void {    
+  search(fieldKey: string, value: string): void {
     if (value == 'undefined')  {
       value = '';
     }
-    // no value change on blur
-    if (this.filtersParams[field] === value) {
-      return;
-    }
-    this.filtersParams[field] = value.toUpperCase();
 
-    this.curPage.next(1);
-    this.filters.next(this.filtersParams);
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
+
+      filter.value = value.toUpperCase();
+
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
+    }
   }
 
   copy(original: any){

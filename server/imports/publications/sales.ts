@@ -8,7 +8,7 @@ import { SearchOptions } from '../../../both/domain/search-options';
 import { Filter, Filters } from '../../../both/domain/filter';
 
 // collections
-// import { Balances } from '../../../both/collections/balances.collection';
+import { Balances } from '../../../both/collections/balances.collection';
 // import { Categories } from '../../../both/collections/categories.collection';
 // import { Counters } from '../../../both/collections/counters.collection';
 import { UserStores } from '../../../both/collections/user-stores.collection';
@@ -97,12 +97,11 @@ Meteor.publishComposite('sale-orders', function(
 Meteor.publishComposite('store-sales', function(
   options: SearchOptions, 
   filters: Filters,
-  balanceId: string,
-  storeId: string
+  storeId: string,
+  balanceNumber?: number,
 ) {
-  check(balanceId, String);
   check(storeId, String);
-  check(filters, String);
+  check(balanceNumber, Match.Maybe(Number));
   let salesFilter = getSelectorFilter(saleFields, filters);
   let usersFilter = getSelectorFilter(userFields, filters);
   let storesFilter = getSelectorFilter(storeFields, filters);
@@ -121,16 +120,27 @@ Meteor.publishComposite('store-sales', function(
           {
             find: function(userStore) {
               return Sales.collection.find({userStoreId: userStore._id});
-            }
+            },
+            children: [
+              {
+                find: function(sale) {
+                  let selector = { _id : sale.balanceId };
+                  if (balanceNumber) {
+                    selector['balanceNumber'] = balanceNumber;
+                  }
+                  return Balances.collection.find(selector);
+                }
+              }
+            ]
           }, 
           {
             find: function(userStore) {
-              let usersSelector: any = {};
-              usersSelector["$and"] = [];
-              usersSelector["$and"].push({_id: userStore.userId});
-              usersSelector["$and"].push(usersFilter);
+              let selector: any = {};
+              selector["$and"] = [];
+              selector["$and"].push({_id: userStore.userId});
+              selector["$and"].push(usersFilter);
               return  Meteor.users.find(
-                usersSelector, 
+                selector, 
                 {fields: {username: 1}}
               );
             }

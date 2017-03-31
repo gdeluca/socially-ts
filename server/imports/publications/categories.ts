@@ -28,8 +28,6 @@ Meteor.publishComposite('categories.sections', function(
 ) {  
     let categoryFilter = getSelectorFilter(categoryFields, filters);
     let sectionFilter = getSelectorFilter(sectionFields, filters);
-console.log(JSON.stringify(categoryFilter));
-console.log(JSON.stringify(sectionFilter));
     checkOptions(options);
     return {
       find: function() {

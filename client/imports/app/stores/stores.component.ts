@@ -19,9 +19,12 @@ import { SearchOptions } from '../../../../both/domain/search-options';
 // model 
 import { Stores } from '../../../../both/collections/stores.collection';
 import { Store } from '../../../../both/models/store.model';
+
+// domain
 import { Dictionary } from '../../../../both/domain/dictionary';
-
-
+import { Filter, Filters } from '../../../../both/domain/filter';
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
  
 import template from './stores.component.html';
 import style from './stores.component.scss';
@@ -31,7 +34,7 @@ import style from './stores.component.scss';
   template,
   styles: [ style ],
 })
-@InjectUser('user')
+@InjectUser('currentUser')
 export class StoresComponent implements OnInit, OnDestroy {
   
   // pagination related
@@ -40,7 +43,18 @@ export class StoresComponent implements OnInit, OnDestroy {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
 
-  filters: Subject<any> = new Subject<any>();
+  filters: Subject<Filters> = new Subject<Filters>();
+
+  filtersParams: Filters = [
+    {key: 'name', value:''},
+    {key: 'address', value:''},
+  ];
+
+  // name <-> sortfield, touple
+  headers: Dictionary[] = [
+    {'key': 'Sucursal', 'value': 'name'}, 
+    {'key': 'Direccion', 'value': 'address'}, 
+  ];
 
   collectionCount: number = 0;
   PAGESIZE: number = 6; 
@@ -49,24 +63,14 @@ export class StoresComponent implements OnInit, OnDestroy {
   optionsSub: Subscription;
   autorunSub: Subscription;
 
+  currentUser: Meteor.User;
 
-  user: Meteor.User;
   editedEntity: Store = {name:'', address:''};
   adding: boolean = false;
   editing: boolean = false;
   selected: any;
   stores: Observable<Store[]>; 
 
-  filtersParams: any = {
-    'name':  '',
-    'address':  '' 
-  };
-
-  // name <-> sortfield, touple
-  headers: Dictionary[] = [
-    {'key': 'Sucursal', 'value': 'name'}, 
-    {'key': 'Direccion', 'value': 'address'}, 
-  ];
   complexForm : FormGroup;
 
   constructor(
@@ -94,27 +98,26 @@ export class StoresComponent implements OnInit, OnDestroy {
         sort: { [sortField as string] : sortDirection as number }
       };
       
-      this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
+      this.paginationService.setCurrentPage(
+        this.paginationService.defaultId() , curPage as number);
 
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('stores-paginated', options, filters)
-        .subscribe(() => {
-          this.stores = Stores.find().zone();
+      this.paginatedSub = MeteorObservable.subscribe(
+        'stores-paginated', 
+        options, 
+        filters
+      ).subscribe(() => {
+        this.stores = Stores.find().zone();
       });
       
     });
 
-    this.pageSize.next(this.PAGESIZE);
-    this.curPage.next(1);
-    this.sortField.next('name');
-    this.sortDirection.next(1);
-    this.filters.next('');
-
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfStores');
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+      this.paginationService.setTotalItems(
+        this.paginationService.defaultId(), this.collectionCount);
     });
 
     this.paginationService.register({
@@ -124,6 +127,11 @@ export class StoresComponent implements OnInit, OnDestroy {
       totalItems: this.collectionCount,
     });
 
+    this.pageSize.next(this.PAGESIZE);
+    this.curPage.next(1);
+    this.sortField.next('name');
+    this.sortDirection.next(1);
+    this.filters.next(this.filtersParams);
   }
   
   ngOnDestroy() {
@@ -152,7 +160,11 @@ export class StoresComponent implements OnInit, OnDestroy {
     }
     let values = this.complexForm.value;
     if (this.complexForm.valid) {
-      MeteorObservable.call('addStore', values.name, values.address).subscribe(() => {
+      MeteorObservable.call(
+        'addStore', 
+        values.name, 
+        values.address
+      ).subscribe(() => {
         alert('Se agrego la sucursal.');
       }, (error) => {
         alert(` Codigo de error:  ${error}`);
@@ -160,30 +172,34 @@ export class StoresComponent implements OnInit, OnDestroy {
 
       this.complexForm.reset();
     }
-    // console.log(value);
   }
 
   copy(original: any){
     return Object.assign({}, original)
   }
 
-   search(field: string, value: string): void {
+  search(fieldKey: string, value: string): void {
     if (value == 'undefined')  {
       value = '';
     }
-    if (this.filtersParams[field] === value) {
-      return;
-    }
-    this.filtersParams[field] = value.toUpperCase();
 
-    this.curPage.next(1);
-    this.filters.next(this.filtersParams);
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
+
+      filter.value = value.toUpperCase();
+
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
+    }
   }
 
   
   changeSortOrder(direction: string, fieldName: string): void {
-    console.log(direction);
-    console.log(fieldName);
     this.sortDirection.next(parseInt(direction));
     this.sortField.next(fieldName);
   }

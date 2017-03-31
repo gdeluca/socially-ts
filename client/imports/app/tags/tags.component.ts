@@ -15,13 +15,18 @@ import 'rxjs/add/operator/combineLatest';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/domain/search-options';
-import { Bert } from 'meteor/themeteorchef:bert';
+
 import { IMultiSelectOption, IMultiSelectTexts, IMultiSelectSettings } from '../../modules/multiselect';
 
 // model 
 import { Tags, definedTags, tagsMapping } from '../../../../both/collections/tags.collection';
 import { Tag } from '../../../../both/models/tag.model';
+
+// domain
 import { Dictionary } from '../../../../both/domain/dictionary';
+import { Filter, Filters } from '../../../../both/domain/filter';
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
 
 
 import template from './tags.component.html';
@@ -41,11 +46,19 @@ export class TagsComponent implements OnInit, OnDestroy {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
   
-  filters: Subject<any> = new Subject<any>();
+  filters: Subject<Filters> = new Subject<Filters>();
 
+  filtersParams: Filters = [
+    {key: 'description', value:''},
+  ];
+
+  headers: Dictionary[] = [
+    {'key': 'Codigo', 'value': 'code'},
+    {'key': 'Descripcion', 'value': 'description'},
+  ];
 
   collectionCount: number = 0;
-  PAGESIZE: number = 20; 
+  PAGESIZE: number = 15; 
   
   paginatedSub: Subscription;
   optionsSub: Subscription;
@@ -60,15 +73,6 @@ export class TagsComponent implements OnInit, OnDestroy {
   tagNames: Observable<Tag[]>;
 
   mapping = tagsMapping; // imported from Tags;
-
-  filtersParams: any = {
-    'description':  ''
-  };
-
-  headers: Dictionary[] = [
-    {'key': 'Codigo', 'value': 'code'},
-    {'key': 'Descripcion', 'value': 'description'},
-  ];
 
   complexForm : FormGroup;
 
@@ -165,23 +169,23 @@ export class TagsComponent implements OnInit, OnDestroy {
         .subscribe(() => {
           this.tags = Tags.find({type: type, code: { $ne: '00' }}).zone();
           this.collectionCount = Counts.get('numberOf'+type);
-          // console.log('numberOf'+type, this.collectionCount);
-          this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+          this.paginationService.setTotalItems(
+            this.paginationService.defaultId(), this.collectionCount);
         })  
       })
     }
+
+    this.autorunSub = MeteorObservable.autorun().subscribe(() => {
+      this.collectionCount = Counts.get('numberOf'+type);
+      this.paginationService.setTotalItems(
+        this.paginationService.defaultId(), this.collectionCount);
+    });
 
     this.pageSize.next(this.PAGESIZE);
     this.curPage.next(1);
     this.sortField.next('description');
     this.sortDirection.next(1);
-    this.filters.next('');
-
-    this.autorunSub = MeteorObservable.autorun().subscribe(() => {
-      this.collectionCount = Counts.get('numberOf'+type);
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
-    });
-
+    this.filters.next(this.filtersParams);
   } 
 
   getMappedTagType(value){
@@ -203,8 +207,11 @@ export class TagsComponent implements OnInit, OnDestroy {
   }
 
   update = function(tag: Tag){
-    MeteorObservable.call('updateTag', tag._id, tag.description)
-    .subscribe(() => {
+    MeteorObservable.call(
+      'updateTag', 
+      tag._id, 
+      tag.description
+    ).subscribe(() => {
       Bert.alert('Se cambio la etiqueta: ' + tag.description , 'success', 'growl-top-right' ); 
     }, (error) => {
       Bert.alert('Error al actualizar:  ${error} ', 'danger', 'growl-top-right' ); 
@@ -219,7 +226,7 @@ export class TagsComponent implements OnInit, OnDestroy {
 
     if (this.complexForm.valid) {
       let values = this.complexForm.value;
-      console.log('adding', this.tagSelected[0], value.description);
+      // console.log('adding', this.tagSelected[0], value.description);
       MeteorObservable.call('addTag', this.tagSelected[0], value.description)
         .subscribe(() => {
           Bert.alert('Se agrego la etiqueta: ' + value.description , 'success', 'growl-top-right' ); 
@@ -235,24 +242,29 @@ export class TagsComponent implements OnInit, OnDestroy {
     return Object.assign({}, original)
   }
 
-  search(field: string, value: string): void {
-    
+  changeSortOrder(direction: string, fieldName: string): void {
+    this.sortDirection.next(parseInt(direction));
+    this.sortField.next(fieldName);
+  }
+
+  search(fieldKey: string, value: string): void {
     if (value == 'undefined')  {
       value = '';
     }
 
-    if (this.filtersParams[field] === value) {
-      return;
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
+
+      filter.value = value.toUpperCase();
+
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
     }
-    this.filtersParams[field] = value.toUpperCase();
-
-    this.curPage.next(1);
-    this.filters.next(this.filtersParams);
-  }
-
-  changeSortOrder(direction: string, fieldName: string): void {
-    this.sortDirection.next(parseInt(direction));
-    this.sortField.next(fieldName);
   }
 
 }

@@ -438,7 +438,7 @@ export class BalancesComponent {
       this.getCurrentStoreId()
     ).subscribe((balanceNumber) => {
      this.updateBalanceStatus(this.getCurrentStoreId());
-      this.router.navigate(['sales/'+balanceNumber]); 
+      this.router.navigate(['balances/'+balanceNumber]); 
     }, (error) => {
       Bert.alert('Error al cerrar el venta: ' +  error, 'danger', 'growl-top-right' ); 
     });  
@@ -451,7 +451,7 @@ export class BalancesComponent {
       this.getCurrentBalanceNumber()
     ).subscribe(() => {
       this.updateBalanceStatus(this.getCurrentStoreId());
-      this.router.navigate(['sales/'+this.getCurrentBalanceNumber()]); 
+      this.router.navigate(['balances/'+this.getCurrentBalanceNumber()]); 
     }, (error) => {
       Bert.alert('Error al cerrar el balance: ' +  error, 'danger', 'growl-top-right' ); 
     }); 

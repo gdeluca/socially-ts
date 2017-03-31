@@ -8,8 +8,6 @@ import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
  
-import { Bert } from 'meteor/themeteorchef:bert'; 
-
 // reactiveX
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
@@ -55,8 +53,12 @@ import { Store } from '../../../../both/models/store.model';
 import { Tag } from '../../../../both/models/tag.model';
 // import { User } from '../../../../both/models/user.model';
 
+// domain
 import { Dictionary } from '../../../../both/domain/dictionary';
-import { isNumeric } from '../../validators/validators';
+import { Filter, Filters } from '../../../../both/domain/filter';
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
+
 import * as moment from 'moment';
 import 'moment/locale/es';
 
@@ -77,14 +79,14 @@ export class PurchasesComponent {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
 
-  filters: Subject<any> = new Subject<any>();
+  filters: Subject<Filters> = new Subject<Filters>();
 
-  filtersParams: any = {
-    'purchaseState':  '',
-    'createdAt': '',
-    'lastUpdate': '',
-    'provider': ''
-  };
+  filtersParams: Filters = [
+    {key: 'purchaseState', value:''},
+    {key: 'createdAt', value:''},
+    {key: 'lastUpdate', value:''},
+    {key: 'provider', value:''},
+  ];
 
   // purchaseNumber, purchaseState, createdAt, lastUpdate, total, provider, paymentAmount
   headers: Dictionary[] = [
@@ -98,7 +100,7 @@ export class PurchasesComponent {
   ];
 
   collectionCount: number = 0;
-  PAGESIZE: number = 6; 
+  PAGESIZE: number = 10; 
 
   paginatedSub: Subscription;
   optionsSub: Subscription;
@@ -139,8 +141,11 @@ export class PurchasesComponent {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('purchases', options, filters)
-        .subscribe(() => {
+      this.paginatedSub = MeteorObservable.subscribe(
+        'purchases', 
+        options, 
+        filters
+      ).subscribe(() => {
           this.purchases = Purchases.find({}).zone();
       });
 
@@ -148,21 +153,17 @@ export class PurchasesComponent {
       if (this.providersSub) { 
         this.providersSub.unsubscribe();
       }
-      this.providersSub = MeteorObservable.subscribe('tags.provider').subscribe(() => {
+      this.providersSub = MeteorObservable.subscribe(
+        'tags.provider').subscribe(() => {
         this.providers = Tags.find({type: 'provider'}).zone();
       });
 
     });
 
-    this.pageSize.next(this.PAGESIZE);
-    this.curPage.next(1);
-    this.sortField.next('purchaseNumber');
-    this.sortDirection.next(-1);
-    this.filters.next('');
-
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfPurchases');
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+      this.paginationService.setTotalItems(
+        this.paginationService.defaultId(), this.collectionCount);
     });
 
     this.paginationService.register({
@@ -172,6 +173,11 @@ export class PurchasesComponent {
       totalItems: this.collectionCount,
     });
 
+    this.pageSize.next(this.PAGESIZE);
+    this.curPage.next(1);
+    this.sortField.next('purchaseNumber');
+    this.sortDirection.next(-1);
+    this.filters.next(this.filtersParams);
   }
 
   getCurrentStoreId(): string{
@@ -195,18 +201,24 @@ export class PurchasesComponent {
     this.sortField.next(fieldName);
   }
 
-  search(field: string, value: string): void {    
+  search(fieldKey: string, value: string): void {
     if (value == 'undefined')  {
       value = '';
     }
-    // no value change on blur
-    if (this.filtersParams[field] === value) {
-      return;
-    }
-    this.filtersParams[field] = value.toUpperCase();
 
-    this.curPage.next(1);
-    this.filters.next(this.filtersParams);
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
+
+      filter.value = value.toUpperCase();
+
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
+    }
   }
 
   createOrder(){

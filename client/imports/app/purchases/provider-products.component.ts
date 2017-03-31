@@ -8,8 +8,6 @@ import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
-
- import { Bert } from 'meteor/themeteorchef:bert';
  
 // reactiveX
 import { Observable } from 'rxjs/Observable';
@@ -50,7 +48,12 @@ import { Store } from '../../../../both/models/store.model';
 import { Tag } from '../../../../both/models/tag.model';
 import { User } from '../../../../both/models/user.model';
 
+// domain
 import { Dictionary } from '../../../../both/domain/dictionary';
+import { Filter, Filters } from '../../../../both/domain/filter';
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
+
 import { isNumeric } from '../../validators/validators';
 
 // import * as moment from 'moment';
@@ -69,22 +72,16 @@ export class ProviderProductsComponent implements OnInit, OnDestroy, OnChanges {
  
   pageSize: Subject<number> = new Subject<number>();
   curPage: Subject<number> = new Subject<number>();
-  filters: Subject<any> = new Subject<any>();
-  collectionCount: number = 0;
-  PAGESIZE: number = 15; 
   
-  @Output('update') notifyProductSelected: EventEmitter<string> = new EventEmitter<string>();
-  @Input() selectedProducts: Observable<Product[]>;
-  @Input() provider: string;
+  filters: Subject<Filters> = new Subject<Filters>();
 
-
-  filtersParams: any = {
-      'name':  '',
-      'code': '',
-      'color': '',
-      'brand': '',
-      'model': ''
-    };
+  filtersParams: Filters = [
+    {key: 'code', value:''},
+    {key: 'name', value:''},
+    {key: 'color', value:''},
+    {key: 'brand', value:''},
+    {key: 'model', value:''},
+  ];
 
   // name <-> sortfield, touple
   headers: Dictionary[] = [
@@ -96,6 +93,13 @@ export class ProviderProductsComponent implements OnInit, OnDestroy, OnChanges {
     {'key': 'Precio Costo', 'value':'cost'},
   ];
 
+  collectionCount: number = 0;
+  PAGESIZE: number = 15; 
+  
+  @Output('update') notifyProductSelected: EventEmitter<string> = new EventEmitter<string>();
+  @Input() selectedProducts: Observable<Product[]>;
+  @Input() provider: string;
+  
   paginatedSub: Subscription;
   optionsSub: Subscription;
   autorunSub: Subscription;
@@ -148,17 +152,16 @@ export class ProviderProductsComponent implements OnInit, OnDestroy, OnChanges {
         this.paginatedSub.unsubscribe();
       }
       this.paginatedSub = MeteorObservable.subscribe(
-        'provider-products', this.provider, options, filters)
-        .subscribe(() => {
-          this.products = Products.find({}).zone();
-          this.productPrices = ProductPrices.find({}).zone();
+        'provider-products', 
+        this.provider, 
+        options, 
+        filters
+      ).subscribe(() => {
+        this.products = Products.find({}).zone();
+        this.productPrices = ProductPrices.find({}).zone();
       });
       
     });
-
-    this.pageSize.next(this.PAGESIZE);
-    this.curPage.next(1);
-    this.filters.next(''); 
 
     if (this.autorunSub) {
       this.autorunSub.unsubscribe();
@@ -175,6 +178,10 @@ export class ProviderProductsComponent implements OnInit, OnDestroy, OnChanges {
       currentPage: 1,
       totalItems: this.collectionCount,
     });
+
+    this.pageSize.next(this.PAGESIZE);
+    this.curPage.next(1);
+    this.filters.next(this.filtersParams); 
 
   }
 
@@ -222,20 +229,24 @@ export class ProviderProductsComponent implements OnInit, OnDestroy, OnChanges {
     this.curPage.next(page);
   }
 
-  search(field: string, value: string): void {
-    console.log(value);
-    
+  search(fieldKey: string, value: string): void {
     if (value == 'undefined')  {
       value = '';
     }
-    // no value change on blur
-    if (this.filtersParams[field] == value) {
-      return;
-    }
-    this.filtersParams[field] = value.toUpperCase();
 
-    this.curPage.next(1);
-    this.filters.next(this.filtersParams);
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
+
+      filter.value = value.toUpperCase();
+
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
+    }
   }
 
   doEmit(productId: string){

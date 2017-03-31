@@ -49,8 +49,10 @@ import { Store } from '../../../../both/models/store.model';
 import { Tag } from '../../../../both/models/tag.model';
 import { User } from '../../../../both/models/user.model';
 
+// domain
 import { Dictionary } from '../../../../both/domain/dictionary';
-import { isNumeric } from '../../validators/validators';
+import { Filter, Filters } from '../../../../both/domain/filter';
+import * as _ from 'underscore';
 
 import * as moment from 'moment';
 import 'moment/locale/es';
@@ -70,20 +72,17 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
   curPage: Subject<number> = new Subject<number>();
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
-  filters: Subject<any> = new Subject<any>();
-  collectionCount: number = 0;
-  PAGESIZE: number = 15; 
+  
+  filters: Subject<Filters> = new Subject<Filters>();
 
-  filtersParams: any = {
-      'code': '',
-      'name':  '',
-      'color': '',
-      'brand': '',
-      'model': '',
-      'size': ''
-  };
-
-  orderStatus = purchasesStatusMapping; // from Purchases;
+  filtersParams: Filters = [
+    {key: 'code', value:''},
+    {key: 'name', value:''},
+    {key: 'color', value:''},
+    {key: 'brand', value:''},
+    {key: 'size', value:''},
+    {key: 'model', value:''},
+  ];
 
   // name <-> sortfield, touple
   headers: Dictionary[] = [
@@ -95,6 +94,11 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
     {'key': 'Talle', 'value':'size'},
     {'key': 'Cantidad a distribuir X talle', 'value':'received'},
   ];
+
+  collectionCount: number = 0;
+  PAGESIZE: number = 15; 
+
+  orderStatus = purchasesStatusMapping; // from Purchases;
 
   orderNumber: number;
   
@@ -130,7 +134,7 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
       this.filters,
       this.activeRoute.params.map(params => params['orderNumber'])
     ).subscribe(([pageSize, curPage, sortDirection, sortField, filters, orderNumber]) => {
-      this.orderNumber = orderNumber;
+      this.orderNumber = +orderNumber;
 
       const options: SearchOptions = {
         limit: pageSize as number,
@@ -138,17 +142,22 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
         sort: { [sortField as string] : sortDirection as number }
       };
 
-      this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
+      this.paginationService.setCurrentPage(
+        this.paginationService.defaultId() , curPage as number);
 
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('purchase-orders', this.orderNumber).subscribe(() => {
-        this.purchase = Purchases.findOne({purchaseNumber: this.orderNumber})
-        this.productPurchases = ProductPurchases.find({ purchaseId: this.purchase._id }).zone();
+      this.paginatedSub = MeteorObservable.subscribe(
+        'purchase-orders', this.orderNumber).subscribe(() => {
+        this.purchase = Purchases.findOne(
+          {purchaseNumber: this.orderNumber})
+        this.productPurchases = ProductPurchases.find(
+          { purchaseId: this.purchase._id }).zone();
         this.productSizes = ProductSizes.find().zone();
         this.products = Products.find().zone();
         this.stocks = Stocks.find({}).zone();
+
         this.loadInputboxValues(); 
       });
 
@@ -156,7 +165,8 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfPurchases');
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+      this.paginationService.setTotalItems(
+        this.paginationService.defaultId(), this.collectionCount);
     });
 
     if (this.storesSub) {
@@ -167,18 +177,18 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
         this.allStores = Stores.find({}).zone();
     });
 
-    this.pageSize.next(this.PAGESIZE);
-    this.curPage.next(1);
-    this.sortField.next('description');
-    this.sortDirection.next(1);
-    this.filters.next('');
-
     this.paginationService.register({
       id: this.paginationService.defaultId(),
       itemsPerPage: this.PAGESIZE,
       currentPage: 1,
       totalItems: this.collectionCount,
     });
+
+    this.pageSize.next(this.PAGESIZE);
+    this.curPage.next(1);
+    this.sortField.next('description');
+    this.sortDirection.next(1);
+    this.filters.next(this.filtersParams);
   }
 
   ngOnDestroy() {
@@ -197,18 +207,24 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
     this.sortField.next(fieldName);
   }
 
-  search(field: string, value: string): void {    
+  search(fieldKey: string, value: string): void {
     if (value == 'undefined')  {
       value = '';
     }
-    // no value change on blur
-    if (this.filtersParams[field] === value) {
-      return;
-    }
-    this.filtersParams[field] = value.toUpperCase();
 
-    this.curPage.next(1);
-    this.filters.next(this.filtersParams);
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
+
+      filter.value = value.toUpperCase();
+
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
+    }
   }
  
   getProduct(productId:Product) {

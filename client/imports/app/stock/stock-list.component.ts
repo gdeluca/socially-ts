@@ -18,7 +18,6 @@ import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/domain/search-options';
-import { Bert } from 'meteor/themeteorchef:bert';
 
 // collections
 import { ProductSizes, getMappingSize } from '../../../../both/collections/product-sizes.collection';
@@ -38,8 +37,12 @@ import { Category } from '../../../../both/models/category.model';
 import { Store } from '../../../../both/models/store.model';
 import { Tag } from '../../../../both/models/tag.model';
 
+// domain
 import { Dictionary } from '../../../../both/domain/dictionary';
+import { Filter, Filters } from '../../../../both/domain/filter';
+import * as _ from 'underscore';
 import { isNumeric } from '../../validators/validators';
+import { Bert } from 'meteor/themeteorchef:bert';
 
 import template from "./stock-list.component.html";
 import style from "./stock-list.component.scss";
@@ -57,20 +60,20 @@ export class StockListComponent implements OnInit, OnDestroy {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
 
-  filters: Subject<any> = new Subject<any>();
+  filters: Subject<Filters> = new Subject<Filters>();
 
-  filtersParams: any = {
-    'barCode': '',
-    'name':  '',
-    'color': '',
-    'size': '',
-    'provider': '',
-    'cost': '',
-    'cashPayment': '',
-    'cardPayment': '',
-    'categoryId': '',
-    'sectionId': ''
-  };
+  filtersParams: Filters = [
+    {key: 'barCode', value:''},
+    {key: 'name', value:''},
+    {key: 'color', value:''},
+    {key: 'size', value:''},
+    {key: 'provider', value:''},
+    {key: 'cost', value:''},
+    {key: 'cashPayment', value:''},
+    {key: 'cardPayment', value:''},
+    {key: 'categoryId', value:''},
+    {key: 'sectionId', value:''},
+  ];
 
   // name <-> sortfield, touple
   headers: Dictionary[] = [
@@ -122,8 +125,7 @@ export class StockListComponent implements OnInit, OnDestroy {
 
   constructor(
     private paginationService: PaginationService, 
-  ){ 
-  }
+  ){ }
  
    ngOnInit() {
     this.optionsSub = Observable.combineLatest(
@@ -133,13 +135,15 @@ export class StockListComponent implements OnInit, OnDestroy {
       this.sortField,
       this.filters
     ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
+      
       const options: SearchOptions = {
         limit: (pageSize as number),
         skip: ((curPage as number) - 1) * (pageSize as number),
         sort: { [sortField as string] : sortDirection as number }
       };
       
-      this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
+      this.paginationService.setCurrentPage(
+        this.paginationService.defaultId() , curPage as number);
 
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
@@ -179,13 +183,6 @@ export class StockListComponent implements OnInit, OnDestroy {
         this.allCategories = Categories.find({}).zone();
     });
 
-
-    this.pageSize.next(this.PAGESIZE);
-    this.curPage.next(1);
-    this.sortField.next('barCode');
-    this.sortDirection.next(1);
-    this.filters.next('');
-
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfProductSizes');
       this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
@@ -198,6 +195,11 @@ export class StockListComponent implements OnInit, OnDestroy {
       totalItems: this.collectionCount,
     });
 
+    this.pageSize.next(this.PAGESIZE);
+    this.curPage.next(1);
+    this.sortField.next('barCode');
+    this.sortDirection.next(1);
+    this.filters.next(this.filtersParams);
   }
   
   ngOnDestroy() {
@@ -251,20 +253,24 @@ export class StockListComponent implements OnInit, OnDestroy {
     this.sortField.next(fieldName);
   }
 
-  search(field: string, value: string): void {
-    console.log(value);
-
+  search(fieldKey: string, value: string): void {
     if (value == 'undefined')  {
       value = '';
     }
-    // no value change on blur
-    if (this.filtersParams[field] == value) {
-      return;
-    }
-    this.filtersParams[field] = value.toUpperCase();
 
-    this.curPage.next(1);
-    this.filters.next(this.filtersParams);
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
+
+      filter.value = value.toUpperCase();
+
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
+    }
   }
 
 }
