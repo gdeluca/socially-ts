@@ -29,14 +29,14 @@ Meteor.methods({
     paymentAmount?:number,
     total?:number
   ) {
-    check(purchaseId, Match.Maybe(String));
-    check(purchaseState, Match.Maybe(String));
-    check(createdAt, Match.Maybe(Date));
-    check(lastUpdate, Match.Maybe(Date));
-    check(provider, Match.Maybe(String));
-    check(paymentAmount, Match.Maybe(Number));
-    check(total, Match.Maybe(Number));
     if (Meteor.isServer)  {
+      check(purchaseId, Match.Maybe(String));
+      check(purchaseState, Match.Maybe(String));
+      check(createdAt, Match.Maybe(Date));
+      check(lastUpdate, Match.Maybe(Date));
+      check(provider, Match.Maybe(String));
+      check(paymentAmount, Match.Maybe(Number));
+      check(total, Match.Maybe(Number));
 
       let purchase = Purchases.findOne(
        {_id: purchaseId}, {fields: {_id: 1}});
@@ -192,6 +192,10 @@ Meteor.methods({
       let productSizes: ProductSize[] = 
         ProductSizes.collection.find(
           {productId: productId}).fetch();
+      if (productSizes.length == 0) {
+         throw new Meteor.Error('400', 
+          'No se agrega porque no encontraron talles asociados al producto, \n actualize el producto en la solapa de productos');
+      }
       for (let productSize of productSizes) {
         Meteor.call("saveProductPurchase",
           purchaseId, 
@@ -239,6 +243,8 @@ Meteor.methods({
     purchaseId: string, 
     newState: string
   ) {
+    check(purchaseId, String);
+    check(newState, String);
     if (Meteor.isServer) {
       Meteor.call("updatePurchaseOrder",
         purchaseId, 

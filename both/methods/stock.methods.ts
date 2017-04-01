@@ -39,7 +39,7 @@ function addStock(
   productSizeId: string, 
   storeId: string, 
   quantity: number,
-  active:boolean = true
+  active: boolean = true
 ) {
   return Stocks.collection.insert({
     productSizeId: productSizeId,
@@ -51,40 +51,102 @@ function addStock(
 
 Meteor.methods({
 
-  increaseStock: function (
-    productSizeId: string, 
-    storeId: string, 
-    quantity: number
-  ) {
-    check(productSizeId, String);
-    check(storeId, String);
-    check(quantity, Number);
-    let stock = Stocks.findOne({productSizeId:productSizeId, storeId:storeId});
-    if (stock) {
-      Stocks.update(stock._id, {
-        $set: { 
-         quantity: stock.quantity + quantity,
-        }
-      });
-    } else {
-      console.log('can not find stock for productSizeId ' 
-        + productSizeId + 'and store id ' + storeId);
-    }
-  },
-
-  saveStocksForStores: function (
+  bulkSaveStockForStores: function(
     productSizeIds: string[], 
     storeIds: string[], 
     quantity: number
-  ) {
-    check(productSizeIds, [String]);
-    check(storeIds, [String]);
-    check(quantity, Number);
-    return productSizeIds.map((productSizeId) => {
-      return storeIds.map((storeId) => {
-        return addStock(productSizeId, storeId, quantity);  
+  ): string[] {
+    if (Meteor.isServer) {
+      check(productSizeIds, [String]);
+      check(storeIds, [String]);
+      check(quantity, Number);
+      let productsSizes = ProductSizes.collection.find(
+        {_id: {$in: productSizeIds}}, {fields: {_id: 1}}).fetch();
+      if (productsSizes.length != productSizeIds.length) {
+         throw new Meteor.Error('400', 
+            'No coinciden las cantidades de talles; se esperaban: ' +
+            productSizeIds.length + ' y existen: ' + productsSizes.length );
+      }
+      
+      let stores = Stores.collection.find(
+        {_id: {$in: storeIds}}, {fields: {_id: 1}}).fetch();
+      if (stores.length != storeIds.length) {
+        throw new Meteor.Error('400', 
+            'No las cantidades de sucursales; se esperaban: ' +
+            storeIds.length + ' y existen: ' + stores.length );
+      }
+          
+      const rawCollection = Stocks.rawCollection();
+      const bulk = rawCollection.initializeUnorderedBulkOp();
+      let response = {};
+      productSizeIds.forEach(productSizeId => 
+        storeIds.forEach(storeId => {
+          
+          response["$or"] = []
+          response["$or"].push(
+            { storeId: storeId, productSizeId: productSizeId}, 
+            {fields: {_id: 1}}
+          );
+
+          bulk.insert({
+            productSizeId: productSizeId,
+            storeId: storeId,
+            quantity: quantity,
+            active: true
+          })
+
+        })
+      )
+      bulk.execute(function(err,results) {
+      if(err)
+        console.error(err);
       });
-    })
+
+      return Stocks.collection.find(response)
+        .fetch().map(stock => {return stock._id});
+    }
+  },
+
+  bulkUpdateStockQuantities: function (
+    productSizeIds: string[],
+    storeIds: string[],
+    quantities: any,
+  ) {
+
+    if (Meteor.isServer) {
+      check(productSizeIds, [String]);
+      check(storeIds, [String]);
+      check(quantities, Match.Any);
+      const rawCollection = Stocks.rawCollection();
+      const bulk = rawCollection.initializeUnorderedBulkOp();
+
+      productSizeIds.map(productSizeId => 
+        storeIds.map(storeId => {
+          let stock = Stocks.findOne(
+            {productSizeId:productSizeId, storeId:storeId});
+          
+          if (stock) {
+            bulk.find({_id: stock._id}).updateOne({
+              $set: { 
+               quantity: +stock.quantity + +quantities[productSizeId + storeId],
+              }
+            })
+          } else {
+            bulk.insert({
+              productSizeId:productSizeId, 
+              storeId:storeId,
+              quantity: +quantities[productSizeId + storeId]
+            })
+          }
+        })
+      )
+
+      bulk.execute(function(err,results) {
+        if(err)
+          console.error(err);
+      });
+
+    }
   },
 
   addStoreToStockAndPrice: function(
@@ -131,7 +193,6 @@ Meteor.methods({
     check(values.size, String);
     check(values.barCode, String);
     check(values.size, String);
-
 
     // last two characters are reserved for product size
     let productCode =  values.barCode.substring(0, 10);

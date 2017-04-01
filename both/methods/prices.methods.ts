@@ -28,10 +28,15 @@ Meteor.methods({
         storeId: String,
         active: Boolean
       });
-      return storeIds.map((storeId) => {
+
+      const rawCollection = ProductPrices.rawCollection();
+      const bulk = rawCollection.initializeUnorderedBulkOp();
+      storeIds.map((storeId) => {
         productPrice['storeId'] = storeId;
-        return ProductPrices.collection.insert(productPrice);
-        })
+        bulk.insert(productPrice);
+      })
+      bulk.execute();
+ 
     }
   },
 

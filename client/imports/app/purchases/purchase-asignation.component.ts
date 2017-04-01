@@ -108,7 +108,7 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
   allStores: Observable<Store[]>;
 
 
-  asignedQuantity: number[] = [];
+  asignedQuantity = [];
 
   constructor(
     private router: Router,
@@ -224,7 +224,8 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
   }
 
   getStockQuantityForSizeAndStore(productSizeId, storeId):number {
-    return Stocks.collection.find({productSizeId: productSizeId, storeId: storeId}, {fields: {quantity: 1}})
+    return Stocks.collection.find(
+      {productSizeId: productSizeId, storeId: storeId}, {fields: {quantity: 1}})
       .fetch()
       .reduce((a, b) => a + +b.quantity, 0);
   }
@@ -244,18 +245,30 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
     }) 
   } 
 
-  saveAndChangeAsignationState(){
+  saveAndChangeAsignationState() {
     let storeIds = Stores.collection.find().fetch().map(function(store) {return store._id});
     if (this.validateStockDelivery(storeIds, this.productPurchases)) {
+      
+      let productSizeIds = [];
       this.productPurchases.distinct().mergeMap(productPurchases => {
         return productPurchases.map(productPurchase => {
           return productPurchase})})
       .subscribe(productPurchase => {
-          console.log('calling update for ',productPurchase._id, storeIds);
-         this.callUpdateStock(productPurchase, storeIds); // set the new stock values
-        }
-      )
-       this.callMoveToFinishState();  // set the new pruchase order state
+        productSizeIds.push(productPurchase.productSizeId);
+      })
+      
+      MeteorObservable.call("bulkUpdateStockQuantities",
+        productSizeIds,
+        storeIds,
+         Object.assign({}, this.asignedQuantity)
+      ).subscribe(
+      (response) => {
+        Bert.alert('Se asignaron los valores de stock', 'success', 'growl-top-right' ); 
+      }, (error) => {
+        Bert.alert('Error al guardar el stock: ' +  error, 'danger', 'growl-top-right' ); 
+      }); 
+      
+      this.callMoveToFinishState();  // set the new pruchase order state
     }
   }
 
@@ -291,27 +304,6 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
     }, (error) => {
       Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
     });  
-  }
-
-  callUpdateStock(productPurchase, storesIds: string[]){
-    storesIds.map(storeId => {
-      console.log(
-        productPurchase.productSizeId,
-        storeId,
-        +this.asignedQuantity[productPurchase.productSizeId + storeId]
-      );
-
-      MeteorObservable.call("increaseStock",
-      productPurchase.productSizeId,
-      storeId,
-      +this.asignedQuantity[productPurchase.productSizeId + storeId]
-    ).subscribe(
-    (response) => {
-      Bert.alert('Se asignaron los valores de stock', 'success', 'growl-top-right' ); 
-    }, (error) => {
-      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
-    }); 
-    })
   }
 
 }

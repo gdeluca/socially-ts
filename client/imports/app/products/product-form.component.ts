@@ -252,8 +252,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           active: true,
           cost: +values.cost, 
 
-          priceCash: values.cashPayment, 
-          priceCard: values.cashPayment, 
+          priceCash: +values.cashPayment, 
+          priceCard: +values.cashPayment, 
           productId: productId,
           storeId: "" 
         }; 
@@ -267,42 +267,43 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         this.allStores.subscribe((stores) => {
           storeIds = stores.map((store) => { return store._id });
         });
-        this.saveProductPriceForAllStores(productPrice, storeIds);
+        this.saveSizesForAllStocks(productId, sizes, storeIds);
+        
+        this.savePriceForAllStores(productPrice, storeIds);
 
-        this.saveProductSizesForAllStocks(productId, sizes, storeIds);
         Bert.alert('Se agrego el producto: ' + productId , 'success', 'growl-top-right' ); 
       }, (error) => {
-        Bert.alert('Error al guardar:  ${error} ', 'danger', 'growl-top-right' ); 
+        Bert.alert('Error al guardar el producto:  ${error} ', 'danger', 'growl-top-right' ); 
     });
   }
  
-  saveProductPriceForAllStores(producPrice: ProductPrice, storeIds: string[]) {
+  savePriceForAllStores(producPrice: ProductPrice, storeIds: string[]) {
     MeteorObservable.call('savePricesForStores', producPrice, storeIds).subscribe(
       (productPriceIds) => {
       Bert.alert('Se agregaron los precios: ' + JSON.stringify(productPriceIds)
          + 'para las sucursales' + JSON.stringify(storeIds), 'success', 'growl-top-right' ); 
     }, (error) => {
-      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+      Bert.alert('Error al guardar los precios: ' +  error, 'danger', 'growl-top-right' );
     });
   }
 
-  saveProductSizesForAllStocks(productId, sizes: string[], storeIds: string[]) {
+  saveSizesForAllStocks(productId, sizes: string[], storeIds: string[]) {
     MeteorObservable.call('saveProductSizes', productId, sizes).subscribe(
       (productSizeIds) => {
       Bert.alert('Se agregaron los talles: ' + JSON.stringify(sizes), 'success', 'growl-top-right' ); 
       this.saveStocks(productSizeIds, storeIds);
     }, (error) => {
-      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+      Bert.alert('Error al guardar los talles: ' +  error, 'danger', 'growl-top-right' ); 
     });
   }
   
   saveStocks(productSizeIds, storeIds) {
-    MeteorObservable.call('saveStocksForStores', productSizeIds, storeIds, 0).subscribe(
+    MeteorObservable.call('bulkSaveStockForStores', productSizeIds, storeIds, 0).subscribe(
       (stockIds) => {
        Bert.alert('Se agregaron los stocks: ' + JSON.stringify(stockIds)
          + 'para las sucursales' + JSON.stringify(storeIds), 'success', 'growl-top-right' ); 
     }, (error) => {
-      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+      Bert.alert('Error al guardar el stock: ' +  error, 'danger', 'growl-top-right' ); 
     });  
   }
 

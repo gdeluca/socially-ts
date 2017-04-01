@@ -41,7 +41,7 @@ Meteor.methods({
             address: address
           });
           MeteorObservable.call(
-            'addStoreToStockAndPriceToStore', 
+            'addStoreToStockAndPrice', 
             storeId
           ).subscribe(() => {
             // Se agregaron los precios al store

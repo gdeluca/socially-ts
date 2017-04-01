@@ -24,7 +24,7 @@ Meteor.methods({
       check(cashPrices, Match.Maybe(Number));
       check(cardPrices, Match.Maybe(Number));
 
-      let query: ProductPrice;
+      let query = {};
       if(costPrice != null) {
         query['cost'] = costPrice;
       }

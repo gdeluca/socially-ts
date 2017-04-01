@@ -116,11 +116,12 @@ Meteor.methods({
     productId: string, 
     sizes: string[]
   ) {
-    check(productId, String);
-    check(sizes, [String]);
     if (Meteor.isServer) { 
+      check(productId, String);
+      check(sizes, [String]);
       let ids = [];
-      let product = Products.findOne({_id:productId}, {fields: {code: 1}});
+      let product = Products.findOne(
+        {_id:productId}, {fields: {code: 1}});
 
       sizes.forEach((item, index) => {
         var productSize = { 
