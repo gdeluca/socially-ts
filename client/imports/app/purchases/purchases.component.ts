@@ -1,8 +1,6 @@
 // angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
-// import { Injectable, Inject, NgModule, Input, Output, EventEmitter  } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
@@ -12,46 +10,31 @@ import { PaginationService } from 'ng2-pagination';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
-// import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/map';
-// import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/domain/search-options';
 
 // collections
-// import { Balances  } from '../../../../both/collections/balances.collection';
-// import { Categories } from '../../../../both/collections/categories.collection';
-// import { Counters } from '../../../../both/collections/counters.collection';
-// import { UserStores } from '../../../../both/collections/user-stores.collection';
 import { ProductPurchases } from '../../../../both/collections/product-purchases.collection';
-// import { ProductSales } from '../../../../both/collections/product-sales.collection';
 import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
 import { Products } from '../../../../both/collections/products.collection';
 import { Purchases, purchasesStatusMapping} from '../../../../both/collections/purchases.collection';
-// import { Sales } from '../../../../both/collections/sales.collection';
 import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
 import { Tags } from '../../../../both/collections/tags.collection';
-// import { Users } from '../../../../both/collections/users.collection';
 
 // model 
-// import { Balance } from '../../../../both/models/balance.model';
-// import { Category } from '../../../../both/models/category.model';
 import { Counter } from '../../../../both/models/counter.model';
-// import { UserStore } from '../../../../both/models/user-store.model';
 import { ProductPurchase } from '../../../../both/models/product-purchase.model';
-// import { ProductSale } from '../../../../both/models/product-sale.model';
 import { ProductSize } from '../../../../both/models/product-size.model';
 import { Product } from '../../../../both/models/product.model';
 import { Purchase } from '../../../../both/models/purchase.model';
-// import { Sale } from '../../../../both/models/sale.model';
 import { Stock } from '../../../../both/models/stock.model';
 import { Store } from '../../../../both/models/store.model';
 import { Tag } from '../../../../both/models/tag.model';
-// import { User } from '../../../../both/models/user.model';
 
 // domain
 import { Dictionary } from '../../../../both/domain/dictionary';
@@ -129,6 +112,7 @@ export class PurchasesComponent {
       this.sortField,
       this.filters
     ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
+      
       const options: SearchOptions = {
         limit: pageSize as number,
         skip: ((curPage as number) - 1) * (pageSize as number),

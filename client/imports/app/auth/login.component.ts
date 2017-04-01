@@ -76,7 +76,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     let username = this.username.toUpperCase();
 
     this.userSub = MeteorObservable.subscribe(
-      'user.stores', email, username).subscribe(() => {
+      'user.stores', 
+      email, 
+      username
+    ).subscribe(() => {
       var user = Users.findOne();
       if (user) {
         let userStores = UserStores.find().zone();
@@ -110,12 +113,10 @@ export class LoginComponent implements OnInit, OnDestroy {
               if (err) {
                Bert.alert(err.reason, 'danger', 'growl-top-right' ); 
               } else {
-                Session.setPersistent("currentUserEmail", values.email);
                 let currentStoreName = (values.storeId > -1)?
                   Stores.findOne(values.storeId).name:"MODO ADMINISTRADOR";
                 Session.setPersistent("currentStoreName", currentStoreName);
                 Session.setPersistent("currentStoreId", values.storeId);
-
                 this.updateBalanceStatus(values.storeId);
                 
                 this.router.navigate(['/']);

@@ -1,30 +1,21 @@
-
 // angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
-// import { Injectable, Inject, NgModule, Input, Output, EventEmitter  } from '@angular/core';
-// import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
- import { Bert } from 'meteor/themeteorchef:bert';
+import { Bert } from 'meteor/themeteorchef:bert';
  
 // reactiveX
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
-// import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
-// import 'rxjs/add/operator/combineLatest';
-// import 'rxjs/add/operator/map';
-// import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/domain/search-options';
 
 // collections
-// import { Counters } from '../../../../both/collections/counters.collection';
 import { ProductPurchases } from '../../../../both/collections/product-purchases.collection';
 import { ProductSales } from '../../../../both/collections/product-sales.collection';
 import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
@@ -37,7 +28,6 @@ import { Tags } from '../../../../both/collections/tags.collection';
 import { Users } from '../../../../both/collections/users.collection';
 
 // model 
-// import { Counter } from '../../../../both/models/counter.model';
 import { ProductPurchase } from '../../../../both/models/product-purchase.model';
 import { ProductSale } from '../../../../both/models/product-sale.model';
 import { ProductSize } from '../../../../both/models/product-size.model';
@@ -98,7 +88,7 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
   collectionCount: number = 0;
   PAGESIZE: number = 15; 
 
-  orderStatus = purchasesStatusMapping; // from Purchases;
+  orderStatus = purchasesStatusMapping;
 
   orderNumber: number;
   
@@ -114,6 +104,7 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
   productSizes: Observable<ProductSize[]>;
   products: Observable<Product[]>;
   stocks: Observable<Stock[]>;
+
   allStores: Observable<Store[]>;
 
 
@@ -149,7 +140,8 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
         this.paginatedSub.unsubscribe();
       }
       this.paginatedSub = MeteorObservable.subscribe(
-        'purchase-orders', this.orderNumber).subscribe(() => {
+        'purchase-orders', this.orderNumber
+      ).subscribe(() => {
         this.purchase = Purchases.findOne(
           {purchaseNumber: this.orderNumber})
         this.productPurchases = ProductPurchases.find(
@@ -244,11 +236,6 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
         return productPurchase})})
     .subscribe(productPurchase => {
       storesIds.map(storeId => {
-        // let stock = Stocks.findOne({storeId: storeId, productSizeId: productPurchase.productSizeId});
-        // if (
-        //   !this.asignedQuantity[productPurchase.productSizeId + storeId]) {
-        //   this.asignedQuantity[productPurchase.productSizeId + storeId] = stock.quantity;
-        // }
          if (
           !this.asignedQuantity[productPurchase.productSizeId + storeId]) {
           this.asignedQuantity[productPurchase.productSizeId + storeId] = 0;

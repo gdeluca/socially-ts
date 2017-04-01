@@ -87,7 +87,9 @@ Meteor.methods({
     })
   },
 
-  addStoreToStockAndPrice: function(storeId: string) {
+  addStoreToStockAndPrice: function(
+    storeId: string
+  ) {
     ProductSizes.find()
     .flatMap(function(productSizes) { return productSizes })
     .distinct()
@@ -103,7 +105,7 @@ Meteor.methods({
       let price = ProductPrices.findOne({productId: product._id});
       if (price) {
         Meteor.call("addProductPrice",
-          price.lastCostPrice,
+          price.cost,
           price.priceCash,
           price.priceCard,
           product._id,
@@ -123,7 +125,9 @@ Meteor.methods({
     });
   }, 
 
-  saveStock: function (values:any) {
+  saveStock: function (
+    values:any
+  ) {
     check(values.size, String);
     check(values.barCode, String);
     check(values.size, String);
@@ -191,7 +195,7 @@ Meteor.methods({
         if (productPrice) { 
           ProductPrices.update(stock._id, {
             $set: { 
-              lastCostPrice: +values.cost,
+              cost: +values.cost,
               priceCash: +values.cashPayment,
               priceCard: +values.cardPayment,
               rateCash: (+values.cashPayment/(+values.cost))*100,
@@ -203,7 +207,7 @@ Meteor.methods({
           let productPriceId = ProductPrices.insert({
             createdAt: new Date(),
             active: true,
-            lastCostPrice: +values.cost,
+            cost: +values.cost,
             priceCash: +values.cashPayment,
             priceCard: +values.cardPayment,
             rateCash: (+values.cashPayment/(+values.cost))*100,
@@ -250,7 +254,7 @@ Meteor.methods({
         ProductPrices.insert({
           createdAt: new Date(),
           active: true,
-          lastCostPrice: +values.cost,
+          cost: +values.cost,
           priceCash: +values.cashPayment,
           priceCard: +values.cardPayment,
           rateCash: (+values.cashPayment/(+values.cost))*100,

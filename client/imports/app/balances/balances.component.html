@@ -12,7 +12,7 @@
           type="button" 
           class="form-control btn btn-primary ml-2" 
           (click)="openBalance()"
-          [hidden]="getCurrentBalanceNumber() < 0 || getCurrentBalanceStatus() == 'OPEN'"
+          [hidden]="getCurrentBalanceNumber() > 0 && getCurrentBalanceStatus() == 'OPEN'"
           >
             Abrir balance
         </button>
@@ -20,7 +20,7 @@
           type="button" 
           class="form-control btn btn-primary ml-2" 
           (click)="closeBalance()"
-          [hidden]="getCurrentBalanceNumber() > -1 && getCurrentBalanceStatus() == 'CLOSED'"
+          [hidden]="getCurrentBalanceNumber() < 0 || getCurrentBalanceStatus() == 'CLOSED'"
           >
             Cerrar balance
         </button>
@@ -182,7 +182,9 @@
                       <ng-container *ngIf="balance.storeId == store._id ">
                        <!-- store  {{store._id}} -->                
                         <td class="text-center">
-                          <a [routerLink]="['/balances', balance.balanceNumber]">{{balance.balanceNumber}}</a>
+                          <a [routerLink]="['/balances', balance.balanceNumber]">
+                          {{ balance.balanceNumber | leadingZeros:7 }}
+                          </a>
                         </td>
 
                         <td class="text-center">

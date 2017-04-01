@@ -1,30 +1,21 @@
-
 // angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
-// import { Injectable, Inject, NgModule, Input, Output, EventEmitter  } from '@angular/core';
-// import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
 import { PaginationService } from 'ng2-pagination';
- import { Bert } from 'meteor/themeteorchef:bert';
+import { Bert } from 'meteor/themeteorchef:bert';
  
 // reactiveX
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs'; 
-// import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
-// import 'rxjs/add/operator/combineLatest';
-// import 'rxjs/add/operator/map';
-// import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/domain/search-options';
 
 // collections
-// import { Counters } from '../../../../both/collections/counters.collection';
 import { ProductPurchases } from '../../../../both/collections/product-purchases.collection';
 import { ProductSales } from '../../../../both/collections/product-sales.collection';
 import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
@@ -37,7 +28,6 @@ import { Tags } from '../../../../both/collections/tags.collection';
 import { Users } from '../../../../both/collections/users.collection';
 
 // model 
-// import { Counter } from '../../../../both/models/counter.model';
 import { ProductPurchase } from '../../../../both/models/product-purchase.model';
 import { ProductSale } from '../../../../both/models/product-sale.model';
 import { ProductSize } from '../../../../both/models/product-size.model';
@@ -95,7 +85,7 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
   collectionCount: number = 0;
   PAGESIZE: number = 15; 
 
-  orderStatus = purchasesStatusMapping; // from Purchases;
+  orderStatus = purchasesStatusMapping;
   
   orderNumber: number;
   
@@ -166,6 +156,8 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
       this.collectionCount = Counts.get('numberOfPurchases');
       this.paginationService.setTotalItems(
         this.paginationService.defaultId(), this.collectionCount);
+    
+      console.log('running autorun');
     });
 
     this.paginationService.register({
@@ -233,9 +225,7 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
   getTotalStock(productId: string) {
     let productSize = ProductSizes.find({productId: productId}, {fields: {_id: 1}});
     if (productSize) {
-      // console.log('encontro los talles');
       let sizesIds = productSize.fetch().map(x => {return x._id});
-      // console.log('los talles id son ', sizesIds);
       return Stocks.collection.find({productSizeId: { $in: sizesIds }}, {fields: {quantity: 1}})
         .fetch()
         .reduce((a, b) => a + +b.quantity, 0);
@@ -246,7 +236,7 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
 
   getCost(productId) {
     let productPrice = ProductPrices.findOne({productId:productId});
-     return (productPrice)?productPrice.lastCostPrice:0;
+     return (productPrice) ? productPrice.cost : 0;
   }
 
   getSizeQuantities(productId){
@@ -258,7 +248,8 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
       return productPurchases.map(productPurchase => {
         return productPurchase})})
     .subscribe(productPurchase => {
-      let productSize = ProductSizes.findOne({_id: productPurchase.productSizeId});
+      let productSize = ProductSizes.findOne(
+        {_id: productPurchase.productSizeId});
       if (!this.toRequestXSize[productSize.productId]){
         this.toRequestXSize[productSize.productId] = productPurchase.quantity;
       }
@@ -266,8 +257,7 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
   } 
  
   addProductToList(productId){ 
-    // console.log(this.purchase._id, productId);
-    MeteorObservable.call('saveProductSizesPurchase', 
+    MeteorObservable.call('addProductSizesPurchase', 
       this.purchase._id, 
       productId
     ).subscribe(
@@ -290,7 +280,6 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
         return productPurchase.productSizeId})})
       .subscribe(res => {
         ids.push(res); 
-        // console.log(res)
       });
       // console.log("productSize ids:" ,ids);
        
@@ -310,7 +299,6 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
         return productSize.productId})})
       .subscribe(res => {
         ids.push(res); 
-        // console.log("product ids:" ,ids);
       });
 
       // Products.find(
@@ -328,7 +316,6 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
   }
 
   removeFormList(productId){
-    // console.log(this.purchase._id, product._id, this.getSizes(product), this.getCost(product));
     MeteorObservable.call('removeProductSizesPurchase', 
       this.purchase._id, 
       this.getProductSizeIds(productId)
@@ -373,7 +360,7 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
     (response) => {
       Bert.alert('Se guardaron los nuevos estados en los pedidios', 'success', 'growl-top-right' ); 
     }, (error) => {
-      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+      Bert.alert('Error al actualizar el producto: ' +  error, 'danger', 'growl-top-right' ); 
     }); 
   }
 
@@ -385,9 +372,9 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
     ).subscribe(
       (response) => {
        this.router.navigate(['purchases/'+this.orderNumber+'/verification']); 
-       Bert.alert('Se actualizo el pedidio al estado VERIFICADO', 'success', 'growl-top-right' ); 
+       Bert.alert('Se actualizo la orden al estado VERIFICADO', 'success', 'growl-top-right' ); 
     }, (error) => {
-      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+      Bert.alert('Error al actualizar la orden al estado VERIFICADO: ' +  error, 'danger', 'growl-top-right' ); 
     });  
   }
 

@@ -9,19 +9,14 @@ import { Filter, Filters } from '../../../both/domain/filter';
 
 // collections
 import { Balances } from '../../../both/collections/balances.collection';
-// import { Categories } from '../../../both/collections/categories.collection';
-// import { Counters } from '../../../both/collections/counters.collection';
 import { UserStores } from '../../../both/collections/user-stores.collection';
-// import { ProductPurchases } from '../../../both/collections/product-purchases.collection';
 import { ProductPrices } from '../../../both/collections/product-prices.collection';
 import { ProductSales } from '../../../both/collections/product-sales.collection';
 import { ProductSizes } from '../../../both/collections/product-sizes.collection';
 import { Products } from '../../../both/collections/products.collection';
-// import { Purchases } from '../../../both/collections/purchases.collection';
 import { Sales } from '../../../both/collections/sales.collection';
 import { Stocks } from '../../../both/collections/stocks.collection';
 import { Stores } from '../../../both/collections/stores.collection';
-// import { Tags } from '../../../both/collections/tags.collection';
 import { Users } from '../../../both/collections/users.collection';
 
 const saleFields = ['paymentForm', 'saleState', 'saleDate'];
@@ -44,29 +39,34 @@ Meteor.publishComposite('sale-orders', function(
     children: [
       {
         find: function(sale) {
-          return ProductSales.collection.find({ saleId: sale._id });
+          return ProductSales.collection.find(
+            { saleId: sale._id });
         },
         children: [
           {
             find: function(productSale) {
-              return ProductSizes.collection.find({ _id: productSale.productSizeId });
+              return ProductSizes.collection.find(
+                { _id: productSale.productSizeId });
             },
             children: [
               {
                 find: function(productSize) {
-                  return Products.collection.find({ _id: productSize.productId });
+                  return Products.collection.find(
+                    { _id: productSize.productId });
                 },
                 children: [
                   { 
                     find: function(product) {
-                      return ProductPrices.collection.find({ productId: product._id});
+                      return ProductPrices.collection.find(
+                        { productId: product._id});
                     }
                   }
                 ]
               },
               { 
                 find: function(productSize) {
-                  return Stocks.collection.find({ productSizeId: productSize._id});
+                  return Stocks.collection.find(
+                    { productSizeId: productSize._id});
                 }
               }
             ]
@@ -75,17 +75,20 @@ Meteor.publishComposite('sale-orders', function(
       },  
       {  
         find: function(sale) {
-          return UserStores.collection.find({ _id: sale.userStoreId });
+          return UserStores.collection.find(
+            { _id: sale.userStoreId });
         },
         children: [
           {
             find: function(userStore) {
-              return Stores.collection.find({ _id: userStore.storeId });
+              return Stores.collection.find(
+                { _id: userStore.storeId });
             }
           },
           {
             find: function(userStore) {
-              return  Meteor.users.find({ _id: userStore.userId }, {fields: {username: 1}});
+              return  Meteor.users.find(
+                { _id: userStore.userId }, {fields: {username: 1}});
             }
           }
         ]

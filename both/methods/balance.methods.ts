@@ -1,16 +1,8 @@
 import {Meteor} from 'meteor/meteor';
 import {check} from 'meteor/check';
-// import { ProductSizes, getMappingSize } from '../collections/product-sizes.collection';
-// import { ProductPurchases } from '../collections/product-purchases.collection';
-// import { ProductPrices } from '../collections/product-prices.collection';
-// import { Purchases } from '../collections/purchases.collection';
+
 import { Balances } from '../collections/balances.collection';
 
-// import { Products } from '../collections/products.collection';
-// import { Stores } from '../collections/stores.collection';
-// import { Stocks } from '../collections/stocks.collection';
-// import { Store } from '../models/store.model';
-// import { Product } from '../models/product.model';
 import { Balance } from '../models/balance.model';
 
 import * as moment from 'moment';
@@ -18,30 +10,29 @@ import 'moment/locale/es';
 import { MongoObservable } from 'meteor-rxjs';
 import { MeteorObservable } from 'meteor-rxjs';
 
-
-function getCurrentDate(){
-  return moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-}
-
-function getWorkShift(date){
-  return (moment(date).format("HH") > "6" && moment(date).format("HH") < "13")?"MORNING":"AFTERNOON"; 
-}
-
 Meteor.methods({
 
   updateBalance: function (
     balanceId, 
     status
   ){
+    if (Meteor.isServer) {
     check(balanceId, String);
     check(status, String);
-    if (Meteor.isServer)  {
+      let balance = Balances.findOne(
+        {_id: balanceId}, {fields: {_id: 1}});
+      if (!balance) {
+        throw new Meteor.Error('400', 
+          'Balance inexistente');
+      }
+
       Balances.collection.update(balanceId, {
         $set: { 
            status: status,
            lastUpdate: new Date()
         }
       });
+
     }
   },
 
@@ -128,16 +119,15 @@ Meteor.methods({
     check(storeId, String);
     check(balanceNumber, Number);
     if (Meteor.isServer)  {
-      let balance = Balances.collection.findOne(
-        { storeId: storeId, balanceNumber: balanceNumber }
-      );
+      let balance = Balances.findOne(
+        { storeId: storeId, balanceNumber: balanceNumber });
       if (balance) {
         if (balance.status == 'OPEN') {
           Meteor.call("updateBalance", balance._id, "CLOSED");
         }
       } else { 
         throw new Meteor.Error('400', 
-          'No se pudo encontrar el balance con nro: ' 
+          'No se encontro el balance con nro: ' 
           + balanceNumber + ' y sucursal: ' + storeId );
       }
     }

@@ -196,7 +196,7 @@
                   <ng-container *ngFor="let store of allStores | async; let priceIndex=index;  "> 
                     <ng-container *ngIf="store._id == productPrice.storeId  && priceIndex == 1 ">
                       <td class="text-center">
-                        <a>{{productPrice.lastCostPrice}}</a>
+                        <a>{{productPrice.cost}}</a>
                       </td>
 
                       <td class="text-center">

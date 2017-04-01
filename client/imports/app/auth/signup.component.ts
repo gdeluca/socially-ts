@@ -14,6 +14,8 @@ import { Store } from '../../../../both/models/store.model';
 import { Stores } from '../../../../both/collections/stores.collection';
 import { UserStores } from '../../../../both/collections/user-stores.collection';
 
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
 import template from './signup.component.html';
  
 @Component({
@@ -26,8 +28,8 @@ export class SignupComponent implements OnInit, OnDestroy {
  
   stores: Observable<Store[]>;
   storesSub: Subscription;
-  selectedStore: Store;
-
+  selectedStores: string[];
+  selectedRole: string;
   constructor(
     private router: Router, 
     private zone: NgZone, 
@@ -59,42 +61,21 @@ export class SignupComponent implements OnInit, OnDestroy {
   } 
 
   signup() {
-    var user_id = ''
     if (this.signupForm.valid) {
       let values = this.signupForm.value;
-      let user_id = Accounts.createUser({
-        email: values.email,
-        username: values.name,
-        password: values.password,
-        profile: { name: values.name }
-      }, (err) => {
-        if (err) {
-          this.zone.run(() => {
-            console.log(err);
-            this.error = err;
-          });
-        } else {
-          UserStores.collection.insert({
-            userId: Meteor.userId(), 
-            storeId: this.selectedStore._id 
-          });
-
-          this.router.navigate(['/']);
-        }
-      });
-
-
-     // Ensuring every user has an email address, should be in server-side code
-      // Accounts.validateNewUser((user) => {
-      // new SimpleSchema({
-      //   _id: { type: String },
-      //   emails: { type: Array },
-      //   'emails.$': { type: Object },
-      //   'emails.$.address': { type: String },
-      //   'emails.$.verified': { type: Boolean },
-      //   createdAt: { type: Date },
-      //   services: { type: Object, blackbox: true }
-      // }).validate(user);
+      MeteorObservable.call(
+        'addUser', 
+        values.email,
+        values.username,
+        values.password,
+        this.selectedStores,
+        this.selectedRole
+      ).subscribe(() => { 
+        Bert.alert('Usuario Creado', 'success', 'growl-top-right'); 
+        this.router.navigate(['/']);
+      }, (error) => { 
+        Bert.alert('Fallo al crear el usuario: ' + error, 'danger', 'growl-top-right'); 
+      })
     }
   }
 

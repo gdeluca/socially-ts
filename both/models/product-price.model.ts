@@ -1,7 +1,7 @@
 import { CollectionObject } from './collection-object.model';
 
 export interface ProductPrice extends CollectionObject {
-  lastCostPrice: number;
+  cost: number;
   createdAt: Date;
   priceCash: number;
   priceCard: number;

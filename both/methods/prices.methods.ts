@@ -11,16 +11,32 @@ import { ProductPrice } from '../models/product-price.model';
 
 Meteor.methods({
 
-  savePricesForStores: function (productPrice: ProductPrice, storeIds: string[]) {
-    check(storeIds, [String]);
-    return storeIds.map((storeId) => {
-      productPrice['storeId'] = storeId;
-      return ProductPrices.collection.insert(productPrice);
-    })
+  savePricesForStores: function (
+    productPrice: ProductPrice, 
+    storeIds: string[]
+  ) {
+    if (Meteor.isServer) {
+      check(storeIds, [String]);
+      check(productPrice, {
+        cost: Number,
+        createdAt: Date,
+        priceCash: Number,
+        priceCard: Number,
+        rateCash: Match.Maybe(Number),
+        rateCard: Match.Maybe(Number),
+        productId: String,
+        storeId: String,
+        active: Boolean
+      });
+      return storeIds.map((storeId) => {
+        productPrice['storeId'] = storeId;
+        return ProductPrices.collection.insert(productPrice);
+        })
+    }
   },
 
   addProductPrice: function (
-    lastCostPrice: number,
+    cost: number,
     priceCash: number,
     priceCard: number,
     productId:string,
@@ -28,28 +44,22 @@ Meteor.methods({
     rateCash?: number,
     rateCard?: number
   ) {
-    check(lastCostPrice, Number);
-    check(priceCash, Number);
-    check(priceCard, Number);
-    check(productId, String);
-    check(storeId, String);
     if (Meteor.isServer)  {
-      let query: ProductPrice;
-      if(lastCostPrice != null) {
-        query['lastCostPrice'] = lastCostPrice;
-      }
-      if(priceCash != null) {
-        query['priceCash'] = priceCash;
-      }
-      if(priceCard != null) {
-        query['priceCard'] = priceCard;
-      }
-      if(productId != null) {
-        query['productId'] = productId;
-      }
-      if(storeId != null){
-        query['storeId'] = storeId;
-      }
+      check(cost, Number);
+      check(priceCash, Number);
+      check(priceCard, Number);
+      check(productId, String);
+      check(storeId, String);
+      check(rateCash, Match.Maybe(Number));
+      check(rateCard, Match.Maybe(Number));
+      
+      let query = {};
+      query['cost'] = cost;
+      query['priceCash'] = priceCash;
+      query['priceCard'] = priceCard;
+      query['productId'] = productId;
+      query['storeId'] = storeId;
+      
       if(rateCash != null) {
         query['rateCash'] = rateCash;
       }
@@ -57,7 +67,7 @@ Meteor.methods({
         query['rateCard'] = rateCard;
       }
    
-       return ProductPrices.insert(query);
+       return ProductPrices.insert(<ProductPrice>query);
     }
   },
 

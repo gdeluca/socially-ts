@@ -11,7 +11,9 @@ import { Store } from '../models/store.model';
 import { Product } from '../models/product.model';
 import { Tag } from '../models/tag.model';
 
-function generateProductCode(product: Product): string {
+function generateProductCode(
+  product: Product
+): string {
   let productTagDef = productTagNames;
   let code = "";
   for (let tagType of productTagNames) {
@@ -24,7 +26,9 @@ function generateProductCode(product: Product): string {
 
 Meteor.methods({
 
-  saveProduct: function (product: Product) {
+  saveProduct: function (
+    product: Product
+  ) {
     check(product, {
       name: String,
       color: String,
@@ -53,45 +57,58 @@ Meteor.methods({
     }
   },
 
+  // TODO: consistency may break if a property change 
+  // given the static code related
+  // we cannot change the product code. Since it can have printed barcodes already
+  // but we can change the description for a tag code with a warning message
+  // this will change the description for all the product that have that code assigned
   updateProduct: function (
-    selector: string, 
-    product: Product
+    productId: string,
+    name: string,
+    color: string,
+    brand: string,
+    model: string,
+    provider: string,
+    categoryId: string
   ) {
-    console.log(product);
-    check(selector, String);
-    // TODO: consistency may break if a property change 
-    // given the static code related
-    check(product, {
-      _id: Match.Maybe(String),
-      name: Match.Maybe(String),
-      //code: Match.Maybe(String),
-      color: Match.Maybe(String),
-      brand: Match.Maybe(String),
-      model: Match.Maybe(String),
-      provider: Match.Maybe(String),
-      categoryId: Match.Maybe(String),
-    });
-    let query = {};
-    if(product.name != null) {
-      product.name = product.name.toUpperCase();
-    }
-    if(product.color != null) {
-      product.color = product.color.toUpperCase();
-    }
-    if(product.brand != null) {
-      product.brand = product.brand.toUpperCase();
-    }
-    if(product.model != null) {
-      product.model = product.model.toUpperCase();
-    }
-    if(product.provider != null) {
-      product.provider = product.provider.toUpperCase();
-    }
     if (Meteor.isServer) { 
-      // we cannot change the product code. Since it can have printed barcodes already
-      // but we can change the description for a tag code with a warning message
-      // this will change the description for all the product that have that code assigned
-      return Products.update(selector, product);
+      check(productId, String);
+
+      check(name, Match.Maybe(String));
+      check(color, Match.Maybe(String));
+      check(brand, Match.Maybe(String));
+      check(model, Match.Maybe(String));
+      check(provider, Match.Maybe(String));
+      check(categoryId, Match.Maybe(String));
+
+      let product = Products.findOne(
+        {_id:productId}, {fields: {_id: 1}});
+      if (!product) {
+        throw new Meteor.Error('400', 
+          'No se encontro el producto a actualizar');
+      }
+
+      let query = {};
+      if(name != null) {
+        query['name'] = name.toUpperCase();
+      }
+      if(color != null) {
+        query['color'] = color.toUpperCase();
+      }
+      if(brand != null) {
+        query['brand'] = brand.toUpperCase();
+      }
+      if(model != null) {
+        query['model'] = model.toUpperCase();
+      }
+      if(provider != null) {
+        query['provider'] = provider.toUpperCase();
+      }
+      if(categoryId != null) {
+        query['categoryId'] = categoryId;
+      }
+
+      return Products.update(productId, query);
     }
   },
 

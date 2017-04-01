@@ -10,6 +10,7 @@ import { UserStores } from '../collections/user-stores.collection';
 import { Tags } from '../collections/tags.collection';
 
 import { Tag } from '../models/tag.model';
+import { UserStore } from '../models/user-store.model';
 import { Product } from '../models/product.model';
 import { ProductSize } from '../models/product-size.model';
 
@@ -17,26 +18,26 @@ import * as _ from 'underscore';
 
 Meteor.methods({
 
-  signup: function (
+  addUser: function (
     email: string, 
     username: string,
     password: string,
-    storeId: string,
+    storeIds: string[],
     rol: string
   ) {
-    check(email, String);
-    check(username, String);
-    check(password, String);
-    check(storeId, String);
-    check(rol, String);
     if (Meteor.isServer) {
+      check(email, String);
+      check(username, String);
+      check(password, String);
+      check(storeIds, [String]);
+      check(rol, String);
       if (_.indexOf(roles, rol) == -1 ) {
         throw new Meteor.Error('400', 'Rol Invalido');
       }
 
       let user = Users.findOne({email: email});
       if (user) {
-        throw new Meteor.Error('400', 'Usuario existente');
+        throw new Meteor.Error('400', 'El usuario ya existe');
       }
 
       let userId = Accounts.createUser(
@@ -50,15 +51,57 @@ Meteor.methods({
           if (error) {
             throw new Meteor.Error('400', 'Fallo al crear el usuario: ', error);
           } else {
-          UserStores.collection.insert(
-            {
-              userId: userId, 
-              storeId: storeId
-            })
-          Roles.addUsersToRoles(userId, rol, 'default-group');
+            storeIds.forEach(storeId => {
+              UserStores.collection.insert(
+                {
+                  userId: userId, 
+                  storeId: storeId
+                })
+            });
+            Roles.addUsersToRoles(userId, rol, 'default-group');
           }
         }
       )
+    }
+  },
+
+  updateUser : function(
+    userId: string,
+    username: string,
+    newStoreIds: string[] = []
+  ) {
+    check(userId, String);
+    check(username, String);
+    check(newStoreIds, Match.Maybe([String]));
+    if (Meteor.isServer) {
+      let user = Users.findOne({_id: userId});
+      if (user) {
+        throw new Meteor.Error('400', 'Usuario inexistente');
+      }
+      Users.update({_id: userId}, {
+        $set: { 
+          username: username.toUpperCase()
+        }
+      }); 
+      
+      var currentStoreIds=[];
+      UserStores.find({userId: userId}).mergeMap(userStores => {
+        return userStores.map(userStore => {
+          return userStore.storeId})}).subscribe(res => {currentStoreIds.push(res)});
+
+      var storeIdsToRemove = currentStoreIds.filter(x => newStoreIds.indexOf(x) == -1);
+      var storeIdsToAdd = newStoreIds.filter(x => currentStoreIds.indexOf(x) == -1);
+
+      for (let storeId of storeIdsToAdd) {
+        UserStores.insert({userId: user._id, storeId: storeId});
+      }
+
+      for (let storeId of storeIdsToRemove) {
+        UserStores.find({userId: user._id, storeId: storeId})
+        .mergeMap(userStores => {return userStores})
+        .subscribe((userStore: UserStore) => {
+          UserStores.remove(userStore._id)})    
+      } 
     }
   },
 

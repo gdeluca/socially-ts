@@ -1,5 +1,7 @@
 <div class="card align-items-center">
-  <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+  <pagination-controls 
+  (pageChange)="onPageChanged($event)"
+  ></pagination-controls>
 </div>
 
 <!-- categories list -->
@@ -8,7 +10,7 @@
   <table class="table table-bordered table-hover table-striped ">
     <thead class="thead-default">
 
-       <!-- headers for sorting -->
+      <!-- headers for sorting -->
       <tr>
         <th class="text-center">Modificar</th>
         <th  class="text-center" *ngFor="let header of headers; let colIndex = index; ">
@@ -195,6 +197,8 @@
   </form>
 </div>
 <div class="card align-items-center">
-  <pagination-controls (pageChange)="onPageChanged($event)"></pagination-controls>
+  <pagination-controls 
+  (pageChange)="onPageChanged($event)"
+  ></pagination-controls>
 </div>
 

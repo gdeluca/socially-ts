@@ -1,5 +1,5 @@
 // angular
-import { Component, OnInit, OnDestroy, Injectable, Inject, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
@@ -20,18 +20,22 @@ import 'rxjs/add/operator/map';
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/domain/search-options';
 
-// model 
+//collections
 import { Users } from '../../../../both/collections/users.collection';
 import { UserStores } from '../../../../both/collections/user-stores.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
 
-import { Dictionary } from '../../../../both/domain/dictionary';
-
-import { emailValidator, matchingPasswords } from '../../validators/validators';
-
+// model 
 import { UserStore } from '../../../../both/models/user-store.model';
 import { Store } from '../../../../both/models/store.model';
 import { User } from '../../../../both/models/user.model';
+
+// domain
+import { emailValidator, matchingPasswords } from '../../validators/validators';
+import { Dictionary } from '../../../../both/domain/dictionary';
+import { Filter, Filters } from '../../../../both/domain/filter';
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
 
 import template from './users.component.html';
 import style from './users.component.scss';
@@ -41,7 +45,7 @@ import style from './users.component.scss';
   template,
   styles: [ style ],
 })
-@InjectUser('user')
+@InjectUser('currentUser')
 export class UsersComponent implements OnInit, OnDestroy {
   
   // pagination related
@@ -50,9 +54,18 @@ export class UsersComponent implements OnInit, OnDestroy {
   sortDirection: Subject<number> = new Subject<number>();
   sortField: Subject<string> = new Subject<string>();
 
-  filterField: Subject<string> = new Subject<string>();
-  filterValue: Subject<string> = new Subject<string>();
+  filters: Subject<Filters> = new Subject<Filters>();
 
+  filtersParams: Filters = [
+    {key: 'email', value:''},
+  ];
+
+  // name, sortfield, touple
+  headers: Dictionary[] = [
+    {'key': 'Nombre de Usuario', 'value':'username'},
+    {'key': 'Email', 'value':'email'},
+    {'key': 'Sucursal', 'value':'storeIds'},
+  ];
 
   collectionCount: number = 0;
   PAGESIZE: number = 6; 
@@ -62,25 +75,19 @@ export class UsersComponent implements OnInit, OnDestroy {
   optionsSub: Subscription;
   autorunSub: Subscription;
 
-
-  user: Meteor.User;
-  editedUser: any = {username:'', email:'',_id:'', storeIds:[]};
-  adding: boolean = false;
-  editing: boolean = false;
+  currentUser: Meteor.User;
+  
   users: Observable<User[]>; // users from the collection related to current page
   paginatedStores: Observable<Store[]>; // stores related to current page of users
-  stores: Observable<Store[]>; // all the stores from the collection
-  selectedStores: Store[]; // selected store from save form 
   paginatedUserStores: Observable<UserStore[]>; // stores related to current page of users
   
+  editedUser: any = {username:'', email:'',_id:'', storeIds:[]};
+  stores: Observable<Store[]>; // all the stores from the collection
+  
+  selectedStores: Store[]; // selected store from save form 
+  selectedRole: string = '';
   st: string[][];
 
-  // name, sortfield, touple
-  headers: Dictionary[] = [
-    {'key': 'Nombre de Usuario', 'value':'username'},
-    {'key': 'Email', 'value':'email'},
-    {'key': 'Sucursal', 'value':'storeIds'},
-  ];
   complexForm : FormGroup;
 
   constructor(
@@ -104,39 +111,37 @@ export class UsersComponent implements OnInit, OnDestroy {
       this.curPage,
       this.sortDirection,
       this.sortField,
-      this.filterField,
-      this.filterValue
-    ).subscribe(([pageSize, curPage, sortDirection, sortField, filterField, filterValue]) => {
+      this.filters,
+    ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
       const options: SearchOptions = {
         limit: pageSize as number,
         skip: ((curPage as number) - 1) * (pageSize as number),
         sort: { [sortField as string] : sortDirection as number }
       };
       
-      this.paginationService.setCurrentPage(this.paginationService.defaultId() , curPage as number);
+      this.paginationService.setCurrentPage(
+        this.paginationService.defaultId() , curPage as number);
 
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('users.stores', options, filterField, filterValue)
-        .subscribe(() => {
-          this.users = Users.find({}).zone();
-          this.paginatedStores = Stores.find({}).zone();
-          this.paginatedUserStores = UserStores.find({}).zone();
-          });
+      this.paginatedSub = MeteorObservable.subscribe(
+        'users.stores', 
+        options, 
+        filters
+      ).subscribe(() => {
+        this.users = Users.find({}).zone();
+        this.paginatedStores = Stores.find({}).zone();
+        this.paginatedUserStores = UserStores.find({}).zone();
+      });
     });
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfUsers');
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+      this.paginationService.setTotalItems(
+        this.paginationService.defaultId(), this.collectionCount);
     });
 
-    this.pageSize.next(this.PAGESIZE);
-    this.curPage.next(1);
-    this.sortField.next('email');
-    this.sortDirection.next(1);
-    this.filterField.next('email');
-    this.filterValue.next('');
 
     if (this.storesSub) {
         this.storesSub.unsubscribe();
@@ -154,6 +159,12 @@ export class UsersComponent implements OnInit, OnDestroy {
       totalItems: this.collectionCount,
     });
 
+    this.pageSize.next(this.PAGESIZE);
+    this.curPage.next(1);
+    this.sortField.next('email');
+    this.sortDirection.next(1);
+    this.filters.next(this.filtersParams);
+
   }
 
   ngOnDestroy() {
@@ -166,73 +177,6 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.curPage.next(page);
   }
  
-  update = function(user){
-    console.log(this.editedUser);
-    console.log(user);
-    
-    // console.log(user);
-    Users.update({_id: user._id}, {
-      $set: { 
-        username: user.username
-      }
-    }); 
-    var currentStoreIds=[];
-    UserStores.find({userId: user._id}).mergeMap(userStores => {
-      return userStores.map(userStore => {
-        return userStore.storeId})}).subscribe(res => {currentStoreIds.push(res)});
-
-    var newStoreIds = [];
-    if (user.storeIds) {
-      newStoreIds = user.storeIds.map(ids => {return ids._id})
-      // console.log('new ids ' + newStoreIds);
-
-    }
-    var storeIdsToRemove = currentStoreIds.filter(x => newStoreIds.indexOf(x) == -1);
-    var storeIdsToAdd = newStoreIds.filter(x => currentStoreIds.indexOf(x) == -1);
-
-    for (let storeId of storeIdsToAdd) {
-      // console.log('adding ' + storeId);
-      UserStores.insert({userId: user._id, storeId: storeId});
-    }
-
-    for (let storeId of storeIdsToRemove) {
-      // console.log('removing ' + storeId);
-      UserStores.find({userId: user._id, storeId: storeId})
-        .mergeMap(userStores => {return userStores })
-        .subscribe((userStore: UserStore) => {
-        UserStores.remove(userStore._id)})    
-    } 
-  }
-
- saveUser() {
-    if (!Meteor.userId()) {
-      alert('Ingrese al sistema para realizar cambios');
-      return;
-    }
-
-    var user_id = ''
-    if (this.complexForm.valid) {
-      user_id = Accounts.createUser({
-        email: this.complexForm.value.email,
-        password: this.complexForm.value.password
-      }, (err) => {
-        if (err) {
-          this.zone.run(() => {
-            console.log(err);
-          });
-        } else {
-          for (let store of this.selectedStores) {
-            UserStores.collection.insert({
-              userId: Meteor.userId(), 
-              storeId: store._id 
-            });
-          }
-        }
-      });
-      this.complexForm.reset();
-    }
-  }
-
   copy(original: User){
     this.editedUser = {
       username: original.username, 
@@ -243,17 +187,67 @@ export class UsersComponent implements OnInit, OnDestroy {
     return this.editedUser;
   }
 
-  search(field: string, value: string): void {
-    console.log(field);
-    console.log(value);
-    // this.curPage.next(1);
-    // this.filterField.next(field);
-    // this.filterValue.next(value); 
+  search(fieldKey: string, value: string): void {
+    if (value == 'undefined')  {
+      value = '';
+    }
+
+    let filter = _.find(this.filtersParams, function(filter)
+      { return filter.key == fieldKey }
+    )
+    if (filter) {
+      if (filter.value === value) {
+        return;
+      }
+
+      filter.value = value.toUpperCase();
+
+      this.curPage.next(1);
+      this.filters.next(this.filtersParams);
+    }
   }
   
   changeSortOrder(direction: string, fieldName: string): void {
     this.sortDirection.next(parseInt(direction));
     this.sortField.next(fieldName);
+  }
+
+  updateUser = function(user){
+    MeteorObservable.call(
+      'addUser', 
+      user._id,
+      user.username,
+      user.storeIds
+    ).subscribe(() => { 
+      Bert.alert('Datos de usuario actualizados', 'success', 'growl-top-right'); 
+      this.router.navigate(['/']);
+    }, (error) => { 
+      Bert.alert('Fallo al actualizar el usuario: ' + error, 'danger', 'growl-top-right'); 
+    })
+  }
+
+  saveUser() {
+    if (!Meteor.userId()) {
+      alert('Ingrese al sistema para realizar cambios');
+      return;
+    }
+
+    if (this.complexForm.valid) {
+      let values = this.complexForm.value;
+      MeteorObservable.call(
+        'addUser', 
+        values.email,
+        values.username,
+        values.password,
+        this.selectedStores,
+        this.selectedRole
+      ).subscribe(() => { 
+        Bert.alert('Usuario Creado', 'success', 'growl-top-right'); 
+        this.complexForm.reset();
+      }, (error) => { 
+        Bert.alert('Fallo al crear el usuario: ' + error, 'danger', 'growl-top-right'); 
+      })
+    }
   }
 
 }

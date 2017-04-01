@@ -105,7 +105,7 @@ export class StoresComponent implements OnInit, OnDestroy {
         this.paginatedSub.unsubscribe();
       }
       this.paginatedSub = MeteorObservable.subscribe(
-        'stores-paginated', 
+        'paginated.stores', 
         options, 
         filters
       ).subscribe(() => {
@@ -145,12 +145,17 @@ export class StoresComponent implements OnInit, OnDestroy {
   }
 
   update = function(store){
-    Stores.update(store._id, {
-      $set: { 
-         name: store.name,
-         address: store.address
+    MeteorObservable.call(
+      'updateStore', 
+      store._id,
+      store.name,
+      store.address
+    ).subscribe(() => { 
+        Bert.alert('Sucursal actualizada', 'success', 'growl-top-right'); 
+      }, (error) => { 
+        Bert.alert('Fallo al actualizar datos: ' + error, 'danger', 'growl-top-right'); 
       }
-    });
+    ); 
   }
 
   save(value: any){
@@ -165,9 +170,9 @@ export class StoresComponent implements OnInit, OnDestroy {
         values.name, 
         values.address
       ).subscribe(() => {
-        alert('Se agrego la sucursal.');
+        Bert.alert('Sucursal agregada', 'success', 'growl-top-right'); 
       }, (error) => {
-        alert(` Codigo de error:  ${error}`);
+        Bert.alert('Fallo al agregar la sucursal ' + error, 'danger', 'growl-top-right'); 
       });
 
       this.complexForm.reset();

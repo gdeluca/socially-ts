@@ -233,6 +233,7 @@ export class BalancesComponent {
       this.sortField,
       this.filters
     ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
+      
       const options: SearchOptions = {
         limit: pageSize as number,
         skip: ((curPage as number) - 1) * (pageSize as number),
@@ -245,8 +246,10 @@ export class BalancesComponent {
         this.paginatedSub.unsubscribe();
       }
       this.paginatedSub = MeteorObservable.subscribe(
-        'balances-sales', options, filters)
-        .subscribe(() => {
+        'balances-sales', 
+        options, 
+        filters
+      ).subscribe(() => {
           this.balances = Balances.find({}).zone();
           this.sales = Sales.find({}).zone();
           this.userStores= UserStores.find({}).zone();
@@ -417,19 +420,19 @@ export class BalancesComponent {
     return 1000;
   }
 
-  getCurrentStoreId(): string{
+  getCurrentStoreId(): string {
     let val = Session.get("currentStoreId"); 
-    return (val != null)?val:'';
+    return (val != null) ? val : '';
   }
 
-  getCurrentBalanceNumber(): number{
+  getCurrentBalanceNumber(): number {
     let val = Session.get("currentBalanceNumber"); 
-    return (val != null)?val: -1;
+    return (val != null) ? val : -1;
   }
 
-  getCurrentBalanceStatus(): number{
+  getCurrentBalanceStatus(): string {
     let val = Session.get("currentBalanceStatus"); 
-    return (val != null)?val:'';
+    return (val != null) ? val : '';
   }
 
   openBalance(){
@@ -451,7 +454,7 @@ export class BalancesComponent {
       this.getCurrentBalanceNumber()
     ).subscribe(() => {
       this.updateBalanceStatus(this.getCurrentStoreId());
-      this.router.navigate(['balances/'+this.getCurrentBalanceNumber()]); 
+      this.router.navigate(['balances/' + this.getCurrentBalanceNumber()]); 
     }, (error) => {
       Bert.alert('Error al cerrar el balance: ' +  error, 'danger', 'growl-top-right' ); 
     }); 

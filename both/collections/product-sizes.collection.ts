@@ -19,13 +19,14 @@ export function getMappingSize(size: string){
   }
 }
 
-function loggedIn() {
-  return !!Meteor.user();
-}
- 
 ProductSizes.allow({
-  insert: loggedIn,
-  update: loggedIn,
-  remove: loggedIn
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
 });
 
+ProductSizes.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
+});

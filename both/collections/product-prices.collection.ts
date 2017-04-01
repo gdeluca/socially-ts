@@ -5,12 +5,14 @@ import { ProductPrice } from '../models/product-price.model';
 
 export const ProductPrices = new MongoObservable.Collection<ProductPrice>('productPrices');
 
-function loggedIn() {
-  return !!Meteor.user();
-}
- 
 ProductPrices.allow({
-  insert: loggedIn,
-  update: loggedIn,
-  remove: loggedIn
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
+});
+
+ProductPrices.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
 });

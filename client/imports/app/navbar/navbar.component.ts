@@ -12,9 +12,11 @@ import {InjectUser} from "angular2-meteor-accounts-ui";
   template,
   styles: [ style ],
 })
-@InjectUser('user')
+@InjectUser('currentUser')
 export class NavbarComponent {
   isCollapsed: boolean = true;
+
+  currentUser: Meteor.User;
 
   constructor(
     private router: Router
@@ -29,25 +31,19 @@ export class NavbarComponent {
     Meteor.logout();
   }
 
-  getCurrentStoreName(){
+  getCurrentStoreName() {
     let val = Session.get("currentStoreName"); 
-    return (val != null)?val:'';
+    return (val != null) ? val : '';
   }
 
-  getCurrentBalanceNumber(): number{
+  getCurrentBalanceNumber(): number {
     let val = Session.get("currentBalanceNumber"); 
-    return (val != null)?val:-1;
+    return (val != null) ? val : -1;
   }
 
-  getCurrentBalanceStatus(): number{
+  getCurrentBalanceStatus(): string {
     let val = Session.get("currentBalanceStatus"); 
-    return (val != null)?val:'';
-  }
-  
-
-  getCurrentUser(){
-    let val = Session.get("currentUserEmail"); 
-    return (val != null)?val:'';
+    return (val != null) ? val : '';
   }
 
   isLoggedin(){

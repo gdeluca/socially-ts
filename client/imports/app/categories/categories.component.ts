@@ -108,10 +108,12 @@ export class CategoriesComponent implements OnInit, OnDestroy {
         this.paginatedSub.unsubscribe();
       }
       this.paginatedSub = MeteorObservable.subscribe(
-        'categories.sections', options, filters)
-        .subscribe(() => {
-          this.categories = Categories.find({}).zone();
-          this.paginatedSections = Tags.find({}).zone();
+        'categories.sections', 
+        options, 
+        filters
+      ).subscribe(() => {
+        this.categories = Categories.find({}).zone();
+        this.paginatedSections = Tags.find({}).zone();
       });
       
     });

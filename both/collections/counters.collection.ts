@@ -5,10 +5,6 @@ import { Counter } from '../models/counter.model';
 
 export const Counters = new MongoObservable.Collection<Counter>('counters');
 
-function loggedIn() {
-  return !!Meteor.user();
-}
-
 Counters.allow({
   insert() { return false; },
   update() { return false; },

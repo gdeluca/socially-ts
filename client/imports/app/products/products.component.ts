@@ -84,9 +84,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
   sources:string[] = [];
 
   currentUser: Meteor.User;
-  editedProduct: Product = 
-  {
-    code: '0', 
+  editedProduct: any = 
+  { 
     name: '', 
     color: '', 
     brand: '', 
@@ -124,10 +123,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.paginatedSub.unsubscribe();
       }
       this.paginatedSub = MeteorObservable.subscribe(
-        'products.categories', options, filters)
-        .subscribe(() => {
-          this.products = Products.find({}).zone();
-          // this.paginatedCategories = Categories.find({}).zone();
+        'products.categories', 
+        options, 
+        filters
+      ).subscribe(() => {
+        this.products = Products.find({}).zone();
+        // this.paginatedCategories = Categories.find({}).zone();
       });
 
       for (let name of this.productTagDef) {

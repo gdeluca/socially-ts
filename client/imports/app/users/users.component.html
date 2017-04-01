@@ -69,7 +69,7 @@
             [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
             type="button" 
             class="btn btn-default" 
-            (click)="currentIndex=rowIndex; editing=false; update(editedUser)">
+            (click)="currentIndex=rowIndex; editing=false; updateUser(editedUser)">
             <span class="fa fa-check-square-o" aria-hidden="true"></span>
           </button>
           <button 

@@ -5,12 +5,14 @@ import { ProductSale } from '../models/product-sale.model';
 
 export const ProductSales = new MongoObservable.Collection<ProductSale>('productSales');
 
-function loggedIn() {
-  return !!Meteor.user();
-}
- 
 ProductSales.allow({
-  insert: loggedIn,
-  update: loggedIn,
-  remove: loggedIn
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
+});
+
+ProductSales.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
 });

@@ -19,7 +19,7 @@ const storesFields = ['name','address'];
 Meteor.publishComposite('stores', function() {
   return {
     find: function() {
-      return Stores.collection.find( {}, {sort: {name: 1}} );
+      return Stores.collection.find({},{sort: {name: 1}});
     }
   }
 });
@@ -27,26 +27,27 @@ Meteor.publishComposite('stores', function() {
 Meteor.publishComposite('stores.users', function(
   userId: string
 ) {
- check(userId, String);
- return {
+  check(userId, String);
+  return {
     find: function() {
-        return UserStores.collection.find({ userId: userId })
+      return UserStores.collection.find({ userId: userId })
     }, 
     children: [
       {
-          find: function(userStore) {
-              return Stores.collection.find({_id: userStore.storeId});
-          }
+        find: function(userStore) {
+          return Stores.collection.find({_id: userStore.storeId});
+        }
       }
     ]
   }
 });
 
-Meteor.publishComposite('stores-paginated', function(
+Meteor.publishComposite('paginated.stores', function(
   options: SearchOptions, 
   filters: Filters
 ) {
   let storesSelector = getSelectorFilter(storesFields, filters);
+  checkOptions(options);
   return {
     find: function() {
       Counts.publish(this, 'numberOfStores',

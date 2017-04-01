@@ -28,14 +28,14 @@ const productFields = ['code','name','color','provider','categoryId'];
 const productSizeFields = ['barCode','size'];
 const categoryFields = ['sectionId'];
 
-Meteor.publish('allStocks', function(
+Meteor.publish('stocks', function(
   options: SearchOptions
 ) {
   checkOptions(options);
   return Stocks.find({}, options);
 });
 
-Meteor.publishComposite('productsSize-stock', function(
+Meteor.publishComposite('productsize-stock', function(
   options: SearchOptions, 
   filters: Filters
 ) {
@@ -71,42 +71,6 @@ Meteor.publishComposite('productsSize-stock', function(
               selector["$and"].push({ productId: product._id });
               selector["$and"].push(productPriceSelector);
               return ProductPrices.collection.find(selector);
-            },
-            children: [
-              {
-                find: function(stock) {
-                  return Stores.collection.find({ _id: stock.storeId });
-                }
-              } 
-            ]
-          }
-        ]
-      }
-    ]
-  }
-});
-
-Meteor.publishComposite('products-stock', function() {
-  return {
-    find: function() { 
-      Counts.publish(this, 'numberOfProductStock', 
-        ProductSizes.collection.find(), { noReady: true });
-      return ProductSizes.collection.find();
-    },
-    children: [
-      {
-        find: function(productSize) {
-          return Stocks.collection.find({ productSizeId: productSize._id });
-        }
-      }, 
-      {
-        find: function(productSize) {
-          return Products.collection.find({ _id: productSize.productId });
-        },
-        children: [
-          {
-            find: function(product) {
-              return ProductPrices.collection.find({ productId: product._id });
             },
             children: [
               {

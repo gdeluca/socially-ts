@@ -105,11 +105,14 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('products-search', options, filters)
-        .subscribe(() => {
-          this.categories = Categories.find({}).zone();
-          this.products = Products.find({}).zone();
-          this.productSizes = ProductSizes.find({}).zone();
+      this.paginatedSub = MeteorObservable.subscribe(
+        'products-search', 
+        options, 
+        filters
+      ).subscribe(() => {
+        this.categories = Categories.find({}).zone();
+        this.products = Products.find({}).zone();
+        this.productSizes = ProductSizes.find({}).zone();
       });
       
     });

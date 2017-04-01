@@ -4,14 +4,16 @@ import { Stock } from '../models/stock.model';
 
 export const Stocks = new MongoObservable.Collection<Stock>('stocks');
 
-function loggedIn() {
-  return !!Meteor.user();
-}
- 
 Stocks.allow({
-  insert: loggedIn,
-  update: loggedIn,
-  remove: loggedIn
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
+});
+
+Stocks.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
 });
 
 Stocks.collection["helpers"]({

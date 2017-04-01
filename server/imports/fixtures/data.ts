@@ -493,31 +493,31 @@ export function loadData() {
     ProductSizes.insert({
       _id: "01",
       productId: "01",
-      barCode: "101010101033",
+      barCode: "1010101010033",
       size: "33"
     });
     ProductSizes.insert({
       _id: "02",
       productId: "02",
-      barCode: "122213301070",
+      barCode: "1222133010700",
       size: "S"
     });
     ProductSizes.insert({
       _id: "03",
       productId: "02",
-      barCode: "122213301073",       
+      barCode: "1222133010730",       
       size: "L"
     });
     ProductSizes.insert({
       _id: "04",
       productId: "02",
-      barCode: "122213301074", 
+      barCode: "1222133010740", 
       size: "XL"
     });
     ProductSizes.insert({
       _id: "03",
       productId: "03",
-      barCode: "122213301073",       
+      barCode: "1222133010699",       
       size: "UNICO"
     });
 
@@ -526,7 +526,7 @@ export function loadData() {
       _id: "01",
       createdAt: new Date(2017, 2, 23, 12, 25),
       active: true,
-      lastCostPrice: 150,
+      cost: 150,
       priceCash: 300,
       priceCard: 210,
       rateCash: 100,
@@ -539,7 +539,7 @@ export function loadData() {
       _id: "02",
       createdAt: new Date(2017, 2, 23, 12, 25),
       active: true,
-      lastCostPrice: 100,
+      cost: 100,
       priceCash: 250,
       priceCard: 220,
       productId: "03",
@@ -549,7 +549,7 @@ export function loadData() {
       _id: "03",
       createdAt: new Date(2017, 2, 23, 12, 25),
       active: true,
-      lastCostPrice: 22,
+      cost: 22,
       priceCash: 300,
       priceCard: 210,
       productId: "02",
@@ -559,7 +559,7 @@ export function loadData() {
       _id: "04",
       createdAt: new Date(2017, 2, 23, 12, 25),
       active: true,
-      lastCostPrice: 50,
+      cost: 50,
       priceCash: 100,
       priceCard: 150,
       productId: "02",
@@ -777,15 +777,15 @@ export function loadData() {
     // productSizes.forEach((sizes) => ProductSizes.insert(sizes));
 
     // const productPrices = [
-    //   { "_id" : "5PqKEBqfM2u4sicBh", "lastCostPrice" : 160, "priceCash" : 300, "priceCard" : 300, "productId" : "oyE9jkW7peeieDfPx", "storeId" : "01" },
-    //   { "_id" : "daaGDjSwBpnjj3YrN", "lastCostPrice" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "oyE9jkW7peeieDfPx", "storeId" : "02" },
-    //   { "_id" : "ZL68zGR6hThvtLmQg", "lastCostPrice" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "oyE9jkW7peeieDfPx", "storeId" : "03" },
-    //   { "_id" : "Aaozh6pYJzcJWuQuK", "lastCostPrice" : 157, "priceCash" : 300, "priceCard" : 300, "productId" : "bDjrLj9evTrZToLvY", "storeId" : "01" },
-    //   { "_id" : "TpQuSgAR2zZziCzCc", "lastCostPrice" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "bDjrLj9evTrZToLvY", "storeId" : "02" },
-    //   { "_id" : "BtHRp79TFNNkoj9B9", "lastCostPrice" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "bDjrLj9evTrZToLvY", "storeId" : "03" },
-    //   { "_id" : "ipQd8numeBJzoEiZb", "lastCostPrice" : 155, "priceCash" : 300, "priceCard" : 300, "productId" : "QpcDBvvdx8qxezBNJ", "storeId" : "01" },
-    //   { "_id" : "SLnza3KrFxBBjM6FX", "lastCostPrice" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "QpcDBvvdx8qxezBNJ", "storeId" : "02" },
-    //   { "_id" : "LYvY2hEmgoepAEksv", "lastCostPrice" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "QpcDBvvdx8qxezBNJ", "storeId" : "03" },
+    //   { "_id" : "5PqKEBqfM2u4sicBh", "cost" : 160, "priceCash" : 300, "priceCard" : 300, "productId" : "oyE9jkW7peeieDfPx", "storeId" : "01" },
+    //   { "_id" : "daaGDjSwBpnjj3YrN", "cost" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "oyE9jkW7peeieDfPx", "storeId" : "02" },
+    //   { "_id" : "ZL68zGR6hThvtLmQg", "cost" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "oyE9jkW7peeieDfPx", "storeId" : "03" },
+    //   { "_id" : "Aaozh6pYJzcJWuQuK", "cost" : 157, "priceCash" : 300, "priceCard" : 300, "productId" : "bDjrLj9evTrZToLvY", "storeId" : "01" },
+    //   { "_id" : "TpQuSgAR2zZziCzCc", "cost" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "bDjrLj9evTrZToLvY", "storeId" : "02" },
+    //   { "_id" : "BtHRp79TFNNkoj9B9", "cost" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "bDjrLj9evTrZToLvY", "storeId" : "03" },
+    //   { "_id" : "ipQd8numeBJzoEiZb", "cost" : 155, "priceCash" : 300, "priceCard" : 300, "productId" : "QpcDBvvdx8qxezBNJ", "storeId" : "01" },
+    //   { "_id" : "SLnza3KrFxBBjM6FX", "cost" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "QpcDBvvdx8qxezBNJ", "storeId" : "02" },
+    //   { "_id" : "LYvY2hEmgoepAEksv", "cost" : 150, "priceCash" : 300, "priceCard" : 300, "productId" : "QpcDBvvdx8qxezBNJ", "storeId" : "03" },
     // ];
     // productPrices.forEach((price) => ProductPrices.insert(price));
    

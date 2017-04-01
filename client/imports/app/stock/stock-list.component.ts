@@ -105,11 +105,10 @@ export class StockListComponent implements OnInit, OnDestroy {
       color:'', 
       size:'', 
       provider:'', 
-      quantity:[{stockId:'', storeId:'', quantity:'', priceCash:'', priceCard:'', lastCostPrice:''}]
+      quantity:[{stockId:'', storeId:'', quantity:'', priceCash:'', priceCard:'', cost:''}]
     };
 
   editedStock: any;
-  editing: boolean = false;
   selectedCategory: Category ;
 
   productSizes: Observable<ProductSize[]>;
@@ -148,13 +147,16 @@ export class StockListComponent implements OnInit, OnDestroy {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
-      this.paginatedSub = MeteorObservable.subscribe('productsSize-stock', options, filters)
-        .subscribe(() => {
-          this.productSizes = ProductSizes.find({}).zone();
-          this.stocks = Stocks.find({}).zone();
-          this.stores = Stores.find({}).zone();
-          this.products = Products.find({}).zone();
-          this.productPrices = ProductPrices.find({}).zone();
+      this.paginatedSub = MeteorObservable.subscribe(
+        'productsize-stock', 
+        options, 
+        filters
+      ).subscribe(() => {
+        this.productSizes = ProductSizes.find({}).zone();
+        this.stocks = Stocks.find({}).zone();
+        this.stores = Stores.find({}).zone();
+        this.products = Products.find({}).zone();
+        this.productPrices = ProductPrices.find({}).zone();
       });
 
     });
@@ -162,9 +164,10 @@ export class StockListComponent implements OnInit, OnDestroy {
     if (this.sectionsSub) {
       this.sectionsSub.unsubscribe();
     } 
-    this.sectionsSub = MeteorObservable.subscribe('tags.section')
-      .subscribe(() => {
-        this.allSections = Tags.find({}).zone();
+    this.sectionsSub = MeteorObservable.subscribe(
+      'tags.section'
+    ).subscribe(() => {
+      this.allSections = Tags.find({}).zone();
     });
 
     if (this.storesSub) {
@@ -218,7 +221,6 @@ export class StockListComponent implements OnInit, OnDestroy {
   /* save values to database */
   update = function(editedStock){
     for (let stock of editedStock.quantity) {
-
       if (stock.quantity && stock.stockId) {
         Stocks.update(stock.stockId, {
           $set: { 
@@ -229,7 +231,7 @@ export class StockListComponent implements OnInit, OnDestroy {
       // do something
     }
 
-    // clean after insert
+    // clean after add
     editedStock = this.copy(this.emptyStock);
   }
 

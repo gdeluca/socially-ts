@@ -1,9 +1,5 @@
-
 // angular
 import { Component, OnInit, OnDestroy, OnChanges, Injectable, Inject, Input, Output, EventEmitter } from '@angular/core';
-// import { Injectable, Inject, NgModule, Input, Output, EventEmitter  } from '@angular/core';
-// import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
@@ -13,17 +9,12 @@ import { PaginationService } from 'ng2-pagination';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
-// import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
-// import 'rxjs/add/operator/combineLatest';
-// import 'rxjs/add/operator/map';
-// import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/domain/search-options';
 
 // collections
-// import { Counters } from '../../../../both/collections/counters.collection';
 import { ProductPurchases } from '../../../../both/collections/product-purchases.collection';
 import { ProductSales } from '../../../../both/collections/product-sales.collection';
 import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
@@ -36,7 +27,6 @@ import { Tags } from '../../../../both/collections/tags.collection';
 import { Users } from '../../../../both/collections/users.collection';
 
 // model 
-// import { Counter } from '../../../../both/models/counter.model';
 import { ProductPurchase } from '../../../../both/models/product-purchase.model';
 import { ProductSale } from '../../../../both/models/product-sale.model';
 import { ProductSize } from '../../../../both/models/product-size.model';
@@ -53,11 +43,6 @@ import { Dictionary } from '../../../../both/domain/dictionary';
 import { Filter, Filters } from '../../../../both/domain/filter';
 import * as _ from 'underscore';
 import { Bert } from 'meteor/themeteorchef:bert';
-
-import { isNumeric } from '../../validators/validators';
-
-// import * as moment from 'moment';
-// import 'moment/locale/es';
 
 import template from "./provider-products.component.html";
 import style from "./provider-products.component.scss";
@@ -115,17 +100,17 @@ export class ProviderProductsComponent implements OnInit, OnDestroy, OnChanges {
 
 
   ngOnChanges(changes:any):void {
-    if (changes.provider) {
+    if (changes.provider && changes.provider.currentValue) {
       // selected provider name
-      console.log('read provider' + changes.provider.currentValue);
+      // console.log('read provider' + changes.provider.currentValue);
       this.provider = changes.provider.currentValue;
-      this.createOptionsSubScription()
+     
+      this.createOptionsSubScription();
+
     }
 
     // get selected products to check if need to be added back to the provider list
     if (changes.products) {
-        console.log('read provider' + changes.provider.currentValue);
-
       this.selectedProducts = changes.products;
     }
 
@@ -152,7 +137,7 @@ export class ProviderProductsComponent implements OnInit, OnDestroy, OnChanges {
         this.paginatedSub.unsubscribe();
       }
       this.paginatedSub = MeteorObservable.subscribe(
-        'provider-products', 
+        'provider.products', 
         this.provider, 
         options, 
         filters
@@ -256,7 +241,7 @@ export class ProviderProductsComponent implements OnInit, OnDestroy, OnChanges {
  
   getCost(productId) {
     let productPrice = ProductPrices.findOne({productId:productId});
-     return (productPrice)?productPrice.lastCostPrice:0;
+     return (productPrice) ? productPrice.cost : 0;
   }
 
 }

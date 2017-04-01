@@ -15,7 +15,7 @@ import './imports/publications/stores';
 import './imports/publications/tags'; 
 import './imports/publications/users'; 
 
-import { loadSecurity } from './imports/modules/rate-limit';
+import { loadRateLimitPolicies } from './imports/modules/rate-limit';
 
 
 // load meteor methods. e.g: to use latency compensation 
@@ -23,5 +23,5 @@ import '../both/methods/products.methods';
 
 Meteor.startup(() => {
   loadData();
-  loadSecurity();
+  loadRateLimitPolicies();
 });

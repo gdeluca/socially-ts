@@ -22,10 +22,11 @@ Meteor.publish('users', function(
   options: SearchOptions, 
   filters: Filters
 ) {
-  let filterSelector = getSelectorFilter(userFields, filters);
+  let selector = getSelectorFilter(userFields, filters);
+  checkOptions(options);
   Counts.publish(this, 'numberOfUsers', 
-    Users.collection.find(filterSelector), { noReady: true });
-  return Users.collection.find(filterSelector, options);
+    Users.collection.find(selector), { noReady: true });
+  return Users.collection.find(selector, options);
 }); 
 
 Meteor.publishComposite('users.stores', function(

@@ -5,13 +5,14 @@ import { UserStore } from '../models/user-store.model';
 
 export const UserStores = new MongoObservable.Collection<UserStore>('userStores');
 
-function loggedIn() {
-  return !!Meteor.user();
-}
- 
 UserStores.allow({
-  insert: loggedIn,
-  update: loggedIn,
-  remove: loggedIn
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
 });
 
+UserStores.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
+});

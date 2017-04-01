@@ -11,8 +11,6 @@ export function getSelectorFilter(filterFields:string[] = [], filters: Filters =
   let selectors: any[] = [];
 
   for (let filterKey of filterFields) {
-    // console.log(filterKey)
-    // console.log(filters)
     let filter = _.find(filters, function(filter){ return filter.key == filterKey })
     if (filter  &&  filter.value){
       if (filter.key.indexOf(":") !== -1) {
@@ -37,11 +35,6 @@ export function getSelectorFilter(filterFields:string[] = [], filters: Filters =
   }
   return result;
 }
-
-//result['and'] = selectors;
-//result = { $and: [ {"name":{$regex:".*v.*",$options:"i"}}, {"size":{"$regex":".*s.*",$options:"i"}} ] }
-// result = {"name":{"$regex":"*"}}
-
 
 export function checkOptions(options: SearchOptions){
   check(

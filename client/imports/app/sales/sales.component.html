@@ -118,7 +118,7 @@
           <a [routerLink]="['/sales', 
               sale.saleNumber]"
               >
-            {{sale.saleNumber}}
+              {{ sale.saleNumber | leadingZeros:7 }}
           </a>
         </td>
 

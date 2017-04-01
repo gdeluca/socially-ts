@@ -129,7 +129,8 @@
           </button>
         </td> -->
         <td class="text-center">
-          <a [routerLink]="['/purchases', purchase.purchaseNumber, purchase.purchaseState.toLowerCase()]">{{purchase.purchaseNumber}}
+          <a [routerLink]="['/purchases', purchase.purchaseNumber, purchase.purchaseState.toLowerCase()]">
+          {{ purchase.purchaseNumber | leadingZeros:7 }}
           </a>
         </td>
 

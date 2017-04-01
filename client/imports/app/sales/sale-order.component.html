@@ -6,7 +6,7 @@
     <div  class="form-inline">
 
       <div class="ml-4 mt-4">
-        <a>Nº de Venta: {{purchase?.purchaseNumber}}</a>
+        <a>Nº de Venta: {{ purchase?.purchaseNumber | leadingZeros:7 }}</a>
       </div>
 
       <div class="ml-4 mt-4">
@@ -81,9 +81,8 @@
           name="selectedProductSizeBarCode" 
           class="form-control" 
           [(ngModel)]="selectedProductSizeBarCode"
-          (keyup.enter)="addProduct()"
-          (blur)="addProduct()"
-          (keyup)="checkLength()"
+          (keyup.enter)="addProductToOrder()"
+          (blur)="addProductToOrder()"
           placeholder="Buscar por Codigo">
       </div>
 

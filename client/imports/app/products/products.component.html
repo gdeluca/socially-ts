@@ -97,19 +97,8 @@
         <!-- code field -->
         <!-- display mode-->
         <td 
-          [hidden]="currentIndex === rowIndex && editing"
           class="text-center">
           <a>{{product.code}}</a>
-        </td>
-        <!-- editing mode-->
-        <td 
-          [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
-          class="text-center">
-          <input 
-            type="text" 
-            name="code-{{rowIndex}}" 
-            class="form-control"
-            [(ngModel)]="editedProduct.code">
         </td>
 
         <!-- color field -->

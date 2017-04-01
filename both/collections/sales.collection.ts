@@ -25,12 +25,14 @@ export const workShiftMapping = {
     'AFTERNOON': 'Tarde', 
   };
 
-function loggedIn() {
-  return !!Meteor.user();
-}
- 
 Sales.allow({
-  insert: loggedIn,
-  update: loggedIn,
-  remove: loggedIn
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
+});
+
+Sales.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
 });

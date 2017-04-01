@@ -1,9 +1,5 @@
-
 // angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
-// import { Injectable, Inject, NgModule, Input, Output, EventEmitter  } from '@angular/core';
-// import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
@@ -13,17 +9,12 @@ import { PaginationService } from 'ng2-pagination';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
-// import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
-// import 'rxjs/add/operator/combineLatest';
-// import 'rxjs/add/operator/map';
-// import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/domain/search-options';
 
 // collections
-// import { Counters } from '../../../../both/collections/counters.collection';
 import { ProductPurchases } from '../../../../both/collections/product-purchases.collection';
 import { ProductSales } from '../../../../both/collections/product-sales.collection';
 import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
@@ -36,7 +27,6 @@ import { Tags } from '../../../../both/collections/tags.collection';
 import { Users } from '../../../../both/collections/users.collection';
 
 // model 
-// import { Counter } from '../../../../both/models/counter.model';
 import { ProductPurchase } from '../../../../both/models/product-purchase.model';
 import { ProductSale } from '../../../../both/models/product-sale.model';
 import { ProductSize } from '../../../../both/models/product-size.model';
@@ -102,7 +92,7 @@ export class PurchaseVerificationComponent implements OnInit, OnDestroy {
   collectionCount: number = 0;
   PAGESIZE: number = 15; 
   
-  orderStatus = purchasesStatusMapping; // from Purchases;
+  orderStatus = purchasesStatusMapping; 
 
   orderNumber: number;
   
@@ -162,6 +152,7 @@ export class PurchaseVerificationComponent implements OnInit, OnDestroy {
         this.products = Products.find().zone();
         this.stocks = Stocks.find({}).zone();
         this.productPrices = ProductPrices.find({}).zone();
+        
         this.loadInputboxValues(); 
       });
 
@@ -239,7 +230,7 @@ export class PurchaseVerificationComponent implements OnInit, OnDestroy {
     .subscribe(productPrice => {
       let product = Products.findOne({_id: productPrice.productId});
       if (!(this.costPrices[product._id] || this.cardPrices[product._id] || this.cashPrices[product._id])) {
-        this.costPrices[product._id] = productPrice.lastCostPrice
+        this.costPrices[product._id] = productPrice.cost
         this.cardPrices[product._id] = productPrice.priceCard
         this.cashPrices[product._id] = productPrice.priceCash
       }
@@ -253,20 +244,19 @@ export class PurchaseVerificationComponent implements OnInit, OnDestroy {
     .subscribe(productPurchase => {
       let productSize = ProductSizes.findOne({_id: productPurchase.productSizeId});
       let product = Products.findOne({_id: productSize.productId});
-       this.callUpdateProductPrices(product); // update the product prices set
-       this.callUpdateProductPurchase(productPurchase, product); // update the product purchases quantities 
-      }
-    )
+      this.callUpdateProductPrices(product); // update the product prices set
+      this.callUpdateProductPurchase(productPurchase, product); // update the product purchases quantities 
+    })
     this.callMoveToAsignation();  // set the new pruchase order state
   }
 
   callUpdateProductPurchase(productPurchase, product){
-    console.log("updateProductPurchase",
-    productPurchase._id,
-      +this.costPrices[product._id],
-      +productPurchase.quantity,
-      +productPurchase.quantity * +this.costPrices[product._id]
-      );
+    // console.log("updateProductPurchase",
+    // productPurchase._id,
+    //   +this.costPrices[product._id],
+    //   +productPurchase.quantity,
+    //   +productPurchase.quantity * +this.costPrices[product._id]
+    //   );
     MeteorObservable.call("updateProductPurchase",
       productPurchase._id,
       +this.costPrices[product._id],
@@ -281,22 +271,21 @@ export class PurchaseVerificationComponent implements OnInit, OnDestroy {
   }
 
   callUpdateProductPrices(product) {
-    console.log("updateProductPrices",
-      product._id,
-      +this.costPrices[product._id],
-      +this.cashPrices[product._id],
-      +this.cardPrices[product._id]
-      );
+    // console.log("updateProductPrices",
+    //   product._id,
+    //   +this.costPrices[product._id],
+    //   +this.cashPrices[product._id],
+    //   +this.cardPrices[product._id]
+    //   );
     MeteorObservable.call("updateProductPrices",
       product._id,
       +this.costPrices[product._id],
       +this.cashPrices[product._id],
       +this.cardPrices[product._id]
-    ).subscribe(
-    (response) => {
+    ).subscribe((response) => {
       Bert.alert('Se guardaron los nuevos precios', 'success', 'growl-top-right' ); 
     }, (error) => {
-      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+      Bert.alert('Error al actualizar los precios: ' +  error, 'danger', 'growl-top-right' ); 
     });  
   }
 
@@ -305,12 +294,11 @@ export class PurchaseVerificationComponent implements OnInit, OnDestroy {
       'updatePurchaseOrderStatus', 
       this.purchase._id, 
       'ASIGNATION'
-    ).subscribe(
-      (response) => {
-       this.router.navigate(['purchases/'+this.orderNumber+'/asignation']); 
-       Bert.alert('Se actualizo el pedidio al estado VERIFICADO', 'success', 'growl-top-right' ); 
+    ).subscribe((response) => {
+      this.router.navigate(['purchases/'+this.orderNumber+'/asignation']); 
+      Bert.alert('Se actualizo la orden al estado ASIGNADO', 'success', 'growl-top-right' ); 
     }, (error) => {
-      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+      Bert.alert('Error al actualizar la orden al estado ASIGNADO: ' +  error, 'danger', 'growl-top-right' ); 
     });  
   }
 

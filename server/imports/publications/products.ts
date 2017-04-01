@@ -14,10 +14,10 @@ import { Categories } from '../../../both/collections/categories.collection';
 
 
 const productFields = ['code','name','brand','color','provider','model'];
-const productSizeFields = ['barCode','size']; 
+const sizesFields = ['barCode','size']; 
 const categoryFields = ['sectionId'];
 
-Meteor.publishComposite('provider-products', 
+Meteor.publishComposite('provider.products', 
   function(
     provider: string, 
     options: SearchOptions, 
@@ -25,6 +25,8 @@ Meteor.publishComposite('provider-products',
 {
   check(provider, String);
   let productFilter = getSelectorFilter(productFields, filters);
+  checkOptions(options);
+
   let selector: any = {};
   selector["$and"] = [];
   selector["$and"].push({ provider: provider });
@@ -38,7 +40,8 @@ Meteor.publishComposite('provider-products',
     children: [
       {
         find: function(product) {
-          return ProductPrices.collection.find({productId: product._id});
+          return ProductPrices.collection.find(
+            {productId: product._id});
         }
       }
     ]
@@ -49,13 +52,14 @@ Meteor.publishComposite('products.categories', function(
   options: SearchOptions, 
   filters: Filters
 ) {
-
-  let productSelector = getSelectorFilter(productFields, filters);
-  let categorySelector = getSelectorFilter(['categoryName:name'], filters);
+  checkOptions(options);
+  let productFilter = getSelectorFilter(productFields, filters);
+  let categoryFilter = getSelectorFilter(['categoryName:name'], filters);
   return {
     find: function() {
-      Counts.publish(this, 'numberOfProducts',Products.collection.find(productSelector , options), { noReady: true });
-      return Products.collection.find(productSelector, options);
+      Counts.publish(this, 'numberOfProducts', 
+        Products.collection.find(productFilter , options), { noReady: true });
+      return Products.collection.find(productFilter, options);
     },
     children: [
       {
@@ -63,7 +67,7 @@ Meteor.publishComposite('products.categories', function(
           let selector: any = {};
           selector["$and"] = [];
           selector["$and"].push({ _id: product._id });
-          selector["$and"].push(categorySelector);
+          selector["$and"].push(categoryFilter);
           return Categories.collection.find(selector)
         }
       }
@@ -75,14 +79,14 @@ Meteor.publishComposite('products-search', function(
   options: SearchOptions, 
   filters: Filters
 ) {
-  let productSelector = getSelectorFilter(productFields, filters);
-  let productSizeSelector = getSelectorFilter(productSizeFields, filters);
+  let productFilter = getSelectorFilter(productFields, filters);
+  let sizesFilter = getSelectorFilter(sizesFields, filters);
   checkOptions(options);
   return {
     find: function() {
       Counts.publish(this, 'numberOfProducts',
-        Products.collection.find(productSelector), { noReady: true });
-      return Products.collection.find(productSelector, options);
+        Products.collection.find(productFilter), { noReady: true });
+      return Products.collection.find(productFilter, options);
     },
     children: [
       {
@@ -90,13 +94,14 @@ Meteor.publishComposite('products-search', function(
           let selector: any = {};
           selector["$and"] = [];
           selector["$and"].push({ productId: product._id });
-          selector["$and"].push(productSizeSelector);
+          selector["$and"].push(sizesFilter);
           return ProductSizes.collection.find(selector)
         }
       },  
       {  
         find: function(product) {
-          return Categories.collection.find({_id: product.categoryId})
+          return Categories.collection.find(
+            {_id: product.categoryId})
         }
       }
     ]

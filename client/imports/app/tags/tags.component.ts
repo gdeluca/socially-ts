@@ -72,7 +72,7 @@ export class TagsComponent implements OnInit, OnDestroy {
   tags: Observable<Tag[]>;
   tagNames: Observable<Tag[]>;
 
-  mapping = tagsMapping; // imported from Tags;
+  mapping = tagsMapping; 
 
   complexForm : FormGroup;
 
@@ -118,7 +118,8 @@ export class TagsComponent implements OnInit, OnDestroy {
     }
     this.tagsSub = MeteorObservable.subscribe('tags')
     .subscribe(() => {
-      this.tagNames = Tags.find({code: '00', description:"ACTIVE"}).zone();
+      this.tagNames = Tags.find(
+        {code: '00', description:"ACTIVE"}).zone();
       this.populateTagsNames();
       this.tagSelected = ['section'];
     })
@@ -145,6 +146,7 @@ export class TagsComponent implements OnInit, OnDestroy {
         this.sortField,
         this.filters
       ).subscribe(([pageSize, curPage, sortDirection, sortField, filters]) => {
+        
         const options: SearchOptions = {
           limit: pageSize as number,
           skip: ((curPage as number) - 1) * (pageSize as number),
@@ -197,7 +199,8 @@ export class TagsComponent implements OnInit, OnDestroy {
     this.tagNames.flatMap(function(tags) { return tags })
     .distinct()
     .subscribe((tag) => {
-      result.push({id: tag.type, name: this.getMappedTagType(tag.type)});
+      result.push(
+        {id: tag.type, name: this.getMappedTagType(tag.type)});
     });
     this.tagsData = result;
   }
@@ -206,7 +209,7 @@ export class TagsComponent implements OnInit, OnDestroy {
     this.curPage.next(page);
   }
 
-  update = function(tag: Tag){
+  update(tag: Tag) {
     MeteorObservable.call(
       'updateTag', 
       tag._id, 

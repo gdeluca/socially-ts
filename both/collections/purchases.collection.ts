@@ -14,13 +14,14 @@ export const purchasesStatusMapping = {
     'CANCELED': 'Cancelada' // only can be canceled on verification.
   };
 
-function loggedIn() {
-  return !!Meteor.user();
-}
- 
 Purchases.allow({
-  insert: loggedIn,
-  update: loggedIn,
-  remove: loggedIn
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
 });
 
+Purchases.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
+});

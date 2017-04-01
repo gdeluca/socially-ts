@@ -3,7 +3,7 @@ import { Meteor } from 'meteor/meteor';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 import * as _ from 'underscore';
 
-export function loadSecurity(){
+export function loadRateLimitPolicies(){
   if (Meteor.isServer) { 
     for (let subscription in Meteor['default_server'].publish_handlers) {
       DDPRateLimiter.addRule({ 

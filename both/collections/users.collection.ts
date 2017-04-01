@@ -12,21 +12,9 @@ export const rolesMapping = {
   'anonymous': 'Usuario'
 };
 
-// Meteor.users.deny({
-//   update: function() {
-//     return true;
-//   }
-// });
-
 function loggedIn() {
   return !!Meteor.user();
 }
-
-// Users.allow({
-//   insert: loggedIn,
-//   update: loggedIn,
-//   remove: loggedIn
-// });
 
 Meteor.users.allow({
   insert() { return false; },
@@ -35,6 +23,18 @@ Meteor.users.allow({
 });
 
 Meteor.users.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
+});
+
+Users.allow({
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
+});
+
+Users.deny({
   insert() { return true; },
   update() { return true; },
   remove() { return true; }

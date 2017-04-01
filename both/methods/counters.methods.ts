@@ -8,8 +8,11 @@ import { Tags, definedTags } from '../../both/collections/tags.collection';
 import { Products } from '../collections/products.collection';
 import { Stores } from '../collections/stores.collection';
 import { Stocks } from '../collections/stocks.collection';
+
 import { Store } from '../models/store.model';
 import { Product } from '../models/product.model';
+import { Counter } from '../models/counter.model';
+
 
 let tagNames = definedTags;
 
@@ -24,29 +27,32 @@ function getTwoDigitsCounters(){
 
 Meteor.methods({
 
-  getNextId(type: string, storeId?: string): number { 
-    check(type, String);
-    check(storeId, Match.Maybe(String));
-
+  getNextId(
+    type: string, 
+    storeId?: string
+  ): number { 
     if (Meteor.isServer) {
-      let selector = (storeId)?
-        {type: type, storeId:storeId}:
-        {type: type};
-      let counter = Counters.findOne(selector);
-
-      let lastCode:number;
-      if (counter) {
-        Counters.update(
-          {type: type}, 
-          {$set:{lastCode: counter.lastCode+1}}
-        );
-        lastCode = counter.lastCode;
-      } else {
-        Counters.insert({type: type, lastCode: 10}); 
-        lastCode = 10;
+      check(type, String);
+      check(storeId, Match.Maybe(String));
+      let result:number;
+      let selector = {type: type}
+      if (storeId) {
+        selector['storeId'] = storeId;
       }
-
-      return lastCode;
+      let counter = Counters.findOne(selector);
+      if (counter) {
+        result = counter.lastCode+1
+        Counters.update(
+          selector, 
+          {$set:{lastCode: result}}
+        )
+      } else {
+        result = 10
+        selector['lastCode'] = result;
+        Counters.insert(<Counter>selector);
+      }
+     
+      return result;
     }
   }
 

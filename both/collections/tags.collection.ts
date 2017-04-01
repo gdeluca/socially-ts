@@ -15,13 +15,14 @@ export const tagsMapping = {
     'section': 'Seccion'
   };
 
-function loggedIn() {
-  return !!Meteor.user();
-}
- 
 Tags.allow({
-  insert: loggedIn,
-  update: loggedIn,
-  remove: loggedIn
+  insert() { return false; },
+  update() { return false; },
+  remove() { return false; }
 });
 
+Tags.deny({
+  insert() { return true; },
+  update() { return true; },
+  remove() { return true; }
+});

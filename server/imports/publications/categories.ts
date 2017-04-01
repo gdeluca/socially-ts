@@ -13,7 +13,6 @@ import { Tags } from '../../../both/collections/tags.collection';
 const categoryFields = ['name'];
 const sectionFields = ['section:name'];
 
-
 Meteor.publishComposite('categories', function() {
   return {
     find: function() {
@@ -31,8 +30,8 @@ Meteor.publishComposite('categories.sections', function(
     checkOptions(options);
     return {
       find: function() {
-      Counts.publish(this, 'numberOfCategories', 
-        Categories.collection.find(categoryFilter, options), { noReady: true });
+        Counts.publish(this, 'numberOfCategories', 
+          Categories.collection.find(categoryFilter, options), { noReady: true });
         return Categories.collection.find(categoryFilter, options);
       },
       children: [

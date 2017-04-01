@@ -1,8 +1,6 @@
 // angular
 import { Component, OnInit, OnDestroy } from '@angular/core';
-// import { Injectable, Inject, NgModule, Input, Output, EventEmitter  } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-// import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
@@ -12,45 +10,26 @@ import { PaginationService } from 'ng2-pagination';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 import { MeteorObservable } from 'meteor-rxjs';
-// import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import { Subject } from 'rxjs/Subject';
 import 'rxjs/add/operator/combineLatest';
 import 'rxjs/add/operator/map';
-// import 'rxjs/add/operator/publishLast';
 
 import { Counts } from 'meteor/tmeasday:publish-counts';
 import { SearchOptions } from '../../../../both/domain/search-options';
 
 // collections
-// import { Balances } from '../../../../both/collections/balances.collection';
-// import { Categories } from '../../../../both/collections/categories.collection';
-// import { Counters } from '../../../../both/collections/counters.collection';
 import { UserStores } from '../../../../both/collections/user-stores.collection';
-// import { ProductPurchases } from '../../../../both/collections/product-purchases.collection';
 import { ProductSales } from '../../../../both/collections/product-sales.collection';
-// import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
-// import { Products } from '../../../../both/collections/products.collection';
-// import { Purchases } from '../../../../both/collections/purchases.collection';
 import { Sales, salesStatusMapping, salePaymentMapping, workShiftMapping } from '../../../../both/collections/sales.collection';
-// import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
-// import { Tags } from '../../../../both/collections/tags.collection';
 import { Users } from '../../../../both/collections/users.collection';
 
 // model 
-// import { Balance } from '../../../../both/models/balance.model';
-// import { Category } from '../../../../both/models/category.model';
-// import { Counter } from '../../../../both/models/counter.model';
 import { UserStore } from '../../../../both/models/user-store.model';
-// import { ProductPurchase } from '../../../../both/models/product-purchase.model';
 import { ProductSale } from '../../../../both/models/product-sale.model';
-// import { ProductSize } from '../../../../both/models/product-size.model';
-// import { Product } from '../../../../both/models/product.model';
-// import { Purchase } from '../../../../both/models/purchase.model';
 import { Sale } from '../../../../both/models/sale.model';
-// import { Stock } from '../../../../both/models/stock.model';
 import { Store } from '../../../../both/models/store.model';
-// import { Tag } from '../../../../both/models/tag.model';
 import { User } from '../../../../both/models/user.model';
 
 // domain
@@ -58,7 +37,6 @@ import { Dictionary } from '../../../../both/domain/dictionary';
 import { Filter, Filters } from '../../../../both/domain/filter';
 import * as _ from 'underscore';
 import { Bert } from 'meteor/themeteorchef:bert';
-import { isNumeric } from '../../validators/validators';
 
 import * as moment from 'moment';
 import 'moment/locale/es';
@@ -136,10 +114,6 @@ export class SalesComponent {
   // productSales: Observable<ProductSale[]>;
   // stores: Observable<Store[]>;
 
-// balanceId has to be parametrized or stored in persistent session
-// hardcoded by now to be able to work on sales development
-  balanceId = 1;  
-
   constructor(
     private paginationService: PaginationService,
     private activeRoute: ActivatedRoute,
@@ -188,7 +162,9 @@ export class SalesComponent {
       if (this.usersSub) { 
         this.usersSub.unsubscribe();
       }
-      this.usersSub = MeteorObservable.subscribe('users').subscribe(() => {
+      this.usersSub = MeteorObservable.subscribe(
+        'users'
+      ).subscribe(() => {
         this.users = Users.find({}).zone();
       });
 
@@ -255,19 +231,19 @@ export class SalesComponent {
     return Object.assign({}, original)
   }
 
-  getCurrentStoreName(){
-    let val = Session.get("currentStoreName"); 
+  getCurrentStoreName() {
+    let val: string = Session.get("currentStoreName"); 
     return (val != null)?val:'';
   }
 
-  getCurrentStoreId(): string{
-    let val = Session.get("currentStoreId"); 
+  getCurrentStoreId(): string {
+    let val: string = Session.get("currentStoreId"); 
     return (val != null)?val:'';
   }
 
-  getCurrentBalanceId(): string{
-    let val = Session.get("currentBalanceId"); 
-    return (val != null)?val:'';
+  getCurrentBalanceNumber(): number {
+    let val: number = +Session.get("currentBalanceNumber"); 
+    return (val != null) ? val : -1;
   }
 
   getUser(userStoreId) {
@@ -275,16 +251,16 @@ export class SalesComponent {
     return Users.findOne({_id: userId});
   }
 
-  createOrder(orderNumber){
-    let userStoreId = UserStores.findOne({storeId: this.getCurrentStoreId()})._id;
+  createOrder(){
+    let userStoreId = UserStores.findOne(
+      {storeId: this.getCurrentStoreId()})._id;
     MeteorObservable.call('createSaleOrder',
-    userStoreId,
-    this.getCurrentBalanceId(),
-    this.getCurrentStoreId()
-    )
-    .subscribe(
+      userStoreId,
+      this.getCurrentBalanceNumber(),
+      this.getCurrentStoreId()
+    ).subscribe(
     (orderNumber) => {
-      this.router.navigate(['sales/'+orderNumber]); 
+      this.router.navigate(['sales/' + orderNumber]); 
     }, (error) => {
       Bert.alert('Error al crear la venta: ' +  error, 'danger', 'growl-top-right' ); 
     });  
