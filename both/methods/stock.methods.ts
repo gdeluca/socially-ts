@@ -131,18 +131,18 @@ Meteor.methods({
             {productSizeId:productSizeId, storeId:storeId});
           
           if (stock) {
-            console.log(+stock.quantity + +quantities[productSizeId + storeId]);
+            // console.log(+stock.quantity + +quantities[productSizeId + storeId]);
             bulk.find({_id:stock._id}).update({
               $set: { 
                quantity: +stock.quantity + +quantities[productSizeId + storeId],
               }
             })
           } else {
-          console.log(
-              {productSizeId:productSizeId, 
-              storeId:storeId,
-              quantity: +quantities[productSizeId + storeId]
-            });
+          // console.log(
+          //     {productSizeId:productSizeId, 
+          //     storeId:storeId,
+          //     quantity: +quantities[productSizeId + storeId]
+          //   });
 
             bulk.insert({
               _id: Random.id(),

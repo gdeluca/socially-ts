@@ -86,7 +86,6 @@ export class UsersComponent implements OnInit, OnDestroy {
   
   selectedStores: Store[]; // selected store from save form 
   selectedRole: string = '';
-  st: string[][];
 
   complexForm : FormGroup;
 

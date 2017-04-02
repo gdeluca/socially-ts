@@ -236,56 +236,129 @@ export class PurchaseVerificationComponent implements OnInit, OnDestroy {
   } 
 
   saveAndChangeVerificationState(){
+    let index = 0;
+    let productPriceParams = [];
+    let productPurchaseParams = [];
     this.productPurchases.mergeMap(productPurchases => {
       return productPurchases.map(productPurchase => {
         return productPurchase})})
     .subscribe(productPurchase => {
       let productSize = ProductSizes.findOne({_id: productPurchase.productSizeId});
-      let product = Products.findOne({_id: productSize.productId});
-      this.callUpdateProductPrices(product); // update the product prices set
-      this.callUpdateProductPurchase(productPurchase, product); // update the product purchases quantities 
+      
+      let val = {};
+       val['productId'] = productSize.productId;
+       val['costPrice'] = this.costPrices[productSize.productId];
+       val['cashPrice'] = this.cashPrices[productSize.productId];
+       val['cardPrice'] = this.cardPrices[productSize.productId];
+       productPriceParams.push(val);
+      // productPriceParams[index] = [];
+      // productPriceParams[index]['productId'] = productSize.productId;
+      // productPriceParams[index]['costPrice'] = this.costPrices[productSize.productId];
+      // productPriceParams[index]['cashPrice'] = this.cashPrices[productSize.productId];
+      // productPriceParams[index]['cardPrice'] = this.cardPrices[productSize.productId];
+
+      // productPurchaseParams[index] = [];
+      // productPurchaseParams[index]['productPurchaseId'] = productPurchase._id;
+      // productPurchaseParams[index]['quantity'] = productPurchase.quantity;
+      // productPurchaseParams[index]['costPrice'] = this.costPrices[productSize.productId];
+      val = {};
+      val['productPurchaseId'] = productPurchase._id;
+      val['quantity'] =  productPurchase.quantity;
+      val['costPrice'] = this.costPrices[productSize.productId];
+      productPurchaseParams.push(val);
+      index++;
     })
+
+    // MeteorObservable.call("bulkUpdateProductPurchase",
+    //     _.clone(productPurchaseParams)
+    // ).subscribe(
+    // (response) => {
+    //   Bert.alert('Se guardaron los nuevos estados en los pedidios', 'success', 'growl-top-right' ); 
+    // }, (error) => {
+    //   Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+    // });  
+    Meteor.call("bulkUpdateProductPurchase",
+     productPurchaseParams
+    )
+
+    Meteor.call("bulkUpdateProductPrices",
+     productPriceParams
+    )
+
+    // MeteorObservable.call("bulkUpdateProductPrices",
+    //   _.clone(productPriceParams)
+    // ).subscribe((response) => {
+    //   Bert.alert('Se guardaron los nuevos precios', 'success', 'growl-top-right' ); 
+    // }, (error) => {
+    //   Bert.alert('Error al actualizar los precios: ' +  error, 'danger', 'growl-top-right' ); 
+    // });  
+
     this.callMoveToAsignation();  // set the new pruchase order state
   }
 
-  callUpdateProductPurchase(productPurchase, product){
-    // console.log("updateProductPurchase",
-    // productPurchase._id,
-    //   +this.costPrices[product._id],
-    //   +productPurchase.quantity,
-    //   +productPurchase.quantity * +this.costPrices[product._id]
-    //   );
-    MeteorObservable.call("updateProductPurchase",
-      productPurchase._id,
-      +this.costPrices[product._id],
-      +productPurchase.quantity,
-      +productPurchase.quantity * +this.costPrices[product._id]
-    ).subscribe(
-    (response) => {
-      Bert.alert('Se guardaron los nuevos estados en los pedidios', 'success', 'growl-top-right' ); 
-    }, (error) => {
-      Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
-    });  
-  }
 
-  callUpdateProductPrices(product) {
-    // console.log("updateProductPrices",
-    //   product._id,
-    //   +this.costPrices[product._id],
-    //   +this.cashPrices[product._id],
-    //   +this.cardPrices[product._id]
-    //   );
-    MeteorObservable.call("updateProductPrices",
-      product._id,
-      +this.costPrices[product._id],
-      +this.cashPrices[product._id],
-      +this.cardPrices[product._id]
-    ).subscribe((response) => {
-      Bert.alert('Se guardaron los nuevos precios', 'success', 'growl-top-right' ); 
-    }, (error) => {
-      Bert.alert('Error al actualizar los precios: ' +  error, 'danger', 'growl-top-right' ); 
-    });  
-  }
+  // saveAndChangeVerificationState(){
+  //   this.productPurchases.mergeMap(productPurchases => {
+  //     return productPurchases.map(productPurchase => {
+  //       return productPurchase})})
+  //   .subscribe(productPurchase => {
+  //     let productSize = ProductSizes.findOne({_id: productPurchase.productSizeId});
+      
+  //     // update the product prices set
+  //     this.callUpdateProductPrices(
+  //       productSize.productId,
+  //       this.costPrices[productSize.productId],
+  //       this.cashPrices[productSize.productId],
+  //       this.cardPrices[productSize.productId]
+  //     ); 
+      
+  //     // update the product purchases quantities 
+  //     this.callUpdateProductPurchase(
+  //       productPurchase._id, 
+  //       productPurchase.quantity, 
+  //       productSize.productId,
+  //       this.costPrices[productSize.productId]
+  //     ); 
+  //   })
+  //   this.callMoveToAsignation();  // set the new pruchase order state
+  // }
+
+  // callUpdateProductPurchase(
+  //   productPurchaseId,
+  //   productPurchaseQuantity,
+  //   productId,
+  //   productCostPrice
+  // ){
+  //   MeteorObservable.call("updateProductPurchase",
+  //     productPurchaseId,
+  //     this.costPrices[productId],
+  //     productPurchaseQuantity,
+  //     productPurchaseQuantity * productCostPrice
+  //   ).subscribe(
+  //   (response) => {
+  //     Bert.alert('Se guardaron los nuevos estados en los pedidios', 'success', 'growl-top-right' ); 
+  //   }, (error) => {
+  //     Bert.alert('Error al guardar: ' +  error, 'danger', 'growl-top-right' ); 
+  //   });  
+  // }
+
+  // callUpdateProductPrices(
+  //   productId,
+  //   productCostPrice,
+  //   productCashPrice,
+  //   productCardPrice
+  // ) {
+  //   MeteorObservable.call("updateProductPrices",
+  //     productId,
+  //     productCostPrice,
+  //     productCashPrice,
+  //     productCardPrice
+  //   ).subscribe((response) => {
+  //     Bert.alert('Se guardaron los nuevos precios', 'success', 'growl-top-right' ); 
+  //   }, (error) => {
+  //     Bert.alert('Error al actualizar los precios: ' +  error, 'danger', 'growl-top-right' ); 
+  //   });  
+  // }
 
   callMoveToAsignation() {
     MeteorObservable.call(

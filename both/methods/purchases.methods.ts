@@ -136,6 +136,64 @@ Meteor.methods({
     }
   },
 
+
+  bulkUpdateProductPurchase: function ( 
+    params
+  ) {
+    if (Meteor.isServer)  {
+      check(params, Match.Any);
+     // check(waitArg, Match.Any);
+      const bulk = ProductPurchases.rawCollection()
+        .initializeUnorderedBulkOp();
+      params.forEach((param) => {
+        let productPurchaseId = param['productPurchaseId'];
+        let quantity = +param['quantity'];
+        let cost = +param['costPrice'];
+        let subTotal = +param['subTotal'];
+        check(productPurchaseId, String);
+        check(cost, Match.Maybe(Number));
+        check(quantity, Match.Maybe(Number));
+        check(subTotal, Match.Maybe(Number));
+        if (!subTotal) {
+          subTotal = cost * quantity;
+        }
+
+        let productPurchase = ProductPurchases.findOne(
+         {_id: productPurchaseId}, {fields: {_id: 1}});
+        
+        if (!productPurchase) {
+          throw new Meteor.Error('400', 
+            'No se encontro la entrada a actualizar en product purchase');
+        }
+
+        let query = {};
+        if(!isNaN(cost)) {
+            query['cost'] = cost;
+        }
+        if(!isNaN(quantity)) {
+            query['quantity'] = quantity;
+        }
+        if(!isNaN(subTotal)) {
+            query['subtotal'] = subTotal;
+        }
+
+        // console.log(query);
+        bulk.find({_id:productPurchaseId}).update({
+          $set: query
+        })
+      });
+
+      bulk.execute(function(error, results) {
+        if (error) {
+          throw new Meteor.Error('400', 
+            'Fallo en bulk al actualizar compras de los productos: ' + error);
+        } else {
+          console.log(results.toJSON());
+        }
+      });
+    }
+  },
+
   updateProductPurchase: function ( 
     productPurchaseId: string, 
     cost?: number,

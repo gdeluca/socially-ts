@@ -155,7 +155,7 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
       this.paginationService.setTotalItems(
         this.paginationService.defaultId(), this.collectionCount);
     
-      console.log('running autorun');
+      // console.log('running autorun');
     });
 
     this.paginationService.register({
@@ -331,35 +331,87 @@ export class PurchaseSelectionComponent implements OnInit, OnDestroy {
   }
 
   saveAndChangeSelectionState(){
-    // console.log(JSON.stringify(this.toRequestXSize));
+    // let index = 0;
+    // let productPriceParams = [];
+    let productPurchaseParams = [];
+
     this.productPurchases.mergeMap(productPurchases => {
       return productPurchases.map(productPurchase => {
         return productPurchase})})
     .subscribe(productPurchase => {
-        let productSize = ProductSizes.findOne({_id: productPurchase.productSizeId});
-        this.callUpdateProductPurchase(productPurchase, productSize); 
-      }
+      let productSize = ProductSizes.findOne({_id: productPurchase.productSizeId});
+
+      // productPurchaseParams[index] = [];
+      // productPurchaseParams[index]['productPurchaseId'] = productPurchase._id;
+      // productPurchaseParams[index]['quantity'] = this.toRequestXSize[productSize.productId];
+      // productPurchaseParams[index]['costPrice'] = undefined;
+      // productPurchaseParams[index]['subTotal'] = this.productSubTotals[productSize.productId];
+
+      // index++;
+      let val = {};
+      val['productPurchaseId'] = productPurchase._id;
+      val['quantity'] = this.toRequestXSize[productSize.productId];
+      val['costPrice'] = undefined;
+      val['subTotal'] = this.productSubTotals[productSize.productId];
+      productPurchaseParams.push(val);
+      // productPurchaseParams[index] = [];
+      // productPurchaseParams[index]['productPurchaseId'] = productPurchase._id;
+      // productPurchaseParams[index]['quantity'] = this.toRequestXSize[productSize.productId];
+      // productPurchaseParams[index]['costPrice'] = undefined;
+      // productPurchaseParams[index]['subTotal'] = this.productSubTotals[productSize.productId];
+
+      // index++;
+       // let val = {};
+       // val['productPurchaseId'] = productPurchase._id;
+       // val['quantity'] = this.toRequestXSize[productSize.productId];
+       // val['costPrice'] = undefined;
+       // val['subTotal'] = this.productSubTotals[productSize.productId];
+       // productPurchaseParams.push(val);
+    })
+
+    console.log(productPurchaseParams);
+    // Meteor.call('bulkUpdateProductPurchase', 
+    //   Object.assign({}, productPurchaseParams), function(err, result){
+    //     console.log(err);
+    //     console.log(result);
+    // });
+    Meteor.call("bulkUpdateProductPurchase",
+     productPurchaseParams
+     //, {wait:true}
     )
     this.callMoveToAsignation();
   }
 
-  callUpdateProductPurchase(productPurchase, productSize){
-    // console.log("updateProductPurchase",
-    // productPurchase.purchaseId,
-    // this.toRequestXSize[productSize.productId], 
-    // this.productSubTotals[productSize.productId]);
-    MeteorObservable.call("updateProductPurchase",
-      productPurchase._id,
-      undefined,
-      +this.toRequestXSize[productSize.productId],
-      +this.productSubTotals[productSize.productId]
-    ).subscribe(
-    (response) => {
-      Bert.alert('Se guardaron los nuevos estados en los pedidios', 'success', 'growl-top-right' ); 
-    }, (error) => {
-      Bert.alert('Error al actualizar el producto: ' +  error, 'danger', 'growl-top-right' ); 
-    }); 
-  }
+  // saveAndChangeSelectionState(){
+  //   // console.log(JSON.stringify(this.toRequestXSize));
+  //   this.productPurchases.mergeMap(productPurchases => {
+  //     return productPurchases.map(productPurchase => {
+  //       return productPurchase})})
+  //   .subscribe(productPurchase => {
+  //       let productSize = ProductSizes.findOne({_id: productPurchase.productSizeId});
+  //       this.callUpdateProductPurchase(productPurchase, productSize); 
+  //     }
+  //   )
+  //   this.callMoveToAsignation();
+  // }
+
+  // callUpdateProductPurchase(productPurchase, productSize){
+  //   // console.log("updateProductPurchase",
+  //   // productPurchase.purchaseId,
+  //   // this.toRequestXSize[productSize.productId], 
+  //   // this.productSubTotals[productSize.productId]);
+  //   MeteorObservable.call("updateProductPurchase",
+  //     productPurchase._id,
+  //     undefined,
+  //     +this.toRequestXSize[productSize.productId],
+  //     +this.productSubTotals[productSize.productId]
+  //   ).subscribe(
+  //   (response) => {
+  //     Bert.alert('Se guardaron los nuevos estados en los pedidios', 'success', 'growl-top-right' ); 
+  //   }, (error) => {
+  //     Bert.alert('Error al actualizar el producto: ' +  error, 'danger', 'growl-top-right' ); 
+  //   }); 
+  // }
 
   callMoveToAsignation() {
     MeteorObservable.call(
