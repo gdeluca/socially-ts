@@ -61,6 +61,7 @@ export class SalesComponent {
   filters: Subject<Filters> = new Subject<Filters>();
 
   filtersParams: Filters = [
+    {key: 'saleNumber', value:''},
     {key: 'saleState', value:''},
     {key: 'saleDate', value:''},
     {key: 'lastUpdate', value:''},
@@ -149,7 +150,7 @@ export class SalesComponent {
         this.paginatedSub.unsubscribe();
       }
       this.paginatedSub = MeteorObservable.subscribe(
-        'store-sales', 
+        'store.sales', 
         options, 
         filters,
         this.getCurrentStoreId(),
@@ -247,8 +248,10 @@ export class SalesComponent {
   }
 
   getUser(userStoreId) {
-    let userId =  UserStores.findOne({_id: userStoreId}).userId;
-    return Users.findOne({_id: userId});
+    let userStore =  UserStores.findOne({_id: userStoreId});
+    if (userStore) {
+      return Users.findOne({_id: userStore.userId});
+    }
   }
 
   createOrder(){

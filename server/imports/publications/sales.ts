@@ -19,7 +19,7 @@ import { Stocks } from '../../../both/collections/stocks.collection';
 import { Stores } from '../../../both/collections/stores.collection';
 import { Users } from '../../../both/collections/users.collection';
 
-const saleFields = ['paymentForm', 'saleState', 'saleDate'];
+const saleFields = ['saleNumber','paymentForm', 'saleState', 'saleDate'];
 const userFields = ['seller'];
 const storeFields = ['name'];
 
@@ -97,7 +97,7 @@ Meteor.publishComposite('sale-orders', function(
   }
 });
 
-Meteor.publishComposite('store-sales', function(
+Meteor.publishComposite('store.sales', function(
   options: SearchOptions, 
   filters: Filters,
   storeId: string,
@@ -122,7 +122,7 @@ Meteor.publishComposite('store-sales', function(
         children: [
           {
             find: function(userStore) {
-              return Sales.collection.find({userStoreId: userStore._id});
+              return Sales.collection.find({userStoreId: userStore._id}, options);
             },
             children: [
               {

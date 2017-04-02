@@ -2,12 +2,12 @@ import {Meteor} from 'meteor/meteor';
 import {check} from 'meteor/check';
 
 import { Balances } from '../collections/balances.collection';
+import { Products } from '../collections/products.collection';
+import { ProductPrices } from '../collections/product-prices.collection';
+import { ProductSales } from '../collections/product-sales.collection';
 import { ProductSizes, getMappingSize } from '../collections/product-sizes.collection';
 import { Sales } from '../collections/sales.collection';
-import { ProductPrices } from '../collections/product-prices.collection';
-import { Products } from '../collections/products.collection';
 import { Stores } from '../collections/stores.collection';
-import { Stocks } from '../collections/stocks.collection';
 
 import { Store } from '../models/store.model';
 import { Sale } from '../models/sale.model';
@@ -64,7 +64,7 @@ Meteor.methods({
           result = orderNumber;
         }, (error) => { 
            throw new Meteor.Error('400', 
-             'Fallo al crear un nro de orden de venta');
+             'Fallo al crear un Nº de orden de venta');
         }
       ); 
     return result;
@@ -83,6 +83,16 @@ Meteor.methods({
     if (!sale) {
       throw new Meteor.Error('400', 
         'No existe la venta que se intenta actualizar');
+    }
+
+    if (newState !== 'CANCELED') {
+      // check there is at least 1 product asociated 
+      // for other status
+      let anyProductSaleRelated = ProductSales.findOne(
+        {saleId:saleId}, {fields: {_id: 1}});
+      if (!anyProductSaleRelated) {
+        throw new Meteor.Error('400', 'No hay productos cargados');
+      }
     }
     Sales.update(saleId, {
       $set: { 

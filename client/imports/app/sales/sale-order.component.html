@@ -11,7 +11,7 @@
       </div>
 
       <div class="ml-4 mt-4">
-        <a>Vendedor: {{seller?.profile.name}}</a>
+        <a>Vendedor: {{seller?.username}}</a>
       </div>
 
       <div class="ml-4 mt-4">
@@ -80,15 +80,16 @@
           type="text" 
           name="selectedProductSizeBarCode" 
           class="form-control" 
+          [focus]="inputFocused"
           [(ngModel)]="selectedProductSizeBarCode"
-          (keyup.enter)="addProductToOrder()"
-          (blur)="addProductToOrder()"
+          (keyup.enter)="addToSaleOrder(); inputFocused.emit(null)"
+          (blur)="addToSaleOrder(); inputFocused.emit(null)"
           placeholder="Buscar por Codigo"
         >
       </div>
 
       <div class="ml-4 mt-4">
-        <a 
+        <a  
           [attr.disabled] = "sale?.saleState == 'submitted'"
           class="btn btn-block btn-info"
           data-toggle="modal"
@@ -152,63 +153,61 @@
                 <ng-container *ngIf=" product._id == productSize.productId ">
                   <ng-container *ngFor="let productPrice of productPrices | async;"> 
                     <ng-container *ngIf=" product._id == productPrice.productId && userStore.storeId == productPrice.storeId">
-                      <ng-container *ngFor="let stock of stocks | async;">
-                        <ng-container *ngIf=" stock.storeId == userStore.storeId && productSize._id == stock.productSizeId">
-                          <td class="text-center">
-                            <a [routerLink]="['/products', product.code]">{{productSize.barCode}}</a>
-                          </td>
-                          <td class="text-center">
-                            <a>{{product.name}}</a>
-                          </td>
 
-                          <td class="text-center">
-                            <a>{{product.color}}</a>
-                          </td>
+                      <td class="text-center">
+                        <a [routerLink]="['/products', product.code]">{{productSize.barCode}}</a>
+                      </td>
+                      <td class="text-center">
+                        <a>{{product.name}}</a>
+                      </td>
 
-                          <td class="text-center">
-                            <a>{{productSize.size}}</a>
-                          </td>
+                      <td class="text-center">
+                        <a>{{product.color}}</a>
+                      </td>
 
-                          <td class="text-center">
-                            <a>{{product.brand}}</a>
-                          </td>
+                      <td class="text-center">
+                        <a>{{productSize.size}}</a>
+                      </td>
 
-                          <td class="text-center">
-                            <a>{{product.model}}</a>
-                          </td>
- 
-                          <td class="text-center">
-                            <a>{{getPrice(productPrice)}}</a>
-                          </td> 
-                          
-                          <td class="text-center">
-                            <button type="button" class="btn btn-default" (click)=decreaseAmount(rowIndex)>
-                              <span class="fa fa-chevron-down" aria-hidden="true"></span>
-                            </button>
-                          </td>
-                          
-                          <td class="text-center">
-                            <a>{{setQuantityTracker(rowIndex, productSale.quantity)}}</a>                      
-                          </td>
-                          
-                          <td class="text-center">
-                            <button type="button" class="btn btn-default" (click)=increaseAmount(rowIndex,stock)>
-                              <span class="fa fa-chevron-up" aria-hidden="true">
-                              </span>
-                            </button>
-                          </td>
+                      <td class="text-center">
+                        <a>{{product.brand}}</a>
+                      </td>
 
-                          <td class="text-center">
-                              <a>{{calculateSubTotal(rowIndex,stock)}}</a>
-                          </td>
+                      <td class="text-center">
+                        <a>{{product.model}}</a>
+                      </td>
 
-                          <td class="text-center">
-                            <button type="button" class="btn btn-default" (click)=removeFormList(product)>
-                              <span class="fa fa-times" aria-hidden="true"></span>
-                            </button>
-                          </td>
-                        </ng-container>
-                      </ng-container>
+                      <td class="text-center">
+                        <a>{{getPrice(productPrice)}}</a>
+                      </td> 
+                      
+                      <td class="text-center">
+                        <button type="button" class="btn btn-default" (click)="decreaseAmount(rowIndex, productSize.barCode)">
+                          <span class="fa fa-chevron-down" aria-hidden="true"></span>
+                        </button>
+                      </td>
+                      
+                      <td class="text-center">
+                        <a>{{setQuantityTracker(rowIndex, productSale.quantity)}}</a>                      
+                      </td>
+                      
+                      <td class="text-center">
+                        <button type="button" class="btn btn-default" (click)="increaseAmount(rowIndex, productSize.barCode)">
+                          <span class="fa fa-chevron-up" aria-hidden="true">
+                          </span>
+                        </button>
+                      </td>
+
+                      <td class="text-center">
+                          <a>{{calculateSubTotal(rowIndex, productPrice)}}</a>
+                      </td>
+
+                      <td class="text-center">
+                        <button type="button" class="btn btn-default" (click)="removeFromSaleOrder(rowIndex, productSize.barCode)">
+                          <span class="fa fa-times" aria-hidden="true"></span>
+                        </button>
+                      </td>
+
                     </ng-container>
                   </ng-container>
                 </ng-container>
@@ -227,30 +226,32 @@
         <h4>Total: $ {{getTotal()}}</h4>
       </div>        
       <div class="col span2">
-        <a class="btn btn-block btn-info" 
-        routerLink="/sales" 
+        <a class="btn btn-block btn-primary" 
         routerLinkActive="active"
+        [class.disabled]="sale?.saleState != 'STARTED'"
         (click)="cancelOrder()"
         >
           Cancelar Orden
         </a>
       </div>
       <div class="col span2">
-        <button type="button" 
-          class="btn btn-block btn-info" 
+        <a class="btn btn-block btn-primary" 
+        routerLinkActive="active"
+          [class.disabled]="sale?.saleState != 'STARTED'"
           (click)="submitOrder()"
           >
           Confirmar Venta
-        </button>
+        </a>
       </div> 
       <div class="col span2">
-        <button type="button" 
-          class="btn btn-block btn-info" 
+        <a class="btn btn-block btn-primary" 
+        routerLinkActive="active"
+          [class.disabled]="sale?.saleState != 'STARTED'"
           (click)="reserveOrder()"
           >
           Reservar Pedido
         </button>
-      </div>    
+      </a>   
     </div>
   </div>
 </div>

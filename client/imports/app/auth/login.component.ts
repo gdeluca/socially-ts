@@ -21,6 +21,7 @@ import { Balance } from '../../../../both/models/balance.model';
 
 import * as _ from 'underscore';
 import { Bert } from 'meteor/themeteorchef:bert';
+import { SessionHelper } from '../../modules/session-helper';
 
 import template from './login.component.html';
  
@@ -45,7 +46,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router, 
     private zone: NgZone, 
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder,
+   // private session: SessionHelper
     ) {}
  
   ngOnInit() {

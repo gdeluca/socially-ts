@@ -1,6 +1,6 @@
 
 // angular
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
@@ -149,33 +149,15 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     this.saleSub.unsubscribe();
     this.allStockSub.unsubscribe();
   }
- 
-  /** search the product by code and add it to the table  */
-  addProductToOrder() {
-    MeteorObservable.call(
-      'addProductToOrder', 
-      this.selectedProductSizeBarCode,
-      this.selectedProductAmount,
-      this.store._id,
-      this.sale._id
-    ).subscribe(() => { 
-        Bert.alert('Producto agregado', 'success', 'growl-top-right'); 
-        this.selectedProductSizeBarCode = "";
-      }, (error) => { 
-        Bert.alert('Fallo al agregar: ' + error, 'danger', 'growl-top-right'); 
-      }
-    ); 
-  }
    
   setQuantityTracker(index, quantity) {
-    this.quantityTracker[index] = quantity; 
+    this.quantityTracker[index] = +quantity; 
     return this.quantityTracker[index];
   }
 
   calculateSubTotal(index, productPrice) {
     this.productSubTotals[index] = 
       this.getPrice(productPrice) * this.quantityTracker[index];
-    console.log(this.getPrice(productPrice));
     return this.productSubTotals[index];
   }
 
@@ -190,29 +172,12 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
   }
 
   getPrice(productPrice: ProductPrice){
-    console.log(productPrice.priceCash);
     if (this.sale.payment == 'CASH') {
       return productPrice.priceCash;
     } else if (this.sale.payment == 'CARD' 
       || this.sale.payment == 'ACCOUNT') {
       return productPrice.priceCard;
     }
-  }
-  
-  increaseAmount(index, stock) {
-    if (stock.quantity - this.quantityTracker[index] > 0) {
-      this.quantityTracker[index] +=1;
-    }
-  }
-
-  decreaseAmount(index) {
-    if (this.quantityTracker[index] > 1) {
-      this.quantityTracker[index] -=1;
-    }
-  }
-
-  removeFormList(product){
- 
   }
 
   getCurrentStoreName(){
@@ -225,50 +190,118 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     return (val != null)?val:'';
   }
 
-  getCurrentBalanceId(): string{
-    let val = Session.get("currentBalanceId"); 
-    return (val != null)?val:'';
-  }
-  
-  getUser(userStoreId) {
-    let userId =  UserStores.findOne({_id: userStoreId}).userId;
-    return Users.findOne({_id: userId});
+  addToSaleOrder(index) {
+    if (!this.selectedProductSizeBarCode ||
+       !this.selectedProductAmount) {
+      return;
+    }
+    MeteorObservable.call(
+      'addToSaleOrder', 
+      this.selectedProductSizeBarCode,
+      +this.selectedProductAmount,
+      this.store._id,
+      this.sale._id
+    ).subscribe(() => { 
+        Bert.alert('Producto agregado', 'success', 'growl-top-right'); 
+        this.selectedProductSizeBarCode = "";
+        this.quantityTracker[index] = +this.selectedProductAmount;
+      }, (error) => { 
+        Bert.alert('Fallo al agregar: ' + error, 'danger', 'growl-top-right'); 
+      }
+    ); 
   }
 
+  removeFromSaleOrder(index, barCode) {
+    MeteorObservable.call(
+      'removeFromSaleOrder', 
+      barCode,
+      this.store._id,
+      this.sale._id
+    ).subscribe(() => { 
+        Bert.alert('Producto quitado', 'success', 'growl-top-right'); 
+        this.quantityTracker[index] = 0;
+        this.productSubTotals[index] = 0;
+      }, (error) => { 
+        Bert.alert('Fallo al quitar: ' + error, 'danger', 'growl-top-right'); 
+      }
+    ); 
+  }
+
+  increaseAmount(index: number, barCode: string) {    
+    MeteorObservable.call(
+      'addToSaleOrder', 
+      barCode,
+      1,
+      this.store._id,
+      this.sale._id
+    ).subscribe(() => {
+      this.quantityTracker[index] +=1;
+    }, (error) => { 
+      Bert.alert('Fallo al agregar: ' + error, 'danger', 'growl-top-right'); 
+    }); 
+  }
+
+  decreaseAmount(index: number, barCode: string) {
+    if (this.quantityTracker[index] > 1) {
+      MeteorObservable.call(
+        'addToSaleOrder', 
+        barCode,
+        -1,
+        this.store._id,
+        this.sale._id
+      ).subscribe(() => { 
+        this.quantityTracker[index] -=1;
+      }, (error) => { 
+        Bert.alert('Fallo al agregar: ' + error, 'danger', 'growl-top-right'); 
+      }); 
+    }
+  }
 
   cancelOrder(){
-    MeteorObservable.call('updateSaleOrderStatus', this.sale._id, 'CANCELED')
-    .subscribe(
-    () => {
+    MeteorObservable.call(
+      'updateSaleOrderStatus', 
+      this.sale._id, 
+      'CANCELED'
+    ).subscribe(() => {
+      Bert.alert('Venta cancelada', 'success', 'growl-top-right' ); 
       this.router.navigate(['sales']); 
-      Bert.alert('Se cancelo la venta', 'success', 'growl-top-right' ); 
     }, (error) => {
-      Bert.alert('Error al crear la venta: ' +  error, 'danger', 'growl-top-right' ); 
+      Bert.alert('Error al cancelar la venta: ' +  error, 'danger', 'growl-top-right' ); 
     });  
   }
 
   submitOrder(){
-    MeteorObservable.call('updateSaleOrderStatus', this.sale._id, 'SUBMITTED')
-    .subscribe(() => {
+    MeteorObservable.call(
+      'updateSaleOrderStatus', 
+      this.sale._id, 
+      'SUBMITTED'
+    ).subscribe(() => {
+      Bert.alert('Venta finalizada', 'success', 'growl-top-right' ); 
       this.router.navigate(['sales']); 
-      Bert.alert('Se marco la venta como finalizada', 'success', 'growl-top-right' ); 
     }, (error) => {
-      Bert.alert('Error al crear la venta: ' +  error, 'danger', 'growl-top-right' ); 
+      Bert.alert('Error al finalizar la venta: ' +  error, 'danger', 'growl-top-right' ); 
     });  
   }
 
   reserveOrder(){
-    MeteorObservable.call('updateSaleOrderStatus', this.sale._id, 'RESERVED')
-    .subscribe(() => {
+    MeteorObservable.call(
+      'updateSaleOrderStatus', 
+      this.sale._id, 
+      'RESERVED'
+    ).subscribe(() => {
+      Bert.alert('Venta reservada', 'success', 'growl-top-right' ); 
       this.router.navigate(['sales']); 
-      Bert.alert('Se marco la venta como reservada', 'success', 'growl-top-right' ); 
     }, (error) => {
-      Bert.alert('Error al crear la venta: ' +  error, 'danger', 'growl-top-right' ); 
+      Bert.alert('Error al reservar la venta: ' +  error, 'danger', 'growl-top-right' ); 
     });  
   }
 
   notifyProductFound(barCode:string) {
     this.selectedProductSizeBarCode = barCode;
-    this.addProductToOrder();
+    // setTimeout(function() { this.inputFocused.emit(null); }, 2000);
+     
+    //this.addToSaleOrder();
   }
+  private inputFocused = new EventEmitter();
+ 
 }

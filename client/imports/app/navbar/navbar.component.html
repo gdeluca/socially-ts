@@ -19,7 +19,8 @@
         NECESITA CREAR UN BALANCE PARA CONTINUAR
         </ng-container>
         <ng-container *ngIf="getCurrentBalanceNumber() > -1">
-        EL BALANCE Nº {{getCurrentBalanceNumber()}} ESTA 
+        BALANCE Nº {{getCurrentBalanceNumber() | leadingZeros:7}} 
+        EN ESTADO 
           <ng-container *ngIf="!getCurrentBalanceStatus() || getCurrentBalanceStatus() == 'CLOSED'">
             CERRADO
           </ng-container>
