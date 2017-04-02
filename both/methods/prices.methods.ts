@@ -1,5 +1,7 @@
-import {Meteor} from 'meteor/meteor';
-import {check} from 'meteor/check';
+import { Random } from 'meteor/random'
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
+
 import { ProductSizes, getMappingSize } from '../collections/product-sizes.collection';
 import { ProductPrices } from '../collections/product-prices.collection';
 import { Products } from '../collections/products.collection';
@@ -33,9 +35,15 @@ Meteor.methods({
       const bulk = rawCollection.initializeUnorderedBulkOp();
       storeIds.map((storeId) => {
         productPrice['storeId'] = storeId;
-        bulk.insert(productPrice);
+        productPrice['_id'] = Random.id(),
+        bulk.insert(Object.assign({}, productPrice)); // clone it
       })
-      bulk.execute();
+      bulk.execute(function(error, results) {
+        if(error) {
+          throw new Meteor.Error('400', 
+            'Fallo al guardar precios de productos: ' + error);
+        }
+      });
  
     }
   },

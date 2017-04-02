@@ -35,16 +35,22 @@ Meteor.methods({
 
     if (Meteor.isServer) {
       if (barcode.length != 13) {
-         throw new Meteor.Error('400', 'Longitud de Codigo de Barra invalida');
+         throw new Meteor.Error('400', 
+           'Longitud de Codigo de Barra invalida');
       }
 
-      let productSize = ProductSizes.collection.findOne(
+      let productSize = ProductSizes.findOne(
         {barCode: barcode});
 
+      if (!productSize) {
+        throw new Meteor.Error('400', 
+          'No existe el talle para el codigo de barras: ' + barcode
+        );
+      }
       let stocks = Stocks.collection.find({
         productSizeId: productSize._id, 
         active:true, 
-        storeId: this.store._id
+        storeId: storeId
       }).fetch();
 
       if (stocks.length > 1) {
@@ -78,13 +84,13 @@ Meteor.methods({
       if (productSale) {
         ProductSales.update(
           {_id:productSale._id},
-          {$set:{quantity:productSale.quantity+quantity}}
+          {$set: {quantity : productSale.quantity + quantity}}
         );
       } else {
         // update the produstsale, add the new productsize
         ProductSales.insert({
           productSizeId: productSize._id, 
-          saleId: this.sale._id,
+          saleId: saleId,
           quantity: quantity
         });
       }
@@ -92,7 +98,7 @@ Meteor.methods({
       // update the stock, decrement the quantity field
       Stocks.update(
        {_id:stock._id},
-       {$set:{quantity:stock.quantity-quantity}}
+       {$set: {quantity : stock.quantity - quantity}}
       );
     }
   },

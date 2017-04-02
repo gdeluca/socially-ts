@@ -20,7 +20,7 @@ import { ProductSales } from '../../../../both/collections/product-sales.collect
 import { ProductSizes } from '../../../../both/collections/product-sizes.collection';
 import { ProductPrices } from '../../../../both/collections/product-prices.collection';
 import { Products } from '../../../../both/collections/products.collection';
-import { Purchases, purchasesStatusMapping } from '../../../../both/collections/purchases.collection';
+import { Purchases } from '../../../../both/collections/purchases.collection';
 import { Stocks } from '../../../../both/collections/stocks.collection';
 import { Stores } from '../../../../both/collections/stores.collection';
 import { Tags } from '../../../../both/collections/tags.collection';
@@ -92,8 +92,6 @@ export class PurchaseVerificationComponent implements OnInit, OnDestroy {
   collectionCount: number = 0;
   PAGESIZE: number = 15; 
   
-  orderStatus = purchasesStatusMapping; 
-
   orderNumber: number;
   
   paginatedSub: Subscription;

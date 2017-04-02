@@ -4,7 +4,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, CanActivate } from '@angular/router';
 
 import { InjectUser } from "angular2-meteor-accounts-ui";
- import { Bert } from 'meteor/themeteorchef:bert';
  
 // reactiveX
 import { Observable } from 'rxjs/Observable';
@@ -38,6 +37,11 @@ import { Store } from '../../../../both/models/store.model';
 import { User } from '../../../../both/models/user.model';
 
 import { Dictionary } from '../../../../both/domain/dictionary';
+import * as _ from 'underscore';
+import { Bert } from 'meteor/themeteorchef:bert';
+
+import * as moment from 'moment';
+import 'moment/locale/es';
 
 import template from "./sale-order.component.html";
 import style from "./sale-order.component.scss";
@@ -52,7 +56,10 @@ import { ProductSearchComponent } from './product-search.component';
 @InjectUser('currentUser')
 export class SaleOrderComponent implements OnInit, OnDestroy {
  
-  orderStatus = salesStatusMapping; // from Sales;
+  valuesMapping = salesStatusMapping;
+
+  paymentMapping = salePaymentMapping;
+
   salePayment = salePaymentMapping;
   workShift = workShiftMapping;
    
@@ -71,7 +78,7 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     {'key': 'SubTotal', 'value':'subTotal'},
   ];
 
-  paymentForm: number = 1;
+  paymentForm = 'CASH';
   quantityTracker: number[] = [];
   productSubTotals: number[] = [];
   orderNumber: number;
@@ -142,11 +149,7 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     this.saleSub.unsubscribe();
     this.allStockSub.unsubscribe();
   }
-  
-  getOrderStatus(value){
-    return this.orderStatus[value];
-  }
-  
+ 
   /** search the product by code and add it to the table  */
   addProductToOrder() {
     MeteorObservable.call(
@@ -172,6 +175,7 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
   calculateSubTotal(index, productPrice) {
     this.productSubTotals[index] = 
       this.getPrice(productPrice) * this.quantityTracker[index];
+    console.log(this.getPrice(productPrice));
     return this.productSubTotals[index];
   }
 
@@ -185,10 +189,12 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     return total;
   }
 
-  getPrice(productPrice){
-    if (this.paymentForm == 1) {
+  getPrice(productPrice: ProductPrice){
+    console.log(productPrice.priceCash);
+    if (this.sale.payment == 'CASH') {
       return productPrice.priceCash;
-    } else {
+    } else if (this.sale.payment == 'CARD' 
+      || this.sale.payment == 'ACCOUNT') {
       return productPrice.priceCard;
     }
   }

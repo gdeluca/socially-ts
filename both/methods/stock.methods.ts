@@ -1,5 +1,6 @@
-import {Meteor} from 'meteor/meteor';
-import {check} from 'meteor/check';
+import { Random } from 'meteor/random'
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
 
 // import { Balances } from '../collections/balances.collection';
 import { ProductPurchases } from '../collections/product-purchases.collection';
@@ -60,6 +61,7 @@ Meteor.methods({
       check(productSizeIds, [String]);
       check(storeIds, [String]);
       check(quantity, Number);
+      console.log('enter saving');
       let productsSizes = ProductSizes.collection.find(
         {_id: {$in: productSizeIds}}, {fields: {_id: 1}}).fetch();
       if (productsSizes.length != productSizeIds.length) {
@@ -81,7 +83,7 @@ Meteor.methods({
       let response = {};
       productSizeIds.forEach(productSizeId => 
         storeIds.forEach(storeId => {
-          
+          console.log(storeId,productSizeId);
           response["$or"] = []
           response["$or"].push(
             { storeId: storeId, productSizeId: productSizeId}, 
@@ -89,6 +91,7 @@ Meteor.methods({
           );
 
           bulk.insert({
+            _id: Random.id(),
             productSizeId: productSizeId,
             storeId: storeId,
             quantity: quantity,
@@ -97,9 +100,11 @@ Meteor.methods({
 
         })
       )
-      bulk.execute(function(err,results) {
-      if(err)
-        console.error(err);
+      bulk.execute(function(error, results) {
+        if(error) {
+          throw new Meteor.Error('400', 
+            'Fallo al agregar el stock: ' + error);
+        }
       });
 
       return Stocks.collection.find(response)
@@ -116,8 +121,8 @@ Meteor.methods({
     if (Meteor.isServer) {
       check(productSizeIds, [String]);
       check(storeIds, [String]);
-      check(quantities, Match.Any);
-      const rawCollection = Stocks.rawCollection();
+      check(quantities, Match.Any); // TODO: replace Match.Any
+      const rawCollection = Stocks.collection.rawCollection();
       const bulk = rawCollection.initializeUnorderedBulkOp();
 
       productSizeIds.map(productSizeId => 
@@ -126,13 +131,21 @@ Meteor.methods({
             {productSizeId:productSizeId, storeId:storeId});
           
           if (stock) {
-            bulk.find({_id: stock._id}).updateOne({
+            console.log(+stock.quantity + +quantities[productSizeId + storeId]);
+            bulk.find({_id:stock._id}).update({
               $set: { 
                quantity: +stock.quantity + +quantities[productSizeId + storeId],
               }
             })
           } else {
+          console.log(
+              {productSizeId:productSizeId, 
+              storeId:storeId,
+              quantity: +quantities[productSizeId + storeId]
+            });
+
             bulk.insert({
+              _id: Random.id(),
               productSizeId:productSizeId, 
               storeId:storeId,
               quantity: +quantities[productSizeId + storeId]
@@ -141,9 +154,12 @@ Meteor.methods({
         })
       )
 
-      bulk.execute(function(err,results) {
-        if(err)
-          console.error(err);
+      bulk.execute(function(error,results) {
+        if(error) {
+           throw new Meteor.Error('400', 
+            'Fallo al actualizar el stock: ' + error);
+        }
+        console.log(results);
       });
 
     }
@@ -164,7 +180,8 @@ Meteor.methods({
     .distinct()
     .subscribe((product) => {
       // return the prices from any store 
-      let price = ProductPrices.findOne({productId: product._id});
+      let price = ProductPrices.findOne(
+        {productId: product._id}, {fields: {_id: 1}});
       if (price) {
         Meteor.call("addProductPrice",
           price.cost,
@@ -187,6 +204,8 @@ Meteor.methods({
     });
   }, 
 
+
+// TODO: review stocks
   saveStock: function (
     values:any
   ) {
@@ -201,7 +220,8 @@ Meteor.methods({
 
     console.log('looking for product with code: ', productCode);
     // find a product
-    let product = Products.findOne({code: productCode});
+    let product = Products.findOne(
+      {code: productCode}, {fields: {_id: 1}});
     if (product) {
         // if exists update the product information
       Products.update(product._id, {

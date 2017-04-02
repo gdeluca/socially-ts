@@ -15,8 +15,8 @@ export const salesStatusMapping = {
   };
 
 export const salePaymentMapping = {
-    'CARD': 'Contado', 
-    'CASH': 'Tarjeta', 
+    'CASH': 'Contado', 
+    'CARD': 'Tarjeta', 
     'ACCOUNT': 'Cuenta', 
   };
 

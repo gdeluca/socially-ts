@@ -6,15 +6,16 @@
     <div  class="form-inline">
 
       <div class="ml-4 mt-4">
-        <a>Nº de Venta: {{ purchase?.purchaseNumber | leadingZeros:7 }}</a>
+        <a>Nº de Venta: {{ sale?.saleNumber | leadingZeros:7 }}
+        </a>
       </div>
 
       <div class="ml-4 mt-4">
-        <a>Proveeo: {{provider}}</a>
+        <a>Vendedor: {{seller?.profile.name}}</a>
       </div>
 
       <div class="ml-4 mt-4">
-        <a>Estado: {{getOrderStatus(sale?.saleState)}}</a>
+        <a>Estado: {{sale?.saleState | mapvalues:valuesMapping}}</a>
       </div>
 
       <ng-container *ngIf="sale?.discount">
@@ -23,7 +24,7 @@
         </div>
       </ng-container>
 
-     <!--  <ng-container *ngIf="sale?.taxes">
+      <ng-container *ngIf="sale?.taxes">
         <div class="ml-4 mt-4">
           <a>Impuestos:$ {{sale?.taxes}}</a>
         </div>
@@ -33,29 +34,28 @@
         <div class="ml-4 mt-4">
           <a>Subtotal:$ {{sale?.subtotal}}</a>
         </div>
-      </ng-container> -->
+      </ng-container>
 
       <div class="ml-4 mt-4">
         <label class="form-check-label">
-        Forma de pago
+        Forma de pago &nbsp;
         <select 
-          name="paymentForm" 
-          class="form-control"
-          [disabled] = "sale?.saleState == 'submitted'"
-          [(ngModel)]="paymentForm"
-          >
-          <option value="1">Contado</option>
-          <option value="2">Tarjeta</option>
-          <option value="3">Cuenta</option>
-        </select> 
-          </label>
+            name="paymentForm" 
+            class="form-control" 
+            required  
+            [disabled] = "sale?.saleState == 'submitted'"
+            [ngModel] = "sale?.payment"
+            (ngModelChange)="sale.payment = $event"
+            >
+            <option *ngFor="let touple of paymentMapping | mapToIterable"
+            [ngValue]="touple.key">{{touple.val}}</option>
+          </select>
+        </label>
       </div>
 
-      
-        <div class="ml-4 mt-4">
-          <a>Total:$ {{getTotal()}}</a>
-        </div>
-     
+      <div class="ml-4 mt-4">
+        <a>Total:$ {{getTotal()}}</a>
+      </div>
 
     </div>
   </div>
@@ -83,10 +83,9 @@
           [(ngModel)]="selectedProductSizeBarCode"
           (keyup.enter)="addProductToOrder()"
           (blur)="addProductToOrder()"
-          placeholder="Buscar por Codigo">
+          placeholder="Buscar por Codigo"
+        >
       </div>
-
-
 
       <div class="ml-4 mt-4">
         <a 
@@ -95,8 +94,8 @@
           data-toggle="modal"
           href="#myModal"
           routerLinkActive="active"
-          >
-            Buscar Producto
+        >
+          Buscar Producto
         </a>
       </div>
 
@@ -116,9 +115,9 @@
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
-          </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-      </div><!-- /.modal -->
+          </div>
+        </div>
+      </div>
 
     </div>
   </div>

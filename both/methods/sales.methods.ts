@@ -42,7 +42,8 @@ Meteor.methods({
       ).subscribe(
         (orderNumber: number) => { 
           let balance = Balances.findOne(
-            { balanceNumber: +balanceNumber, storeId:storeId })
+            { balanceNumber: balanceNumber, storeId:storeId }, 
+            {fields: {_id: 1}});
 
           if (!balance) {
             // console.log('nº balance:' 
@@ -53,16 +54,12 @@ Meteor.methods({
           Sales.insert({
             saleNumber: orderNumber,
             saleState: 'STARTED',
-            payment: '',
+            payment: 'CASH', //Default payment method
             createdAt:  new Date(),
             lastUpdate: new Date(),
             workShift: getWorkShift(new Date()),
             userStoreId: userStoreId,
-            balanceId: balance._id,
-            discount: 0,
-            taxes: 0,
-            subtotal: 0,
-            total: 0
+            balanceId: balance._id
           })
           result = orderNumber;
         }, (error) => { 

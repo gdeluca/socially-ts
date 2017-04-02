@@ -12,7 +12,7 @@ import { ProductPurchases } from '../../../both/collections/product-purchases.co
 import { ProductSizes } from '../../../both/collections/product-sizes.collection';
 import { ProductPrices } from '../../../both/collections/product-prices.collection';
 import { Products } from '../../../both/collections/products.collection';
-import { Purchases, purchasesStatusMapping } from '../../../both/collections/purchases.collection';
+import { Purchases } from '../../../both/collections/purchases.collection';
 import { Stocks } from '../../../both/collections/stocks.collection';
 
 // // model 
