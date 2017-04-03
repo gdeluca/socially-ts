@@ -105,7 +105,7 @@ Meteor.methods({
     productSizeId:string,
     cost: number,
     quantity:number,
-    subtotal?: number
+    subTotal?: number
   ) {
     if (Meteor.isServer) {
       check(purchaseId, String);
@@ -113,7 +113,7 @@ Meteor.methods({
       check(productSizeId, String);
       check(cost, Number);
       check(quantity, Number);
-      check(subtotal, Match.Maybe(Number));
+      check(subTotal, Match.Maybe(Number));
 
       let productPurchase = ProductPurchases.findOne(
         {purchaseId: purchaseId, productSizeId: productSizeId}, {fields: {_id: 1}});
@@ -121,8 +121,8 @@ Meteor.methods({
       let query = {};
       query['cost'] = cost;
       query['quantity'] = quantity;
-      if(subtotal != null) {
-        query['subtotal'] = subtotal;
+      if(subTotal != null) {
+        query['subTotal'] = subTotal;
       }  
       if (productPurchase) {
         ProductPurchases.update(productPurchase._id, {
@@ -174,7 +174,7 @@ Meteor.methods({
             query['quantity'] = quantity;
         }
         if(!isNaN(subTotal)) {
-            query['subtotal'] = subTotal;
+            query['subTotal'] = subTotal;
         }
 
         // console.log(query);
@@ -198,13 +198,13 @@ Meteor.methods({
     productPurchaseId: string, 
     cost?: number,
     quantity?:number,
-    subtotal?: number
+    subTotal?: number
   ) {
     if (Meteor.isServer)  {
       check(productPurchaseId, String);
       check(cost, Match.Maybe(Number));
       check(quantity, Match.Maybe(Number));
-      check(subtotal, Match.Maybe(Number));
+      check(subTotal, Match.Maybe(Number));
 
       let productPurchase = ProductPurchases.findOne(
        {_id: productPurchaseId}, {fields: {_id: 1}});
@@ -221,8 +221,8 @@ Meteor.methods({
       if(quantity != null) {
           query['quantity'] = quantity;
       }
-      if(subtotal != null) {
-          query['subtotal'] = subtotal;
+      if(subTotal != null) {
+          query['subTotal'] = subTotal;
       }
       ProductPurchases.update(
         productPurchaseId, {
@@ -297,16 +297,30 @@ Meteor.methods({
     }
   },
 
+
   updatePurchaseOrderStatus: function (
     purchaseId: string, 
     newState: string
   ) {
-    check(purchaseId, String);
-    check(newState, String);
     if (Meteor.isServer) {
+      check(purchaseId, String);
+      check(newState, String);
+
+      let productPurchases = ProductPurchases.collection.find(
+        {purchaseId: purchaseId}, {fields: {subTotal: 1}}).fetch();
+      
+      let total = 0;
+      productPurchases.forEach(productPurchase => {
+        total += productPurchase.subTotal;
+      })
       Meteor.call("updatePurchaseOrder",
         purchaseId, 
-        newState
+        newState,
+        undefined,
+        new Date(),
+        undefined,
+        undefined,
+        total
       );
     }
   },

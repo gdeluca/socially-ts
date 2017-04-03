@@ -86,7 +86,7 @@
         </ng-container> 
       </tr> 
 
-      <!-- 'saleNumber', 'payment', 'discount', 'saleState', 'saleDate', 'lastUpdate', 'seller', 'total'  -->
+      <!-- 'saleNumber', 'payment', 'discount', 'saleState', 'createdAt', 'lastUpdate', 'seller', 'total'  -->
       <tr *ngFor="let sale of sales | async; let rowIndex=index; ">
 
         <!-- action buttons for to edit sale state -->
@@ -149,9 +149,9 @@
           <a>{{sale.payment | mapvalues:salePaymentValues}}</a>
         </td>
 
-        <!-- saleDate -->
+        <!-- createdAt -->
         <td class="text-center">
-          <a>{{sale.saleDate | amDateFormat:'LL hh:mmA'}}</a>
+          <a>{{sale.createdAt | amDateFormat:'LL hh:mmA'}}</a>
         </td>
 
         <!-- lastUpdate -->
@@ -171,7 +171,7 @@
 
         <!-- total -->
         <td class="text-center">
-          <a>{{sale?.total || 0 }}</a>
+          <a>{{ sale?.total | currency:'ARS':true:'1.2-2' }}</a>
         </td>
       </tr>
     </tbody>

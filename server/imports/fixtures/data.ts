@@ -651,14 +651,14 @@ export function loadData() {
     ProductPurchases.insert({
       quantity: 50,
       cost: 100,
-      subtotal:5000,
+      subTotal:5000,
       purchaseId: "01", 
       productSizeId: "01"
     });
     ProductPurchases.insert({
       quantity: 50,
       cost: 200,
-      subtotal:10000,
+      subTotal:10000,
       purchaseId: "01", 
       productSizeId: "02"
     });
@@ -693,7 +693,7 @@ export function loadData() {
     // Sales.update({_id:"01"},{
     //   $set: { 
     //     saleState: "STARTED",
-    //     subtotal: 930,
+    //     subTotal: 930,
     //     taxes: 195.3,
     //     total: 1125.3,
     //     lastUpdate: "2017-02-23 18:27:32"
@@ -755,7 +755,7 @@ export function loadData() {
     // products.forEach((product) => Products.insert(product));
 
     // const sales = [
-    //   { "_id" : "nCmZGEYNGRFTvtwa9", "saleNumber" : 11, "saleState" : "SUBMITTED", "payment" : "", "saleDate" : "2017-03-23 19:54:16", "lastUpdate" : "2017-03-23 19:54:16", "workShift" : "AFTERNOON", "userStoreId" : "01", "balanceId" : "10", "discount" : 0, "taxes" : 0, "subtotal" : 0, "total" : 0 }
+    //   { "_id" : "nCmZGEYNGRFTvtwa9", "saleNumber" : 11, "saleState" : "SUBMITTED", "payment" : "", "cre<tedAt" : "2017-03-23 19:54:16", "lastUpdate" : "2017-03-23 19:54:16", "workShift" : "AFTERNOON", "userStoreId" : "01", "balanceId" : "10", "discount" : 0, "taxes" : 0, "subTotal" : 0, "total" : 0 }
     // ];
     // sales.forEach((sale) => Sales.insert(sale));
 

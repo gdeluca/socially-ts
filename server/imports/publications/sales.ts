@@ -19,7 +19,7 @@ import { Stocks } from '../../../both/collections/stocks.collection';
 import { Stores } from '../../../both/collections/stores.collection';
 import { Users } from '../../../both/collections/users.collection';
 
-const saleFields = ['saleNumber','paymentForm', 'saleState', 'saleDate'];
+const saleFields = ['saleNumber','paymentForm', 'saleState', 'cretedAt'];
 const userFields = ['seller'];
 const storeFields = ['name'];
 

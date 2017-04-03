@@ -94,9 +94,20 @@ Meteor.methods({
         throw new Meteor.Error('400', 'No hay productos cargados');
       }
     }
+  
+    let productsales = ProductSales.collection.find(
+        {saleId: saleId}, {fields: {subTotal: 1}}).fetch();
+    
+    let total = 0;
+    productsales.forEach(productsale => {
+      total += productsale.subTotal;
+    })
+
     Sales.update(saleId, {
       $set: { 
         saleState: newState,
+        lastUpdate: new Date(),
+        total: +total
       }
     }
   )},

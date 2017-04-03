@@ -49,8 +49,8 @@
     <thead class="thead-default">
       <tr>
         <!-- headers for sorting -->
-        <th class="text-center">#</th>
-        <th class="text-center" 
+<!--         <th class="text-center">#</th>
+ -->        <th class="text-center" 
           style="vertical-align:middle;" 
           *ngFor="let header of headers; let colIndex = index; ">
           <div class="form-horizontal" >
@@ -162,7 +162,7 @@
         </td>
 
         <td class="text-center">
-          <a>{{purchase?.total || 0 }}</a>
+          <a>{{purchase?.total  | currency:'ARS':true:'1.2-2' }}</a>
         </td>
 
         <td class="text-center">
@@ -170,7 +170,7 @@
         </td>
 
         <td class="text-center">
-          <a>{{purchase.paymentAmount | currency:'ARS':true:'1.2-2'}}</a>
+          <a>{{purchase?.paymentAmount | currency:'ARS':true:'1.2-2'}}</a>
         </td>
       </tr>
     </tbody>

@@ -16,6 +16,7 @@ import { UserStores } from '../../../../both/collections/user-stores.collection'
 
 import * as _ from 'underscore';
 import { Bert } from 'meteor/themeteorchef:bert';
+
 import template from './signup.component.html';
  
 @Component({

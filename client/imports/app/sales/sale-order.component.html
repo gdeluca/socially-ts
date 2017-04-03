@@ -30,9 +30,9 @@
         </div>
       </ng-container>
 
-      <ng-container *ngIf="sale?.subtotal">
+      <ng-container *ngIf="sale?.subTotal">
         <div class="ml-4 mt-4">
-          <a>Subtotal:$ {{sale?.subtotal}}</a>
+          <a>Subtotal:$ {{sale?.subTotal}}</a>
         </div>
       </ng-container>
 
@@ -147,13 +147,13 @@
 
         <!-- 'Codigo', 'Descripcion', 'Color', 'Talle', 'Marca', 'Modelo', 'Precio', 'UP',  'Cantidad', 'DOWN',  'SubTotal', '#' -->
         <ng-container *ngFor="let productSale of productSales | async;">
-          <tr *ngFor="let productSize of productSizes | async; let rowIndex=index; ">
+          <tr *ngFor="let productSize of productSizes | async; ">
             <ng-container *ngIf=" productSale.productSizeId == productSize._id">
               <ng-container *ngFor="let product of products | async;"> 
                 <ng-container *ngIf=" product._id == productSize.productId ">
                   <ng-container *ngFor="let productPrice of productPrices | async;"> 
                     <ng-container *ngIf=" product._id == productPrice.productId && userStore.storeId == productPrice.storeId">
-
+ 
                       <td class="text-center">
                         <a [routerLink]="['/products', product.code]">{{productSize.barCode}}</a>
                       </td>
@@ -178,32 +178,32 @@
                       </td>
 
                       <td class="text-center">
-                        <a>{{getPrice(productPrice)}}</a>
+                        <a>{{getPrice(productPrice) | currency:'ARS':true:'1.2-2' }}</a>
                       </td> 
                       
                       <td class="text-center">
-                        <button type="button" class="btn btn-default" (click)="decreaseAmount(rowIndex, productSize.barCode)">
+                        <button type="button" class="btn btn-default" (click)="decreaseAmount(productSize.barCode)">
                           <span class="fa fa-chevron-down" aria-hidden="true"></span>
                         </button>
                       </td>
                       
                       <td class="text-center">
-                        <a>{{setQuantityTracker(rowIndex, productSale.quantity)}}</a>                      
+                        <a>{{setQuantityTracker(productSize.barCode, productSale.quantity)}}</a>                      
                       </td>
                       
                       <td class="text-center">
-                        <button type="button" class="btn btn-default" (click)="increaseAmount(rowIndex, productSize.barCode)">
+                        <button type="button" class="btn btn-default" (click)="increaseAmount( productSize.barCode)">
                           <span class="fa fa-chevron-up" aria-hidden="true">
                           </span>
                         </button>
                       </td>
 
                       <td class="text-center">
-                          <a>{{calculateSubTotal(rowIndex, productPrice)}}</a>
+                          <a>{{calculateSubTotal(productSize.barCode, productPrice) | currency:'ARS':true:'1.2-2' }}</a>
                       </td>
 
                       <td class="text-center">
-                        <button type="button" class="btn btn-default" (click)="removeFromSaleOrder(rowIndex, productSize.barCode)">
+                        <button type="button" class="btn btn-default" (click)="removeFromSaleOrder(productSize.barCode)">
                           <span class="fa fa-times" aria-hidden="true"></span>
                         </button>
                       </td>
@@ -223,7 +223,7 @@
   <div class="card-footer">
     <div class="row">
       <div class="col-2">
-        <h4>Total: $ {{getTotal()}}</h4>
+        <h4>Total:{{getTotal() | currency:'ARS':true:'1.2-2' }}</h4>
       </div>        
       <div class="col span2">
         <a class="btn btn-block btn-primary" 

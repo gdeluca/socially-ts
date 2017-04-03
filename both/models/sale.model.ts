@@ -11,6 +11,6 @@ export interface Sale extends CollectionObject {
   balanceId: string;
   discount?: number;
   taxes?:number;
-  subtotal?:number;
+  subTotal?:number;
   total?: number;
 }

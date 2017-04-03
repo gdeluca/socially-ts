@@ -80,9 +80,8 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
 
   paymentForm = 'CASH';
   quantityTracker: number[] = [];
-  productSubTotals: number[] = [];
+  subTotals: number[] = [];
   orderNumber: number;
-  total: number = 0;
 
   selectedProductSizeBarCode: string;
   selectedProductAmount: number = 1;
@@ -150,23 +149,21 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     this.allStockSub.unsubscribe();
   }
    
-  setQuantityTracker(index, quantity) {
-    this.quantityTracker[index] = +quantity; 
-    return this.quantityTracker[index];
+  setQuantityTracker(barCode, quantity) {
+    this.quantityTracker[barCode] = +quantity; 
+    return this.quantityTracker[barCode];
   }
 
-  calculateSubTotal(index, productPrice) {
-    this.productSubTotals[index] = 
-      this.getPrice(productPrice) * this.quantityTracker[index];
-    return this.productSubTotals[index];
+  calculateSubTotal(barCode, productPrice) {
+    this.subTotals[barCode] = 
+      +this.getPrice(productPrice) * +this.quantityTracker[barCode];
+    return this.subTotals[barCode];
   }
 
   getTotal(){
-    var total = 0;
-    if (this.productSubTotals.length > 0) {
-      for (let subTotal of this.productSubTotals) {
-        total += subTotal;
-      }
+    let total = 0; 
+    for (let barCode of Object.keys(this.subTotals)) {
+      total += this.subTotals[barCode];
     }
     return total;
   }
@@ -190,7 +187,7 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     return (val != null)?val:'';
   }
 
-  addToSaleOrder(index) {
+  addToSaleOrder() {
     if (!this.selectedProductSizeBarCode ||
        !this.selectedProductAmount) {
       return;
@@ -204,14 +201,14 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     ).subscribe(() => { 
         Bert.alert('Producto agregado', 'success', 'growl-top-right'); 
         this.selectedProductSizeBarCode = "";
-        this.quantityTracker[index] = +this.selectedProductAmount;
+        this.quantityTracker[this.selectedProductSizeBarCode] = +this.selectedProductAmount;
       }, (error) => { 
         Bert.alert('Fallo al agregar: ' + error, 'danger', 'growl-top-right'); 
       }
     ); 
   }
 
-  removeFromSaleOrder(index, barCode) {
+  removeFromSaleOrder(barCode) {
     MeteorObservable.call(
       'removeFromSaleOrder', 
       barCode,
@@ -219,15 +216,15 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
       this.sale._id
     ).subscribe(() => { 
         Bert.alert('Producto quitado', 'success', 'growl-top-right'); 
-        this.quantityTracker[index] = 0;
-        this.productSubTotals[index] = 0;
+        this.quantityTracker[barCode] = 0;
+        this.subTotals[barCode] = 0;
       }, (error) => { 
         Bert.alert('Fallo al quitar: ' + error, 'danger', 'growl-top-right'); 
       }
     ); 
   }
 
-  increaseAmount(index: number, barCode: string) {    
+  increaseAmount(barCode) {    
     MeteorObservable.call(
       'addToSaleOrder', 
       barCode,
@@ -235,14 +232,14 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
       this.store._id,
       this.sale._id
     ).subscribe(() => {
-      this.quantityTracker[index] +=1;
+      this.quantityTracker[barCode] +=1;
     }, (error) => { 
       Bert.alert('Fallo al agregar: ' + error, 'danger', 'growl-top-right'); 
     }); 
   }
 
-  decreaseAmount(index: number, barCode: string) {
-    if (this.quantityTracker[index] > 1) {
+  decreaseAmount(barCode) {
+    if (this.quantityTracker[barCode] > 1) {
       MeteorObservable.call(
         'addToSaleOrder', 
         barCode,
@@ -250,7 +247,7 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
         this.store._id,
         this.sale._id
       ).subscribe(() => { 
-        this.quantityTracker[index] -=1;
+        this.quantityTracker[barCode] -=1;
       }, (error) => { 
         Bert.alert('Fallo al agregar: ' + error, 'danger', 'growl-top-right'); 
       }); 
@@ -296,11 +293,11 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
     });  
   }
 
-  notifyProductFound(barCode:string) {
+  notifyProductFound(barCode) {
     this.selectedProductSizeBarCode = barCode;
     // setTimeout(function() { this.inputFocused.emit(null); }, 2000);
      
-    //this.addToSaleOrder();
+    this.addToSaleOrder();
   }
   private inputFocused = new EventEmitter();
  

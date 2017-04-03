@@ -63,7 +63,7 @@ export class SalesComponent {
   filtersParams: Filters = [
     {key: 'saleNumber', value:''},
     {key: 'saleState', value:''},
-    {key: 'saleDate', value:''},
+    {key: 'createdAt', value:''},
     {key: 'lastUpdate', value:''},
     {key: 'seller', value:''},
     {key: 'paymentForm', value:''},
@@ -74,7 +74,7 @@ export class SalesComponent {
     {'key': 'Nº Venta', 'value':'saleNumber'},
     {'key': 'Estado', 'value':'status', 'showHeaderFilter': true},
     {'key': 'Forma de Pago', 'value': 'payment', 'showHeaderFilter': true},
-    {'key': 'Fecha de Venta', 'value':'saleDate', 'showHeaderFilter': true},
+    {'key': 'Fecha de Venta', 'value':'createdAt', 'showHeaderFilter': true},
     {'key': 'Ultimo Cambio', 'value':'lastUpdate', 'showHeaderFilter': false},
     {'key': 'Responsable', 'value':'seller', 'showHeaderFilter': true},
     // {'key': 'Sucursal', 'value':'name', 'showHeaderFilter': true},
