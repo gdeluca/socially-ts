@@ -190,9 +190,18 @@ export class ProductsComponent implements OnInit, OnDestroy {
   onPageChanged(page: number): void {
     this.curPage.next(page);
   }
- 
+
   update = function(product){
-    MeteorObservable.call('updateProduct', product._id, product).subscribe(() => {
+    console.log(product);
+    MeteorObservable.call('updateProduct', 
+      product._id, 
+      product.name,
+      product.color,
+      product.brand,
+      product.model,
+      product.provider,
+      product.categoryId
+    ).subscribe(() => {
       Bert.alert('Se cambio el producto: ' + product.code , 'success', 'growl-top-right' ); 
     }, (error) => {
       Bert.alert('Error al actualizar:  ${error} ', 'danger', 'growl-top-right' ); 

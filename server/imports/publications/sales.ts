@@ -3,7 +3,7 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { } from 'meteor-publish-composite';
 import {check} from 'meteor/check';
 
-import { getSelectorFilter, checkOptions } from './commons';
+import { getSelectorFilter, checkOptions } from '../../../both/domain/selectors';
 import { SearchOptions } from '../../../both/domain/search-options';
 import { Filter, Filters } from '../../../both/domain/filter';
 
@@ -97,13 +97,12 @@ Meteor.publishComposite('sale-orders', function(
   }
 });
 
-Meteor.publishComposite('store.sales', function(
+
+Meteor.publishComposite('balance.sales', function(
   options: SearchOptions, 
   filters: Filters,
-  storeId: string,
   balanceNumber?: number,
 ) {
-  check(storeId, String);
   check(balanceNumber, Match.Maybe(Number));
   let salesFilter = getSelectorFilter(saleFields, filters);
   let usersFilter = getSelectorFilter(userFields, filters);
@@ -111,45 +110,42 @@ Meteor.publishComposite('store.sales', function(
   checkOptions(options);
   return {
     find: function() {
-      let storesSelector = {_id: storeId};
-      return Stores.collection.find(storesSelector);
-    },
-    children: [
-      {
-        find: function(store) {
-          return UserStores.collection.find({storeId: storeId});
-        },
-        children: [
-          {
-            find: function(userStore) {
-              return Sales.collection.find({userStoreId: userStore._id}, options);
-            },
-            children: [
-              {
-                find: function(sale) {
-                  let selector = { _id : sale.balanceId };
-                  if (balanceNumber) {
-                    selector['balanceNumber'] = balanceNumber;
-                  }
-                  return Balances.collection.find(selector);
-                }
-              }
-            ]
-          }, 
-          {
-            find: function(userStore) {
-              let selector: any = {};
-              selector["$and"] = [];
-              selector["$and"].push({_id: userStore.userId});
-              selector["$and"].push(usersFilter);
-              return  Meteor.users.find(
-                selector, 
-                {fields: {username: 1}}
-              );
-            }
-          }
-        ]
+      let selector = salesFilter;
+      if (balanceNumber) {
+        let balance = Balances.findOne({balanceNumber:balanceNumber});
+        selector["$and"] = [];
+        selector = {balanceId:balance._id};
       }
-    ]
+      console.log(selector);
+      return Sales.collection.find(selector, options);
+    }
+    // children: [
+    //   {
+    //     find: function() {
+    //       return UserStores.collection.find({storeId: storeId});
+    //     },
+    //     children: [
+    //       {
+    //         find: function(userStore) {
+    //           let selector: any = usersFilter;
+    //           selector["$and"] = [];
+    //           selector["$and"].push({_id: userStore.userId});
+    //           return  Meteor.users.find(
+    //             selector, 
+    //             {fields: {username: 1}}
+    //           );
+    //         }
+    //       },
+    //       {
+    //         find: function(userStore) {
+    //           let selector = storesFilter;
+    //           selector["$and"] = [];
+    //           selector["$and"].push({_id: storeId});
+    //           return Stores.collection.find(selector);
+    //         },
+    //       }
+    //     ]
+    //   }
+    // ]
   }
 });

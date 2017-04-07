@@ -204,6 +204,192 @@
           </ng-container>
         </ng-container>
       </tr>
+     
+<!--       <tr> 
+ -->        <!-- fields sizes -->
+       <!--  <td 
+          class="text-center"
+          [hidden]="currentIndex === rowIndex && editing">
+          <div>
+            <h4> Talles:</h4>
+
+            <div class=" ml-4 mt-4">
+              <multi-dropdown 
+                [options]= "selectorSizesData"
+                [texts]="commonTexts" 
+                [settings]="multiSettingsWithoutChecks" 
+                [(ngModel)]="sizesSelector"
+                formControlName="sizesSelector"
+                class="form-control">
+              </multi-dropdown>
+            </div>
+          </div>
+        </td> -->
+        <!-- selector sizes Numerico --> 
+       <!--  <td 
+          class="text-center"
+          [hidden]="currentIndex === rowIndex && editing">
+          <div>
+            <div class="form-check">
+              <label class="form-check-label">
+                <input type="radio" 
+                  class="form-check-input form-control" 
+                  value="numeric" 
+                  [ngModelOptions]="{standalone: true}"
+                  [(ngModel)]="sizesType" 
+                  (ngModelChange)="adding && setSizes('numeric',numericStartSelected,numericEndSelected)"
+                  >
+                Numerico
+              </label>
+            </div>
+
+            <div class=" ml-4 mt-4">
+            Desde
+              <multi-dropdown 
+                [options]="numericSizesData"
+                [texts]="commonTexts" 
+                [settings]="singleSettings" 
+                [(ngModel)]="numericStartSelected"
+                [ngModelOptions]="{standalone: true}"
+                [disabled]="sizesType == 'letters' || sizesType == 'unique'"
+                (ngModelChange)="adding && setSizes('numeric',numericStartSelected,numericEndSelected)"
+                >
+              </multi-dropdown>
+            </div>
+            <div class=" ml-4 mt-4">
+            Hasta
+              <multi-dropdown 
+                [options]="numericSizesData"
+                [texts]="commonTexts" 
+                [settings]="singleSettings" 
+                [(ngModel)]="numericEndSelected"
+                [ngModelOptions]="{standalone: true}"
+                [disabled]="sizesType == 'letters' || sizesType == 'unique'"
+                (ngModelChange)="adding && setSizes('numeric',numericStartSelected,numericEndSelected)"
+                >
+              </multi-dropdown>
+            </div>
+          </div>
+        </td> -->
+        <!-- selector sizes letras --> 
+      <!--   <td 
+          class="text-center"
+          [hidden]="currentIndex === rowIndex && editing"
+        >
+          <div class="form-check">
+            <label class="form-check-label">
+              <input type="radio" 
+                class="form-check-input form-control"
+                value="letters"
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="sizesType"
+                (ngModelChange)="adding && setSizes('letters',lettersStartSelected,lettersEndSelected)"
+                >
+              Letras
+            </label>
+          </div>
+
+          <div class=" ml-4 mt-4">
+            Desde
+            <multi-dropdown 
+              [options]="lettersSizesData"
+              [texts]="commonTexts" 
+              [settings]="singleSettings" 
+              [(ngModel)]="lettersStartSelected"
+              [ngModelOptions]="{standalone: true}"
+              [disabled]="sizesType == 'numeric' || sizesType == 'unique'"
+              (ngModelChange)="adding && setSizes('letters',lettersStartSelected,lettersEndSelected)"
+              >
+            </multi-dropdown>
+          </div>
+          <div class=" ml-4 mt-4">
+            Hasta
+            <multi-dropdown 
+              [options]="lettersSizesData"
+              [texts]="commonTexts" 
+              [settings]="singleSettings" 
+              [(ngModel)]="lettersEndSelected"
+              [ngModelOptions]="{standalone: true}"
+              [disabled]="sizesType == 'numeric' || sizesType == 'unique'"
+              (ngModelChange)="adding && setSizes('letters',lettersStartSelected,lettersEndSelected)"
+              >
+            </multi-dropdown>
+          </div>
+        </td> -->
+        <!-- selector sizes unique --> 
+    <!--     <td  
+          class="text-center"
+          [hidden]="currentIndex === rowIndex && editing"
+        >
+          <div class="form-check">
+            <label class="form-check-label">
+              <input type="radio" 
+                class="form-check-input form-control" 
+                value="unique"
+                [ngModelOptions]="{standalone: true}"
+                [(ngModel)]="sizesType"
+                (ngModelChange)="adding && setSizes('unique','','')"
+                >
+              Unico
+            </label>
+          </div> 
+        </td> -->
+        
+        <!-- field cost -->
+        <!-- <td class="text-center" 
+            [ngClass]="{'has-error':!complexForm.controls['cost'].valid && complexForm.controls['cost'].touched}">
+            <input 
+              [hidden]="!adding" 
+              type="text" 
+              name="cost" 
+              class="form-control" 
+              placeholder="Precio de Costo"
+              (ngModelChange)="populatePrices($event)"
+               [formControl]="complexForm.controls['cost']">
+            <div *ngIf="complexForm.controls['cost'].hasError('required') && complexForm.controls['cost'].touched" class="alert alert-danger">
+              Precio de Costo
+            </div>
+            <div *ngIf="complexForm.controls['cost'].hasError('invalidNumber') && complexForm.controls['cost'].touched" class="alert alert-danger">
+              El valor debe ser numerico.
+            </div>
+        </td> -->
+         <!-- field cashPayment -->
+      <!--   <td class="text-center" 
+            [ngClass]="{'has-error':!complexForm.controls['cashPayment'].valid && complexForm.controls['cashPayment'].touched}">
+            <input 
+              [hidden]="!adding" 
+              type="text" 
+              name="cashPayment"
+              [(ngModel)]="cashPayment" 
+              class="form-control" 
+              placeholder="Precio efectivo" [formControl]="complexForm.controls['cashPayment']">
+            <div *ngIf="complexForm.controls['cashPayment'].hasError('required') && complexForm.controls['cashPayment'].touched" class="alert alert-danger">
+              Precio de Contado
+            </div>
+            <div *ngIf="complexForm.controls['cashPayment'].hasError('invalidNumber') && complexForm.controls['cashPayment'].touched" class="alert alert-danger">
+              El valor debe ser numerico.
+            </div>
+        </td> -->
+        <!-- field cardPayment -->
+      <!--   <td class="text-center" 
+            [ngClass]="{'has-error':!complexForm.controls['cardPayment'].valid && complexForm.controls['cardPayment'].touched}">
+            <input 
+              [hidden]="!adding" 
+              type="text" 
+              name="cardPayment" 
+              [(ngModel)]="cardPayment" 
+              class="form-control" 
+              placeholder="Precio de Lista" [formControl]="complexForm.controls['cardPayment']">
+            <div *ngIf="complexForm.controls['cardPayment'].hasError('required') && complexForm.controls['cardPayment'].touched" class="alert alert-danger">
+              Precio de Lista
+            </div>
+            <div *ngIf="complexForm.controls['cardPayment'].hasError('invalidNumber') && complexForm.controls['cardPayment'].touched" class="alert alert-danger">
+              El valor debe ser numerico.
+            </div>
+        </td>
+
+      </tr> -->
+
     </tbody>
   </table>
 </div>

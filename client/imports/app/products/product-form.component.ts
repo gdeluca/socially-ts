@@ -27,6 +27,7 @@ import { Store } from '../../../../both/models/store.model';
 import { Tag } from '../../../../both/models/tag.model';
 
 import { isNumeric } from '../../validators/validators'; 
+import * as _ from 'underscore';
 
 import template from './product-form.component.html';
 import style from './product-form.component.scss';
@@ -51,6 +52,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   currentUser: Meteor.User;
   adding: boolean = false;
+  cashPayment = 0;
+  cardPayment = 0;
 
   complexForm : FormGroup;
 
@@ -222,6 +225,11 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     } 
   }
 
+  populatePrices(values){
+    console.log(values);
+    this.cashPayment = values * 2;
+    this.cardPayment = Math.round(values * 2.1);
+  }
   save(form: FormGroup){
     if (!Meteor.userId()) {
       alert('Ingrese al sistema para poder guardar');
@@ -244,7 +252,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         provider: values.provider, 
         categoryId: values.category._id
     }; 
-
+    
     MeteorObservable.call('saveProduct', product).subscribe(
       (productId: string) => {
        let productPrice: ProductPrice = {
@@ -255,19 +263,38 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           priceCash: +values.cashPayment, 
           priceCard: +values.cashPayment, 
           productId: productId,
-          storeId: "" 
+          storeId: ""  
         }; 
 
         let sizes:string[] = [];
-        for (var key in values.sizesSelector) {
-          sizes.push(this.selectorSizesData[key].name);
-        }        
-      
+
+        // for (let selector of values.sizesSelector) {
+        //   for (let sizeData of this.selectorSizesData) {
+        //     if (sizeData.id == selector) {
+        //       sizes.push(sizeData.name)
+        //     }
+        //   }
+        // }
+
+        var selectedSizes = this.selectorSizesData.filter(sizesData => {
+          return values.sizesSelector.indexOf(sizesData.id) !== -1;
+        });
+          
+        //   if (selector) {
+        //     sizes.push(selector.name)
+        //   }
+        // }        
+        //   console.log(JSON.stringify(values.sizesSelector));
+        //   console.log(JSON.stringify(sizes));
+
         let storeIds:string[] = [];
         this.allStores.subscribe((stores) => {
           storeIds = stores.map((store) => { return store._id });
         });
-        this.saveSizesForAllStocks(productId, sizes, storeIds);
+        this.saveSizesForAllStocks(
+          productId, 
+          _.pluck(selectedSizes, 'name'),
+           storeIds);
         
         this.savePriceForAllStores(productPrice, storeIds);
 

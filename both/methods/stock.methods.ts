@@ -36,21 +36,32 @@ import { Store } from '../models/store.model';
 // import { Tag } from '../models/tag.model';
 // import { User } from '../models/user.model';
 
-function addStock(
-  productSizeId: string, 
-  storeId: string, 
-  quantity: number,
-  active: boolean = true
-) {
-  return Stocks.collection.insert({
-    productSizeId: productSizeId,
-    storeId: storeId,
-    quantity: quantity,
-    active: active
-  });
-}
-
 Meteor.methods({
+
+  upsertStock: function(
+    productSizeId: string,
+    storeId: string,
+    quantity: number,
+    active:boolean = true
+  ) {
+    check(storeId, String);
+    check(productSizeId, String);
+    check(quantity, Number);
+    check(active, Boolean);
+    let stock = Stocks.findOne({storeId:storeId, productSizeId:productSizeId, active:true});
+    if (stock) {
+      return Stocks.collection.update(stock._id, 
+        { $set: { quantity:quantity }}
+      );
+    } else {
+      return Stocks.collection.insert({
+        productSizeId: productSizeId,
+        storeId: storeId,
+        quantity: quantity,
+        active: active
+      });
+    }
+  },
 
   bulkSaveStockForStores: function(
     productSizeIds: string[], 
@@ -172,7 +183,7 @@ Meteor.methods({
     .flatMap(function(productSizes) { return productSizes })
     .distinct()
     .subscribe((productSize) => {
-      return addStock(productSize._id, storeId, 0);  
+      return Meteor.call("upsertStock", productSize._id, storeId, 0);  
     });
 
    Products.find()

@@ -29,21 +29,21 @@ Meteor.methods({
   saveProduct: function (
     product: Product
   ) {
-    check(product, {
-      name: String,
-      color: String,
-      brand: String,
-      model: String,
-      provider: String,
-      categoryId: String,
-    });
-    product.name = product.name.toUpperCase();
-    product.color = product.color.toUpperCase();
-    product.brand = product.brand.toUpperCase();
-    product.model = product.model.toUpperCase();
-    product.provider = product.provider.toUpperCase();
-
     if (Meteor.isServer) { 
+      check(product, {
+        name: String,
+        color: String,
+        brand: String,
+        model: String,
+        provider: String,
+        categoryId: String,
+      });
+      product.name = product.name.toUpperCase();
+      product.color = product.color.toUpperCase();
+      product.brand = product.brand.toUpperCase();
+      product.model = product.model.toUpperCase();
+      product.provider = product.provider.toUpperCase();
+
       // add tags on product if they are missed
       let productTagDef = productTagNames;
       productTagDef.forEach((tag) => {
@@ -108,7 +108,7 @@ Meteor.methods({
         query['categoryId'] = categoryId;
       }
 
-      return Products.update(productId, query);
+      return Products.update(productId, { $set: query });
     }
   },
 

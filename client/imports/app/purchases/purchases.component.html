@@ -154,15 +154,15 @@
         </td>
 
         <td class="text-center">
-          <a>{{purchase.createdAt | amDateFormat:'LL hh:mmA'}}</a>
+          <a>{{purchase.createdAt | amDateFormat:'DD/MM/YYYY hh:mmA'}}</a>
         </td>
 
         <td class="text-center">
-          <a>{{purchase.lastUpdate | amDateFormat:'LL hh:mmA'}}</a>
+          <a>{{purchase.lastUpdate | amDateFormat:'DD/MM/YYYY hh:mmA'}}</a>
         </td>
 
         <td class="text-center">
-          <a>{{purchase?.total  | currency:'ARS':true:'1.2-2' }}</a>
+          <a>{{purchase?.total  | currency:'USD':true:'1.2-2' }}</a>
         </td>
 
         <td class="text-center">
@@ -170,7 +170,7 @@
         </td>
 
         <td class="text-center">
-          <a>{{purchase?.paymentAmount | currency:'ARS':true:'1.2-2'}}</a>
+          <a>{{purchase?.paymentAmount | currency:'USD':true:'1.2-2'}}</a>
         </td>
       </tr>
     </tbody>

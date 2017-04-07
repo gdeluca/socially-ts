@@ -101,7 +101,7 @@ export class BalancesComponent {
     {'key': 'Dia', 'value':'day'},
     {'key': 'Turno', 'value':'workShift'},
     {'key': 'Sucursal', 'value':'store'},
-    {'key': 'Existencia', 'value':'existence'},
+    {'key': 'Caja', 'value':'existence'},
     {'key': 'Operacion', 'value':'operation'},
     {'key': 'Facturacion', 'value':'invoicing'},
   ];
@@ -349,7 +349,7 @@ export class BalancesComponent {
  
   populateDays(month, year){
     this.daysData = this.daysInMonth(month, year);
-    this.daysSelected = [+moment().format('D')];
+    // this.daysSelected = [+moment().format('D')];
     this.daysSelected = Array.from(
         new Array(this.daysInMonthCount(month, year)),(val,index)=>index+1);
   }

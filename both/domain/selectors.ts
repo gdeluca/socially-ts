@@ -1,13 +1,18 @@
 import {Meteor} from 'meteor/meteor';
 import {check, Match} from 'meteor/check';
-import { SearchOptions } from '../../../both/domain/search-options';
-import { Filter, Filters } from '../../../both/domain/filter';
+import { SearchOptions } from './search-options';
+import { Filter, Filters } from './filter';
 import * as _ from 'underscore';
 
 
-export function getSelectorFilter(filterFields:string[] = [], filters: Filters = []) {
+export function getSelectorFilter(
+  filterFields:string[] = [], 
+  filters: Filters = [], 
+  otherFilter?: any
+) {
   check(filterFields, [String]);
   check(filters, Match.Any);
+  check(otherFilter, Match.Maybe(Match.Any));
   let selectors: any[] = [];
 
   for (let filterKey of filterFields) {
@@ -24,7 +29,15 @@ export function getSelectorFilter(filterFields:string[] = [], filters: Filters =
       }
     } 
   }
-       
+  
+  if (!_.isEmpty(otherFilter)) {
+    if (otherFilter instanceof Array) {
+      selectors = selectors.concat(otherFilter)
+    } else {
+      selectors.push(otherFilter);
+    }
+  }
+  
   let result: any = {};
   if (selectors.length > 0) {
     if (selectors.length == 1) {
@@ -33,6 +46,7 @@ export function getSelectorFilter(filterFields:string[] = [], filters: Filters =
       result["$and"] = selectors;
     }
   }
+
   return result;
 }
 

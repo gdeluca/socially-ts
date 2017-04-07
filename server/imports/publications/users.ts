@@ -3,7 +3,7 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { } from 'meteor-publish-composite';
 import {check} from 'meteor/check';
 
-import { getSelectorFilter, checkOptions } from './commons';
+import { getSelectorFilter, checkOptions } from '../../../both/domain/selectors';
 import { SearchOptions } from '../../../both/domain/search-options';
 import { Filter, Filters } from '../../../both/domain/filter';
  
@@ -24,6 +24,7 @@ Meteor.publish('users', function(
 ) {
   let selector = getSelectorFilter(userFields, filters);
   checkOptions(options);
+  
   Counts.publish(this, 'numberOfUsers', 
     Users.collection.find(selector), { noReady: true });
   return Users.collection.find(selector, options);
@@ -35,11 +36,12 @@ Meteor.publishComposite('users.stores', function(
 ) {
   let selector = getSelectorFilter(userFields, filters);
   checkOptions(options);
+  
   return {
     find: function() {
       Counts.publish(this, 'numberOfUsers',
         Users.collection.find(selector), { noReady: true });
-        options["password"] = 0;
+
       return Users.collection.find(selector, options);
     }, 
     children: [{

@@ -124,6 +124,8 @@ export class SalesComponent {
     // this.complexForm = formBuilder.group({
     //   saleState: ['', Validators.required],
     // });
+        moment.locale("es");
+
   }
 
   ngOnInit() {
@@ -150,23 +152,22 @@ export class SalesComponent {
         this.paginatedSub.unsubscribe();
       }
       this.paginatedSub = MeteorObservable.subscribe(
-        'store.sales', 
+        'balance.sales', 
         options, 
         filters,
-        this.getCurrentStoreId(),
         this.balanceNumber
       ).subscribe(() => {
         this.sales = Sales.find({}).zone();
-        this.userStores= UserStores.find({}).zone();
       });
 
       if (this.usersSub) { 
         this.usersSub.unsubscribe();
       }
       this.usersSub = MeteorObservable.subscribe(
-        'users'
+        'users.stores'
       ).subscribe(() => {
         this.users = Users.find({}).zone();
+        this.userStores= UserStores.find({}).zone();
       });
 
     });

@@ -197,7 +197,8 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
       this.selectedProductSizeBarCode,
       +this.selectedProductAmount,
       this.store._id,
-      this.sale._id
+      this.sale._id,
+      this.sale.payment
     ).subscribe(() => { 
         Bert.alert('Producto agregado', 'success', 'growl-top-right'); 
         this.selectedProductSizeBarCode = "";
@@ -230,7 +231,8 @@ export class SaleOrderComponent implements OnInit, OnDestroy {
       barCode,
       1,
       this.store._id,
-      this.sale._id
+      this.sale._id,
+      this.sale.payment
     ).subscribe(() => {
       this.quantityTracker[barCode] +=1;
     }, (error) => { 

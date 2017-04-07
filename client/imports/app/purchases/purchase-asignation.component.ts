@@ -217,7 +217,7 @@ export class PurchaseAsignationComponent implements OnInit, OnDestroy {
     }
   }
  
-  getProduct(productId:Product) {
+  getProduct(productId: string) {
     return Products.findOne({_id: productId});
   }
 

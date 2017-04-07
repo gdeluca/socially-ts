@@ -72,8 +72,12 @@
 
     </ul>
     <form class="form-inline my-2 my-lg-0" [hidden]="currentUser">
-        <a class="form-control mr-sm-2"  [routerLink]="['/login']" >Ingresar
-        <!-- <a class="btn btn-outline-success my-2 my-sm-0" [routerLink]="['/signup']">Sign up</a> -->
+      <div class="mr-2">
+        <a class="btn btn-outline-success my-2 my-sm-0" [routerLink]="['/signup']">Registrar</a>
+      </div>
+      <div class="mr-2">
+        <a class="form-control mr-sm-2"  [routerLink]="['/login']" >Ingresar</a>
+      </div>  
     </form>
     <form class="form-inline my-2 my-lg-0" [hidden]="!currentUser">
         <span>{{ user | displayName }}</span>&nbsp;&nbsp;&nbsp;

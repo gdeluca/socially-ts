@@ -151,12 +151,12 @@
 
         <!-- createdAt -->
         <td class="text-center">
-          <a>{{sale.createdAt | amDateFormat:'LL hh:mmA'}}</a>
+          <a>{{sale.createdAt | amDateFormat:'DD/MM/YYYY hh:mmA'}}</a>
         </td>
 
         <!-- lastUpdate -->
         <td class="text-center">
-          <a>{{sale.lastUpdate | amDateFormat:'LL hh:mmA'}}</a>
+          <a>{{sale.lastUpdate | amDateFormat:'DD/MM/YYYY hh:mmA'}}</a>
         </td>
 
         <!-- seller -->
@@ -171,7 +171,7 @@
 
         <!-- total -->
         <td class="text-center">
-          <a>{{ sale?.total | currency:'ARS':true:'1.2-2' }}</a>
+          <a>{{ sale?.total | currency:'USD':true:'1.2-2' }}</a>
         </td>
       </tr>
     </tbody>

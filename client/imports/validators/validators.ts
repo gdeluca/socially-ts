@@ -29,3 +29,10 @@ export function matchingPasswords(passwordKey: string, confirmPasswordKey: strin
   }
 }
 
+// not working as expected
+export function notEmptyArrayValidator(control: FormControl): {[key: string]: any} {
+  console.log(control.value.length > 0);
+ if (control.value instanceof Array && control.value.length > 0) {
+    return { invalidArray: true }
+  }
+}

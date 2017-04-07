@@ -73,7 +73,7 @@ Meteor.methods({
   
   updateSaleOrderStatus: function (
     saleId: string, 
-    newState: string
+    newState: string,
   ) {
     check(saleId, String);
     check(newState, String);
@@ -100,7 +100,8 @@ Meteor.methods({
     
     let total = 0;
     productsales.forEach(productsale => {
-      total += productsale.subTotal;
+      console.log(productsale.subTotal)
+      total += +productsale.subTotal;
     })
 
     Sales.update(saleId, {

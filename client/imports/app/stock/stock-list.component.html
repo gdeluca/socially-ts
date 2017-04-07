@@ -35,21 +35,12 @@
           (ngModelChange)="search('sectionId', selectedSection)"
           >
           <option value=undefined selected>Seccion</option>
-          <option *ngFor="let section of allSections | async" 
-          [ngValue]="section._id"
-          >{{section.name}}</option>
+          <option *ngFor="let sectionTag of allSections | async" 
+          [ngValue]="sectionTag.code"
+          >{{sectionTag.description}}</option>
         </select> 
       </div>
 
-      <div class=" ml-4 mt-4">
-        <input 
-          type="text" 
-          name="barCodeLookup" 
-          class="form-control" 
-          [(ngModel)]="selectedCode"
-          (ngModelChange)="search('barCode', selectedCode)"
-          placeholder="Buscar por Codigo">
-      </div>
     </div>
   </div>
   
@@ -57,7 +48,7 @@
     <div class="col-12 text-center">
       <pagination-controls 
         (pageChange)="onPageChanged($event)"
-        [hidden]="collectionCount < PAGESIZE" 
+        
         >
       </pagination-controls>
     </div>
@@ -72,52 +63,10 @@
           <th class="text-center">#</th>
           <th  class="text-center" *ngFor="let header of headers; let colIndex = index; ">
             {{header.key}}
-           <!--  <button 
-              [hidden]="idx !== colIndex || direction !== 'up'" 
-              type="button" 
-              class="btn btn-default" 
-              (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
-              <span class="fa fa-chevron-up" aria-hidden="true"></span>
-            </button>
-            <button 
-                [hidden]="idx !== colIndex || direction !== 'down'" 
-                type="button" 
-                class="btn btn-default"  
-                (click)="idx = colIndex; direction = 'up';changeSortOrder(1, header.value)">
-                <span class="fa fa-chevron-down" aria-hidden="true"></span>
-            </button>
-            <button 
-              [hidden]="direction && idx === colIndex " 
-              type="button" 
-              class="btn btn-default"   
-              (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, header.value)">
-              <span class="fa fa-sort" aria-hidden="true"></span>
-            </button>         -->
           </th> 
 
           <th class="text-center" *ngFor="let store of allStores | async; let colIndex = index; ">
             Stock en {{store.name}}
-           <!--  <<!-- button 
-              [hidden]="idx !== colIndex || direction !== 'up'" 
-              type="button" 
-              class="btn btn-default" 
-              (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, store.name)">
-              <span class="fa fa-chevron-up" aria-hidden="true"></span>
-            </button>
-            <button 
-                [hidden]="idx !== colIndex || direction !== 'down'" 
-                type="button" 
-                class="btn btn-default"  
-                (click)="idx = colIndex; direction = 'up';changeSortOrder(1, store.name)">
-                <span class="fa fa-chevron-down" aria-hidden="true"></span>
-            </button>
-            <button 
-              [hidden]="direction && idx === colIndex " 
-              type="button" 
-              class="btn btn-default"   
-              (click)="idx = colIndex; direction = 'down';changeSortOrder(-1, store.name)">
-              <span class="fa fa-sort" aria-hidden="true"></span>
-            </button>-->
           </th> 
         </tr>
       </thead>
@@ -125,7 +74,7 @@
 
         <!-- filter fields on table header -->
         <tr>
-        <td class="text-center"></td>
+          <td class="text-center"></td>
           <ng-container *ngFor="let header of headers; let colIndex=index; ">
             <td class="text-center">
               <input 
@@ -142,103 +91,88 @@
         </tr> 
         
         <!-- 'barCode', 'name', 'color', 'size', 'quantity', 'provider', 'cost', 'cashPayment', 'cardPayment' -->
-        <tr *ngFor="let productSize of productSizes | async; let rowIndex=index; ">
-          <ng-container *ngFor="let product of products | async; "> 
-            <ng-container *ngIf="product._id == productSize.productId ">
-              
-              <!-- action buttons for to edit stock fields -->
-              <td>
-                <button 
-                  [hidden]="currentIndex === rowIndex && editing"
-                  type="button" 
-                  class="btn btn-default" 
-                  (click)="currentIndex=rowIndex; editing=true;editedStock = copy(emptyStock)">
-                  <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
-                </button>
-                <button 
-                  [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
-                  type="button" 
-                  class="btn btn-default" 
-                  (click)="currentIndex=rowIndex; editing=false; update(editedStock)">
-                  <span class="fa fa-check-square-o" aria-hidden="true"></span>
-                </button>
-                <button 
-                  [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)" 
-                  type="button" 
-                  class="btn btn-default" 
-                  (click)="currentIndex=rowIndex; editing=false; ">
-                  <span class="fa fa-ban" aria-hidden="true"></span>
-                </button>
-              </td>
+        <tr *ngFor="let productSize of productSizes | async; let rowIndex = index; ">
+          <td>
+            <button 
+              [hidden]="currentIndex === rowIndex && editing"
+              type="button" 
+              class="btn btn-default" 
+              (click)="currentIndex=rowIndex; editing=true;editedStock = copy(emptyStock)">
+              <span class="fa fa-pencil-square-o" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
+              type="button" 
+              class="btn btn-default" 
+              (click)="currentIndex=rowIndex; editing=false; update(editedStock)">
+              <span class="fa fa-check-square-o" aria-hidden="true"></span>
+            </button>
+            <button 
+              [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)" 
+              type="button" 
+              class="btn btn-default" 
+              (click)="currentIndex=rowIndex; editing=false; ">
+              <span class="fa fa-ban" aria-hidden="true"></span>
+            </button>
+          </td>
 
-              <td class="text-center">
-                <a [routerLink]="['/products', product.code]">{{productSize.barCode}}</a>
-              </td>
-
-              <td class="text-center">
-                <a>{{product.name}}</a>
-              </td>
-
-              <td class="text-center">
-                <a>{{product.color}}</a>
-              </td>
-
-              <td class="text-center">
-                <a>{{productSize.size}}</a>
-              </td>
-
-              <td class="text-center">
-                <a>{{product.provider}}</a>
-              </td>
-
-              <ng-container *ngFor="let productPrice of productPrices | async; "> 
-                <ng-container *ngIf="product._id == productPrice.productId ">
-                  <ng-container *ngFor="let store of allStores | async; let priceIndex=index;  "> 
-                    <ng-container *ngIf="store._id == productPrice.storeId  && priceIndex == 1 ">
-                      <td class="text-center">
-                        <a>{{productPrice.cost}}</a>
-                      </td>
-
-                      <td class="text-center">
-                        <a>{{productPrice.priceCash}}</a>
-                      </td>
-
-                      <td class="text-center">
-                        <a>{{productPrice.priceCard}}</a>
-                      </td>   
-                    </ng-container>
-                  </ng-container>
-                </ng-container>
-              </ng-container>
-
-              <ng-container *ngFor="let store of allStores | async; let stockIndex=index; ">
-                <ng-container *ngFor="let stock of stocks | async;  "> 
-                  <ng-container *ngIf="  stock.storeId  ==  store._id && stock.productSizeId == productSize._id ">
-                    <td 
-                      class="text-center"
-                      [hidden]="currentIndex === rowIndex && editing">
-                       <a>{{stock.quantity}}</a>
-                    </td>
-                    <td 
-                      [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)"
-                      class="text-center">
-                      <input 
-                        type="text" 
-                        name="quantity-{{stockIndex}}-{{storeIndex}}" 
-                        class="form-control" 
-                        [value]="stock.quantity" 
-                        (input)="updateEditedStock(editedStock,stock._id,$event.target.value)">
-                    </td>
-                  </ng-container> 
-                </ng-container>    
-              </ng-container>
-            </ng-container>
-          </ng-container>
+          <td class="text-center">
+            <a>{{productSize.barCode}}</a>
+          </td>
+          <td class="text-center">
+            <a>{{getProduct(productSize.productId)?.name}}</a>
+          </td>
+          <td class="text-center">
+            <a>{{getProduct(productSize.productId)?.color}}</a>
+          </td>
+          <td class="text-center">
+            <a>{{productSize.size}}</a>
+          </td>
+          <td class="text-center">
+            <a>{{getProduct(productSize.productId)?.provider}}</a>
+          </td>
+          <td class="text-center">
+            <a>{{getProduct(productSize.productId)?.model}}</a>
+          </td>
+          <td class="text-center">
+            <a>{{getPrice(productSize.productId)?.cost | currency:'USD':true:'1.2-2'}}</a>
+          </td>
+          <td class="text-center">
+            <a>{{getPrice(productSize.productId)?.priceCash | currency:'USD':true:'1.2-2'}}</a>
+          </td>
+          <td class="text-center">
+            <a>{{getPrice(productSize.productId)?.priceCard | currency:'USD':true:'1.2-2'}}</a>
+          </td>
+          <ng-container *ngFor="let store of allStores | async; let storeIndex = index; ">
+            <td class="text-center"
+              [hidden]="currentIndex === rowIndex && editing" >
+              <a>{{getStock(productSize._id,store._id)?.quantity || 0}}</a>
+            </td>
+            <td class="text-center"
+              [hidden]="currentIndex !== rowIndex || (currentIndex === rowIndex && !editing)" >
+              <input 
+                type="text" 
+                name="quantity-{{stockIndex}}-{{storeIndex}}" 
+                class="form-control" 
+                [value]="getStock(productSize._id,store._id)?.quantity || 0" 
+                (input)="updateEditedStock(editedStock,productSize._id,store._id,$event.target.value)">
+            </td>
+           </ng-container>
         </tr>
       </tbody>
     </table>
   </div>
   
+  <div class="row">
+    <div class="col-12 text-center">
+      <pagination-controls 
+        (pageChange)="onPageChanged($event)"
+        [hidden]="collectionCount < PAGESIZE" 
+        >
+      </pagination-controls>
+    </div>
+  </div>
+
   <div class="row">
     <!-- submission form -->
     <stock-form></stock-form>

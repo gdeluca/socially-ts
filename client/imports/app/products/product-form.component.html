@@ -260,7 +260,9 @@
               type="text" 
               name="cost" 
               class="form-control" 
-              placeholder="Precio de Costo" [formControl]="complexForm.controls['cost']">
+              placeholder="Precio de Costo"
+              (ngModelChange)="populatePrices($event)"
+               [formControl]="complexForm.controls['cost']">
             <div *ngIf="complexForm.controls['cost'].hasError('required') && complexForm.controls['cost'].touched" class="alert alert-danger">
               Precio de Costo
             </div>
@@ -274,7 +276,8 @@
             <input 
               [hidden]="!adding" 
               type="text" 
-              name="cashPayment" 
+              name="cashPayment"
+              [(ngModel)]="cashPayment" 
               class="form-control" 
               placeholder="Precio efectivo" [formControl]="complexForm.controls['cashPayment']">
             <div *ngIf="complexForm.controls['cashPayment'].hasError('required') && complexForm.controls['cashPayment'].touched" class="alert alert-danger">
@@ -291,6 +294,7 @@
               [hidden]="!adding" 
               type="text" 
               name="cardPayment" 
+              [(ngModel)]="cardPayment" 
               class="form-control" 
               placeholder="Precio de Lista" [formControl]="complexForm.controls['cardPayment']">
             <div *ngIf="complexForm.controls['cardPayment'].hasError('required') && complexForm.controls['cardPayment'].touched" class="alert alert-danger">

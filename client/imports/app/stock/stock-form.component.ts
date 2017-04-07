@@ -66,7 +66,9 @@ export class StockFormComponent implements OnInit, OnDestroy {
     }
     this.sectionsSub = MeteorObservable.subscribe('tags.section')
       .subscribe(() => {
-        this.allSections = Tags.find({}).zone();
+        this.allSections = Tags.find(
+          { $and: [ {type: 'section'}, {code: { $ne: '00' }}]}
+        ).zone();
     });
 
     if (this.categoriesSub) {

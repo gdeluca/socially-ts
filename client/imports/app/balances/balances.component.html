@@ -12,7 +12,8 @@
           type="button" 
           class="form-control btn btn-primary ml-2" 
           (click)="openBalance()"
-          [hidden]="getCurrentBalanceNumber() > 0 && getCurrentBalanceStatus() == 'OPEN'"
+          [hidden]="getCurrentBalanceNumber() > 0 
+          && getCurrentBalanceStatus() == 'OPEN'"
           >
             Abrir balance
         </button>
@@ -20,7 +21,8 @@
           type="button" 
           class="form-control btn btn-primary ml-2" 
           (click)="closeBalance()"
-          [hidden]="getCurrentBalanceNumber() < 0 || getCurrentBalanceStatus() == 'CLOSED'"
+          [hidden]="getCurrentBalanceNumber() < 0 
+          || getCurrentBalanceStatus() == 'CLOSED'"
           >
             Cerrar balance
         </button>
@@ -114,6 +116,8 @@
           </label>
         </div>
       </div>
+
+      <!-- TODO: show only if logggedin in global mode -->
       <div class=" ml-4 mt-4">
         <multi-dropdown 
           [options]="storesData"
@@ -170,17 +174,17 @@
       <tbody>
         <!-- 'balanceNumber', 'year', 'month', 'day', 'workShift', 'store', 'existence', 'operation', 'invoicing'  -->
         <tr *ngFor="let balance of balances | async; let rowIndex=index; ">
-          <ng-container *ngFor="let sale of sales | async; "> 
+          <!-- <ng-container *ngFor="let sale of sales | async; ">  -->
             <!-- balance {{balance.balanceNumber}} -->
-            <ng-container *ngIf="balance._id == sale.balanceId ">
+            <!-- <ng-container *ngIf="balance._id == sale.balanceId "> -->
               <!-- sale {{sale.saleNumber}} -->
-              <ng-container *ngFor="let userStore of userStores | async; "> 
-                <ng-container *ngIf="userStore._id == sale.userStoreId ">
+              <!-- <ng-container *ngFor="let userStore of userStores | async; ">  -->
+                <!-- <ng-container *ngIf="userStore._id == sale.userStoreId "> -->
                     <!-- userstore {{userStore._id}} -->
                   <ng-container *ngFor="let store of stores | async;  "> 
-                    <ng-container *ngIf="store._id == userStore.storeId && getCurrentStoreId() == store._id">
+                    <ng-container *ngIf="getCurrentStoreId() == store._id">
                       <ng-container *ngIf="balance.storeId == store._id ">
-                       <!-- store  {{store._id}} -->                
+                       <!-- store  {{store._id}}                 -->
                         <td class="text-center">
                           <a [routerLink]="['/balances', balance.balanceNumber]">
                           {{ balance.balanceNumber | leadingZeros:7 }}
@@ -208,7 +212,7 @@
                         </td>
 
                         <td class="text-center">
-                          <a>{{balance.cashExistence}}</a>
+                          <a>{{balance.cashExistence | currency:'USD':true:'1.2-2'}}</a>
                         </td>
 
                         <td class="text-center">
@@ -216,15 +220,15 @@
                         </td>
 
                         <td class="text-center">
-                          <a>{{calculateInvoicing()}}</a>
+                          <a>{{calculateInvoicing() | currency:'USD':true:'1.2-2'}}</a>
                         </td>
                       </ng-container>
                     </ng-container>
                   </ng-container>
-                </ng-container>
-              </ng-container>
-            </ng-container>
-          </ng-container>
+                <!-- </ng-container> -->
+              <!-- </ng-container> -->
+            <!-- </ng-container> -->
+          <!-- </ng-container> -->
         </tr>
       </tbody>
     </table>

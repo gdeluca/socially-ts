@@ -199,7 +199,7 @@
                       </td>
 
                       <td class="text-center">
-                          <a>{{calculateSubTotal(productSize.barCode, productPrice) | currency:'ARS':true:'1.2-2' }}</a>
+                          <a>{{calculateSubTotal(productSize.barCode, productPrice) | currency:'USD':true:'1.2-2' }}</a>
                       </td>
 
                       <td class="text-center">
@@ -223,7 +223,7 @@
   <div class="card-footer">
     <div class="row">
       <div class="col-2">
-        <h4>Total:{{getTotal() | currency:'ARS':true:'1.2-2' }}</h4>
+        <h4>Total:{{getTotal() | currency:'USD':true:'1.2-2' }}</h4>
       </div>        
       <div class="col span2">
         <a class="btn btn-block btn-primary" 

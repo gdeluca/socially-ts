@@ -32,8 +32,10 @@ import { User } from '../../../../both/models/user.model';
 
 // domain
 import { emailValidator, matchingPasswords } from '../../validators/validators';
+import { IMultiSelectOption, IMultiSelectTexts, IMultiSelectSettings } from '../../modules/multiselect';
 import { Dictionary } from '../../../../both/domain/dictionary';
 import { Filter, Filters } from '../../../../both/domain/filter';
+
 import * as _ from 'underscore';
 import { Bert } from 'meteor/themeteorchef:bert';
 
@@ -57,13 +59,16 @@ export class UsersComponent implements OnInit, OnDestroy {
   filters: Subject<Filters> = new Subject<Filters>();
 
   filtersParams: Filters = [
+    {key: 'username', value:''},
     {key: 'email', value:''},
+    {key: 'role', value:''},
   ];
 
   // name, sortfield, touple
   headers: Dictionary[] = [
     {'key': 'Nombre de Usuario', 'value':'username'},
     {'key': 'Email', 'value':'email'},
+    {'key': 'Persmisos', 'value':'role'},
     {'key': 'Sucursal', 'value':'storeIds'},
   ];
 
@@ -78,31 +83,59 @@ export class UsersComponent implements OnInit, OnDestroy {
   currentUser: Meteor.User;
   
   users: Observable<User[]>; // users from the collection related to current page
-  paginatedStores: Observable<Store[]>; // stores related to current page of users
-  paginatedUserStores: Observable<UserStore[]>; // stores related to current page of users
+  stores: Observable<Store[]>; // stores related to current page of users
+  userStores: Observable<UserStore[]>; // stores related to current page of users
   
-  editedUser: any = {username:'', email:'',_id:'', storeIds:[]};
-  stores: Observable<Store[]>; // all the stores from the collection
+  editedUser: any = {username:'', email:'', _id:'', role:'', stores:[]};
+  allStores: Observable<Store[]>; // all the stores from the collection
   
   selectedStores: Store[]; // selected store from save form 
-  selectedRole: string = '';
+  selectedRole: string;
+  storesSelected: number[] = []; // Default selection
+  
+  storesData: IMultiSelectOption[] = [];
 
-  complexForm : FormGroup;
+  populateStoresDropdownData(){
+    let result = [];
+    let index = 0;
+    this.stores
+      .flatMap(function(stores) { return stores })
+      .distinct()
+      .subscribe((store) => {
+        result.push({id: store['_id'], name: store['name'] }); 
+      });
+      
+    return result;
+  }
+
+  commonTexts: IMultiSelectTexts = {
+      checkAll: 'Todos',
+      uncheckAll: 'Ninguno',
+      checked: 'Selecionado',
+      checkedPlural: 'Seleccionados',
+      searchPlaceholder: 'Buscar...',
+      defaultTitle: 'Sin seleccion',
+      allSelected: 'Todos Selecionados',
+  };
+
+  multiSettingsWithChecks: IMultiSelectSettings = {
+      pullRight: false,
+      enableSearch: false,
+      checkedStyle: 'fontawesome',
+      buttonClasses: 'btn btn-default btn-secondary',
+      selectionLimit: 0,
+      autoUnselect: false,
+      closeOnSelect: false,
+      showCheckAll: false,
+      showUncheckAll: false,
+      dynamicTitleMaxItems: 10,
+      maxHeight: '300px',
+  };
 
   constructor(
     private zone: NgZone, 
     private paginationService: PaginationService, 
-    private formBuilder: FormBuilder,
-  ){
-    this.complexForm = formBuilder.group({
-      username: ["", Validators.required],
-      email: ['', Validators.compose([Validators.required,  emailValidator])],
-      password: ["", Validators.required],
-      confirmPassword: ['', Validators.required],
-      store: ["", Validators.required]
-      }, {validator: matchingPasswords('password', 'confirmPassword')
-    });
-  }
+  ){ }
 
   ngOnInit() {
     this.optionsSub = Observable.combineLatest(
@@ -130,8 +163,8 @@ export class UsersComponent implements OnInit, OnDestroy {
         filters
       ).subscribe(() => {
         this.users = Users.find({}).zone();
-        this.paginatedStores = Stores.find({}).zone();
-        this.paginatedUserStores = UserStores.find({}).zone();
+        this.stores = Stores.find({}).zone();
+        this.userStores = UserStores.find({}).zone();
       });
     });
 
@@ -176,11 +209,12 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.curPage.next(page);
   }
  
-  copy(original: User){
+  copy(user: User){
     this.editedUser = {
-      username: original.username, 
-      email: original.emails[0].address,
-      _id:original._id
+      username: user.username, 
+      email: user.emails[0].address,
+      role: user['roles']['default-group'][0],
+      _id:user._id
     };
 
     return this.editedUser;
@@ -213,7 +247,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   updateUser = function(user){
     MeteorObservable.call(
-      'addUser', 
+      'updateUser', 
       user._id,
       user.username,
       user.storeIds
@@ -223,30 +257,6 @@ export class UsersComponent implements OnInit, OnDestroy {
     }, (error) => { 
       Bert.alert('Fallo al actualizar el usuario: ' + error, 'danger', 'growl-top-right'); 
     })
-  }
-
-  saveUser() {
-    if (!Meteor.userId()) {
-      alert('Ingrese al sistema para realizar cambios');
-      return;
-    }
-
-    if (this.complexForm.valid) {
-      let values = this.complexForm.value;
-      MeteorObservable.call(
-        'addUser', 
-        values.email,
-        values.username,
-        values.password,
-        this.selectedStores,
-        this.selectedRole
-      ).subscribe(() => { 
-        Bert.alert('Usuario Creado', 'success', 'growl-top-right'); 
-        this.complexForm.reset();
-      }, (error) => { 
-        Bert.alert('Fallo al crear el usuario: ' + error, 'danger', 'growl-top-right'); 
-      })
-    }
   }
 
 }

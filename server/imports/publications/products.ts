@@ -3,7 +3,7 @@ import { Counts } from 'meteor/tmeasday:publish-counts';
 import { } from 'meteor-publish-composite';
 import {check} from 'meteor/check';
 
-import { getSelectorFilter, checkOptions } from './commons';
+import { getSelectorFilter, checkOptions } from '../../../both/domain/selectors';
 import { SearchOptions } from '../../../both/domain/search-options';
 import { Filter, Filters } from '../../../both/domain/filter';
 
@@ -66,7 +66,7 @@ Meteor.publishComposite('products.categories', function(
         find: function(product) {
           let selector: any = {};
           selector["$and"] = [];
-          selector["$and"].push({ _id: product._id });
+          selector["$and"].push({ _id: product.categoryId });
           selector["$and"].push(categoryFilter);
           return Categories.collection.find(selector)
         }

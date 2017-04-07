@@ -22,16 +22,16 @@ Meteor.methods({
     email: string, 
     username: string,
     password: string,
-    storeIds: string[],
-    rol: string
+    role: string,
+    storeIds: string[]
   ) {
     if (Meteor.isServer) {
       check(email, String);
       check(username, String);
       check(password, String);
+      check(role, String);
       check(storeIds, [String]);
-      check(rol, String);
-      if (_.indexOf(roles, rol) == -1 ) {
+      if (_.indexOf(roles, role) == -1 ) {
         throw new Meteor.Error('400', 'Rol Invalido');
       }
 
@@ -40,28 +40,33 @@ Meteor.methods({
         throw new Meteor.Error('400', 'El usuario ya existe');
       }
 
-      let userId = Accounts.createUser(
-        {
-          email: email,
+      try {
+        let userId = Accounts.createUser({
           username: username,
           password: password,
-          profile: { name: username }
-        }, 
-        function(error, result) {
-          if (error) {
-            throw new Meteor.Error('400', 'Fallo al crear el usuario: ', error);
-          } else {
-            storeIds.forEach(storeId => {
-              UserStores.collection.insert(
-                {
-                  userId: userId, 
-                  storeId: storeId
-                })
-            });
-            Roles.addUsersToRoles(userId, rol, 'default-group');
+          email: email,
+          profile: {
+            name: username
+            //lastname: doc.lastname,
+            //contact:doc.phoneNumber,
+            //bdat:doc.bod,
+            //address:doc.address
           }
-        }
-      )
+        });
+
+        storeIds.forEach(storeId => {
+          UserStores.collection.insert(
+            {
+              userId: userId, 
+              storeId: storeId
+            })
+        });
+        Roles.addUsersToRoles(userId, role, 'default-group');
+
+      } catch(err) {
+        throw new Meteor.Error('400', 'Fallo al crear el usuario: ', err);
+      }
+
     }
   },
 
@@ -70,10 +75,10 @@ Meteor.methods({
     username: string,
     newStoreIds: string[] = []
   ) {
-    check(userId, String);
-    check(username, String);
-    check(newStoreIds, Match.Maybe([String]));
     if (Meteor.isServer) {
+      check(userId, String);
+      check(username, String);
+      check(newStoreIds, Match.Maybe([String]));
       let user = Users.findOne({_id: userId});
       if (user) {
         throw new Meteor.Error('400', 'Usuario inexistente');

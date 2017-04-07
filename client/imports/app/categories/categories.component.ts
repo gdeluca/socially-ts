@@ -129,7 +129,9 @@ export class CategoriesComponent implements OnInit, OnDestroy {
     }
     this.sectionsSub = MeteorObservable.subscribe('tags.section')
       .subscribe(() => {
-        this.sections = Tags.find({}).zone();
+        this.sections = Tags.find(
+          { $and: [ {type: 'section'}, {code: { $ne: '00' }}]}
+        ).zone();
     });
     
     this.paginationService.register({

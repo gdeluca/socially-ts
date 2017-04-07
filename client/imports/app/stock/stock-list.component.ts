@@ -40,7 +40,9 @@ import { Tag } from '../../../../both/models/tag.model';
 // domain
 import { Dictionary } from '../../../../both/domain/dictionary';
 import { Filter, Filters } from '../../../../both/domain/filter';
-import * as _ from 'underscore';
+import { getSelectorFilter, checkOptions } from '../../../../both/domain/selectors';
+
+import * as _ from 'underscore'; 
 import { isNumeric } from '../../validators/validators';
 import { Bert } from 'meteor/themeteorchef:bert';
 
@@ -68,6 +70,7 @@ export class StockListComponent implements OnInit, OnDestroy {
     {key: 'color', value:''},
     {key: 'size', value:''},
     {key: 'provider', value:''},
+    {key: 'model', value:''},    
     {key: 'cost', value:''},
     {key: 'cashPayment', value:''},
     {key: 'cardPayment', value:''},
@@ -82,6 +85,7 @@ export class StockListComponent implements OnInit, OnDestroy {
     {'key': 'Color', 'value':'color'},
     {'key': 'Talle', 'value':'size'},
     {'key': 'Proveedor', 'value':'provider'},
+    {'key': 'Modelo', 'value':'model'},
     {'key': 'Costo', 'value':'cost'},
     {'key': 'Contado', 'value':'cashPayment'},
     {'key': 'Tarjeta', 'value':'cardPayment'},
@@ -95,7 +99,13 @@ export class StockListComponent implements OnInit, OnDestroy {
   autorunSub: Subscription;
   categoriesSub: Subscription;
   sectionsSub: Subscription;
+  
   storesSub: Subscription;
+  // stockSub: Subscription;
+  // productSub: Subscription;
+  // productPriceSub: Subscription;
+  // productSizeSub: Subscription;
+  // categorySub: Subscription;
 
   currentUser: Meteor.User;
   emptyStock: any = 
@@ -105,7 +115,7 @@ export class StockListComponent implements OnInit, OnDestroy {
       color:'', 
       size:'', 
       provider:'', 
-      quantity:[{stockId:'', storeId:'', quantity:'', priceCash:'', priceCard:'', cost:''}]
+      quantity:[{productSizeId:'', storeId:'', quantity:''}]
     };
 
   editedStock: any;
@@ -126,7 +136,7 @@ export class StockListComponent implements OnInit, OnDestroy {
     private paginationService: PaginationService, 
   ){ }
  
-   ngOnInit() {
+  ngOnInit() {
     this.optionsSub = Observable.combineLatest(
       this.pageSize,
       this.curPage,
@@ -147,18 +157,135 @@ export class StockListComponent implements OnInit, OnDestroy {
       if (this.paginatedSub) {
         this.paginatedSub.unsubscribe();
       }
+
+      // this.categorySub = MeteorObservable.subscribe(
+      //   'categories.test',
+      //   filters,
+      //   ['sectionId']
+      // ).subscribe(() => {
+
+      //   this.categories = Categories.find().zone();
+      //   let categoryIds = _.pluck(Categories.find().fetch(), '_id');
+      //   this.productSub = MeteorObservable.subscribe(
+      //     'products.test',
+      //     filters,
+      //     ['code','name','color','provider','categoryId'],
+      //     {categoryId: {$in: categoryIds }}
+      //   ).subscribe(() => {
+
+      //     this.products = Products.find().zone();
+      //     let productIds = _.pluck(Products.find().fetch(), '_id');
+      //     this.storesSub = MeteorObservable.subscribe(
+      //       'stores.test',
+      //       filters,
+      //       []
+      //     ).subscribe(() => {
+
+      //       this.stores = Stores.find().zone();
+      //       let storeIds = _.pluck(Stores.find().fetch(), '_id');
+      //       this.productPriceSub = MeteorObservable.subscribe(
+      //         'productprices.test',
+      //         filters,
+      //         [],
+      //         [
+      //           {storeId: {$in: storeIds }},
+      //           {productId: {$in: productIds }}
+      //         ]
+      //       ).subscribe(() => {
+
+      //         this.productPrices = ProductPrices.find().zone();
+      //         this.productSizeSub = MeteorObservable.subscribe(
+      //           'productsizes.test',
+      //           options,
+      //           filters,
+      //           ['barCode','size'],
+      //           [
+      //             {productId: {$in: productIds }}
+      //           ]
+      //         ).subscribe(() => {
+
+      //           this.productSizes = ProductSizes.find().zone();
+      //           let productSizeIds = _.pluck(ProductSizes.find().fetch(), '_id');
+      //           this.stockSub = MeteorObservable.subscribe(
+      //             'stocks.test',
+      //             filters,
+      //             [],
+      //             [ 
+      //               {productSizeId: {$in:  productSizeIds }},
+      //               {storeId: {$in: storeIds }},
+      //               {active: true }
+      //             ]
+      //           ).subscribe(() => {
+
+      //             this.stocks = Stocks.find().zone();
+      //           })
+      //         })
+      //       })
+      //     })
+      //   })
+      // })
+
+      // this.storesSub = MeteorObservable.subscribe(
+      //   'stores.test',
+      //   filters,
+      // this.productSub = MeteorObservable.subscribe(
+      //   'products.test',
+      //   filters,
+      //   ['code','name','color','provider','categoryId']
+      // ).subscribe(() => {
+      // this.productSizeSub = MeteorObservable.subscribe(
+      //   'productsizes.test',
+      //   options,
+      //   filters,
+      //   ['barCode','size']
+      // ).subscribe(() => {
+      //   this.productSizes = ProductSizes.find().zone();
+      //   this.stocksSub = MeteorObservable.subscribe(
+      //   'stocks.test',
+      //   filters,
+      //   [],
+      //   _.pluck(ProductSizes.find().fetch(), '_id'),
+      //   ).subscribe(() => {
+      //     [ 
+      //       {productSizeId: {$in:  _.pluck(ProductSizes.find().fetch(), '_id') }},
+      //       {storeId: {$in:  _.pluck(Stores.find().fetch(), '_id') }},
+      //       {active: true }
+      //     ]
+      //     this.stocks = Stocks.find().zone();
+      //   })
+
+      // })
+
       this.paginatedSub = MeteorObservable.subscribe(
-        'productsize-stock', 
+        'productsize.stock', 
         options, 
         filters
       ).subscribe(() => {
-        this.productSizes = ProductSizes.find({}).zone();
+        this.productSizes = ProductSizes.find().zone();
         this.stocks = Stocks.find({}).zone();
         this.stores = Stores.find({}).zone();
         this.products = Products.find({}).zone();
         this.productPrices = ProductPrices.find({}).zone();
-      });
 
+        if (this.storesSub) {
+          this.storesSub.unsubscribe();
+        } 
+        this.storesSub = MeteorObservable.subscribe('stores')
+          .subscribe(() => {
+            this.allStores = Stores.find({}).zone();
+        });
+
+        // this.stockSub = MeteorObservable.subscribe(
+        //   'product.stocks',
+        //   _.pluck(ProductSizes.find().fetch(), '_id'),
+        //   _.pluck(Stores.find().fetch(), '_id')
+        // ).subscribe(() => { 
+        //   this.stocks = Stocks.find({}).zone(); 
+        // console.log('finish local process');
+ 
+        // }) 
+
+      });
     });
 
     if (this.sectionsSub) {
@@ -167,16 +294,12 @@ export class StockListComponent implements OnInit, OnDestroy {
     this.sectionsSub = MeteorObservable.subscribe(
       'tags.section'
     ).subscribe(() => {
-      this.allSections = Tags.find({}).zone();
+      this.allSections = Tags.find(
+        { $and: [ {type: 'section'}, {code: { $ne: '00' }}]}
+      ).zone();
     });
 
-    if (this.storesSub) {
-      this.storesSub.unsubscribe();
-    } 
-    this.storesSub = MeteorObservable.subscribe('stores')
-      .subscribe(() => {
-        this.allStores = Stores.find({}).zone();
-    });
+    
 
     if (this.categoriesSub) {
       this.categoriesSub.unsubscribe();
@@ -188,7 +311,8 @@ export class StockListComponent implements OnInit, OnDestroy {
 
     this.autorunSub = MeteorObservable.autorun().subscribe(() => {
       this.collectionCount = Counts.get('numberOfProductSizes');
-      this.paginationService.setTotalItems(this.paginationService.defaultId(), this.collectionCount);
+      this.paginationService.setTotalItems(
+        this.paginationService.defaultId(), this.collectionCount);
     });
 
     this.paginationService.register({
@@ -205,48 +329,90 @@ export class StockListComponent implements OnInit, OnDestroy {
     this.filters.next(this.filtersParams);
   }
   
+  // function getIds(entity, filter){        
+  //   let currentIds=[];
+  //   entity.find(filter).mergeMap(a => {
+  //         return a.map(b => {
+  //           return b._id})}).subscribe(res => {currentIds.push(res)});
+  //   return currentIds;
+  // }
+
   ngOnDestroy() {
     this.paginatedSub.unsubscribe();
     this.optionsSub.unsubscribe(); 
     this.autorunSub.unsubscribe();
     this.sectionsSub.unsubscribe();
     this.categoriesSub.unsubscribe();
+     
     this.storesSub.unsubscribe();
+    // this.stockSub.unsubscribe();
+    // this.productSub.unsubscribe();
+    // this.productPriceSub.unsubscribe();
+    // this.productSizeSub.unsubscribe();
+    // this.categorySub.unsubscribe();
+
+   
   } 
 
   onPageChanged(page: number): void {
     this.curPage.next(page);
   }
 
-  /* save values to database */
-  update = function(editedStock){
-    for (let stock of editedStock.quantity) {
-      if (stock.quantity && stock.stockId) {
-        Stocks.update(stock.stockId, {
-          $set: { 
-            quantity: stock.quantity,
-          }
-        });
-      }
-      // do something
-    }
+  getProduct(productId) {
+    return Products.findOne({_id: productId});
+  }
 
-    // clean after add
-    editedStock = this.copy(this.emptyStock);
+  getPrice(productId) {
+    return ProductPrices.findOne({productId: productId});
+  }
+
+  getStock(productSizeId, storeId) {
+    return Stocks.findOne({
+      productSizeId: productSizeId, 
+      storeId: storeId,
+      active:true
+    });
+  }
+
+  update = function(editedStock){
+    for (let edited of editedStock.quantity) {
+      if (edited.quantity && 
+        edited.storeId && 
+        edited.productSizeId) {
+
+        //TODO: low priority, change to a bulk operation, its OK if 2 o 3 stores
+        MeteorObservable.call('upsertStock', 
+          edited.productSizeId, 
+          edited.storeId,
+          +edited.quantity
+        ).subscribe(
+          (productSizeIds) => {
+        Bert.alert('Stock actualizado: ', 'success', 'growl-top-right' ); 
+        }, (error) => {
+          Bert.alert('Error al guardar e stock: ' +  error, 'danger', 'growl-top-right' ); 
+        });
+
+      } 
+    }
+    this.editedStock = this.copy(this.emptyStock);
   }
 
   copy(original: any){
     return Object.assign({}, original)
   }
 
-  updateEditedStock(editedStock: any, id: string, quantity: number) {
+  updateEditedStock(
+    editedStock: any, 
+    productSizeId: string,
+    storeId: string, 
+    quantity: number
+  ) {
     if (quantity) {
-      editedStock.quantity.push(
-        {
-          stockId: id, 
-          quantity: quantity,
-        }
-      );
+      editedStock.quantity.push({
+        storeId: storeId,
+        productSizeId: productSizeId,
+        quantity: quantity
+      });
     }
   }
 
@@ -269,9 +435,9 @@ export class StockListComponent implements OnInit, OnDestroy {
       }
 
       filter.value = value.toUpperCase();
-
       this.curPage.next(1);
       this.filters.next(this.filtersParams);
+      console.log(this.filtersParams);
     }
   }
 

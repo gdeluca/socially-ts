@@ -39,31 +39,32 @@ Meteor.methods({
   findCurrentStoreBalance: function(
     storeId: string
   ): Balance {
-    check(storeId, String);
-    //find if balance number if for current date and storeId
-    // ensure only 1 balance X day X store
-    let today = moment().startOf('day');
-    let tomorrow = moment(today).add(1, 'days');
     if (Meteor.isServer)  {
-      let todayBalance = Balances.findOne(
-      {
-        createdAt: {
-          $gte: today.toDate(),
-          $lt: tomorrow.toDate()
-        },
-        storeId: storeId
-      });
-      return todayBalance;
+      check(storeId, String);
+      //find if balance number if for current date and storeId
+      // ensure only 1 balance X day X store
+      let today = moment().startOf('day');
+      let tomorrow = moment(today).add(1, 'days');
+      if (Meteor.isServer)  {
+        let todayBalance = Balances.findOne(
+        {
+          createdAt: {
+            $gte: today.toDate(),
+            $lt: tomorrow.toDate()
+          },
+          storeId: storeId
+        });
+        return todayBalance;
+      }
     }
   },
 
   openBalance: function (
     storeId: string,
   ) {
-    check(storeId, String);
-    let result = undefined;
-
     if (Meteor.isServer)  {
+      check(storeId, String);
+      let result = undefined;
 
       let todayBalance = Meteor.call("findCurrentStoreBalance",storeId)
       if (todayBalance) { // if balance found
@@ -108,8 +109,8 @@ Meteor.methods({
           }
         ); 
       }
+      return result; 
     }
-    return result; 
   },
 
   closeBalance: function (

@@ -9,14 +9,21 @@ export const uniqueSize = {'UNICO':'699'};
 
 export function getMappingSize(size: string){
   if (size) {
-    if (lettersSizes[size.toUpperCase()]) {
-      return lettersSizes[size.toUpperCase()];
-    } else if (isNaN(+size)) { 
-      return "talle-invalido";
-    } else {
+    if (!isNaN(+size)) {  // if is numeric
+      if (size.length > 3) {
+        size = size.substring(0,3);
+      }
       return Array(3-size.length).join("0")+""+size; 
+    } else {
+      size = size.toUpperCase();
+      if (lettersSizes[size]) {
+        return lettersSizes[size];
+      } else if (uniqueSize[size]) {
+        return uniqueSize[size];
+      }
     }
   }
+  return "talle-invalido";
 }
 
 ProductSizes.allow({
